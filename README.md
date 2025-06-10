@@ -1,0 +1,3 @@
+# Candela
+
+Regex highlighter tool
