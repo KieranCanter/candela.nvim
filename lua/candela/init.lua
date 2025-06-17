@@ -10,10 +10,15 @@
 --    * Change color
 --    * Toggle highlighting
 --    * Toggle pattern showing up in lightbox
+--  * Syntax highlighting option true or false
+--  * Lightbox
+--    * separate buffer/window for only "lightbox" true patterns
 --]]
 
 local CandelaUi = require("candela.ui")
 local CandelaPattern = require("candela.pattern")
+local CandelaConfig = require("candela.config")
+local CandelaCommands = require("candela.commands")
 
 ---@class Candela
 ---@field ui CandelaUi
@@ -24,21 +29,18 @@ Candela.__index = Candela
 
 ---@return Candela
 function Candela:new()
-    -- local config = Config.get_default_config()
-
-    local candela = setmetatable({
-        -- config = config,
-        ui = CandelaUi:new(),
-        patterns = {},
-    }, self)
+    local candela = setmetatable({}, Candela)
+    -- TODO: candela.config = Config.get_default_config(),
+    -- TODO: candela.commands = CandelaCommands.setup(),
+    candela.ui = CandelaUi:new()
+    candela.patterns = {}
 
     return candela
 end
 
 function Candela.setup(opts)
+    local candela = Candela:new()
     vim.api.nvim_create_user_command("Candela", function()
-        local Candela = require("candela")
-        local candela = Candela:new()
         candela.ui:toggle()
     end, {})
 end
