@@ -16,7 +16,7 @@
 --]]
 
 local CandelaUi = require("candela.ui")
-local CandelaPattern = require("candela.pattern")
+local CandelaPatternList = require("candela.pattern_list")
 local CandelaConfig = require("candela.config")
 local CandelaCommands = require("candela.commands")
 
@@ -25,17 +25,15 @@ local CandelaCommands = require("candela.commands")
 ---@field patterns CandelaPattern[]
 
 local Candela = {}
-Candela.__index = Candela
 
 ---@return Candela
 function Candela:new()
-    local candela = setmetatable({}, Candela)
-    -- TODO: candela.config = Config.get_default_config(),
-    -- TODO: candela.commands = CandelaCommands.setup(),
-    candela.ui = CandelaUi:new()
-    candela.patterns = {}
+    -- TODO: self.config = Config.get_default_config(),
+    -- TODO: self.commands = CandelaCommands.setup(),
+    self.ui = CandelaUi:setup()
+    self.patterns = {}
 
-    return candela
+    return self
 end
 
 function Candela.setup(opts)

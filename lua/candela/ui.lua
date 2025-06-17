@@ -13,31 +13,29 @@
 ---@field highlight_win number
 ---@field lightbox_win number
 ---@field prompt_win number
----@field win_configs table<string, vim.api.keyset.win_config[]>
+---@field win_configs table<string, vim.api.keyset.win_config>
 
 local CandelaUi = {}
-CandelaUi.__index = CandelaUi
 
 ---@return CandelaUi
-function CandelaUi:new()
-    local ui = setmetatable({}, CandelaUi)
-    ui.patterns_buf = nil
-    ui.colors_buf = nil
-    ui.regex_buf = nil
-    ui.highlight_buf = nil
-    ui.lightbox_buf = nil
-    ui.prompt_buf = nil
-    ui.patterns_win = nil
-    ui.colors_win = nil
-    ui.regex_win = nil
-    ui.highlight_win = nil
-    ui.lightbox_win = nil
-    ui.prompt_win = nil
+function CandelaUi:setup()
+    self.patterns_buf = nil
+    self.colors_buf = nil
+    self.regex_buf = nil
+    self.highlight_buf = nil
+    self.lightbox_buf = nil
+    self.prompt_buf = nil
+    self.patterns_win = nil
+    self.colors_win = nil
+    self.regex_win = nil
+    self.highlight_win = nil
+    self.lightbox_win = nil
+    self.prompt_win = nil
 
-    local initial_height = 9
-    ui.win_configs = CandelaUi:create_window_configurations(initial_height)
+    local initial_height = 9 -- reasonable starting height TODO: make as a config option?
+    self.win_configs = self:create_window_configurations(initial_height)
 
-    return ui
+    return self
 end
 
 function CandelaUi:create_window_configurations(initial_height)
