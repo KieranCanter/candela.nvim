@@ -1,4 +1,4 @@
--- Module for defining a pattern object for Candela to work with
+-- Module for defining a single pattern
 
 ---@class CandelaPattern
 ---@field color string
@@ -7,21 +7,43 @@
 ---@field lightbox boolean
 
 local CandelaPattern = {}
-CandelaPattern.__index = CandelaPattern
 
----@param col string
----@param reg string
----@param hl boolean
----@param lb boolean
+---@param col string: color
+---@param reg string: regex
+---@param hl boolean: enable highlight
+---@param lb boolean: enable lightbox
 ---@return CandelaPattern
 function CandelaPattern:new(col, reg, hl, lb)
-    local pattern = setmetatable({}, CandelaPattern)
-    pattern.color = col
-    pattern.regex = reg
-    pattern.highlight = hl
-    pattern.lightbox = lb
+    self.color = col
+    self.regex = reg
+    self.highlight = hl
+    self.lightbox = lb
 
-    return pattern
+    return self
+end
+
+---@param new_color string
+function CandelaPattern:change_color(new_color)
+    if _is_valid_color(new_color) then
+        self.color = new_color
+    else
+        -- TODO: notify error or something
+    end
+end
+
+---@param color string
+---@return boolean
+function _is_valid_color(color)
+    -- TODO: check format of color string
+    return true
+end
+
+function CandelaPattern:toggle_highlight()
+    self.highlight = not self.highlight
+end
+
+function CandelaPattern:toggle_lightbox()
+    self.lightbox = not self.lightbox
 end
 
 return CandelaPattern
