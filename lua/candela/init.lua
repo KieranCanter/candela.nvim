@@ -15,7 +15,7 @@
 --    * separate buffer/window for only "lightbox" true patterns
 --]]
 
-local CandelaUi = require("candela.ui")
+local CandelaUi = require("candela.ui"):setup()
 local CandelaPatternList = require("candela.pattern_list")
 local CandelaConfig = require("candela.config")
 local CandelaCommands = require("candela.commands")
@@ -31,16 +31,49 @@ function Candela:new()
     -- TODO: self.config = Config.get_default_config(),
     -- TODO: self.commands = CandelaCommands.setup(),
     self.ui = CandelaUi:setup()
-    self.patterns = {}
+    self.patterns = CandelaPatternList
 
     return self
 end
 
 function Candela.setup(opts)
     local candela = Candela:new()
-    vim.api.nvim_create_user_command("Candela", function()
-        candela.ui:toggle()
-    end, {})
+    vim.api.nvim_create_user_command("Candela", function(opts)
+        local args = opts.fargs
+        local subcommand = args[1]
+        local tail = table.concat(vim.list_slice(args, 2), " ")
+
+        if subcommand == "" or subcommand == nil then
+            candela.ui:toggle()
+        elseif subcommand == "add" then
+            candela.ui:display_prompt_window("add")
+        elseif subcommand == "edit" then
+            candela.ui:display_prompt_window("edit")
+        elseif subcommand == "newfrom" then
+            candela.ui:display_prompt_window("newfrom")
+        --[[
+        elseif subcommand == "remove" then
+            require("candela").remove(tail)
+        elseif subcommand == "clear" then
+            require("candela").clear()
+        --]]
+        else
+            vim.notify("Candela: unsupported command: " .. subcommand, vim.log.levels.ERROR)
+        end
+    end, {
+        nargs = "?",
+        desc = "Regex highlighter",
+        complete = function(_, line)
+            local completions = { "add"--[[, "clear", "remove"]] }
+            local split = vim.split(line, " ")
+            if #split == 2 then
+                return vim.tbl_filter(function(c)
+                    return vim.startswith(c, split[2])
+                end, completions)
+            end
+            return {}
+        end,
+    })
 end
 
 --[[

@@ -1,23 +1,23 @@
 -- Module for defining a single pattern
 
 ---@class CandelaPattern
----@field color string
 ---@field regex string
+---@field color string
 ---@field highlight boolean
 ---@field lightbox boolean
 
 local CandelaPattern = {}
 
----@param col string: color
----@param reg string: regex
----@param hl boolean: enable highlight
----@param lb boolean: enable lightbox
+---@param regex string:
+---@param color string:
+---@param highlight boolean:
+---@param lightbox boolean:
 ---@return CandelaPattern
-function CandelaPattern:new(col, reg, hl, lb)
-    self.color = col
-    self.regex = reg
-    self.highlight = hl
-    self.lightbox = lb
+function CandelaPattern:new(regex, color, highlight, lightbox)
+    self.regex = regex
+    self.color = color
+    self.highlight = highlight
+    self.lightbox = lightbox
 
     return self
 end
@@ -34,7 +34,11 @@ end
 ---@param color string
 ---@return boolean
 function _is_valid_color(color)
-    -- TODO: check format of color string
+    local valid_pattern = "#%x%x%x%x%x%x"
+    if not string.match(color, valid_pattern) then
+        -- TODO: notify error or something
+        return false
+    end
     return true
 end
 
