@@ -1,18 +1,32 @@
 -- Module for defining the list of patterns
 
+local CandelaPattern = require("candela.pattern")
+
 ---@class CandelaPatternList: CandelaPattern[]
 
 local CandelaPatternList = {}
 
 ---@param regex string
-function CandelaPatternList:add(regex)
-    -- TODO: CandelaPattern:new() and add to list
+---@param color? string --|generate_color()
+---@param highlight? boolean = true
+---@param lightbox? boolean = true
+function CandelaPatternList:add(regex, color, highlight, lightbox)
+    color = color or "#FFFFFF" -- TODO: implement function to generate color from pool of colors
+    if highlight == nil then
+        highlight = true
+    end
+    if lightbox == nil then
+        lightbox = true
+    end
+
+    local new_pattern = CandelaPattern:new(regex, color, highlight, lightbox)
+    table.insert(self, new_pattern)
 end
 
 ---@param old_pattern_index number: index of pattern to edit
 ---@param new_regex string: new regex to change pattern to
 function CandelaPatternList:edit(old_pattern_index, new_regex)
-    -- TODO: get pattern in list and change regex to new_regex
+    self[old_pattern_index].regex = new_regex
 end
 
 return CandelaPatternList
