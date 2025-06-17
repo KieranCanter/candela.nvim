@@ -18,28 +18,29 @@
 local CandelaUi = {}
 CandelaUi.__index = CandelaUi
 
+---@return CandelaUi
 function CandelaUi:new()
-    local ui = setmetatable({
-        patterns_buf = nil,
-        colors_buf = nil,
-        regex_buf = nil,
-        highlight_buf = nil,
-        lightbox_buf = nil,
-        prompt_buf = nil,
-        patterns_win = nil,
-        colors_win = nil,
-        regex_win = nil,
-        highlight_win = nil,
-        lightbox_win = nil,
-        prompt_win = nil,
-        win_configs = {},
-    }, self)
+    local ui = setmetatable({}, CandelaUi)
+    ui.patterns_buf = nil
+    ui.colors_buf = nil
+    ui.regex_buf = nil
+    ui.highlight_buf = nil
+    ui.lightbox_buf = nil
+    ui.prompt_buf = nil
+    ui.patterns_win = nil
+    ui.colors_win = nil
+    ui.regex_win = nil
+    ui.highlight_win = nil
+    ui.lightbox_win = nil
+    ui.prompt_win = nil
 
-    ui.win_configs = ui:create_window_configurations()
+    local initial_height = 9
+    ui.win_configs = CandelaUi:create_window_configurations(initial_height)
+
     return ui
 end
 
-function CandelaUi:create_window_configurations()
+function CandelaUi:create_window_configurations(initial_height)
     local win_width = vim.o.columns
     local win_height = vim.o.lines
 
@@ -49,8 +50,9 @@ function CandelaUi:create_window_configurations()
     -- fill rest of width with regex window, minus 2 for border (1 space on each side)
     local pattern_regex_width = float_width - pattern_color_width - (pattern_ops_width * 2) - 2
 
-    local pattern_height = 9 -- reasonable size to start patterns window
+    local pattern_height = initial_height -- starting height
     local prompt_height = 1 -- 1 space height for prompt
+    local float_height = pattern_height + prompt_height + 2
 
     local total_width = float_width + 6 -- total window width after borders
 
@@ -62,7 +64,7 @@ function CandelaUi:create_window_configurations()
         patterns = {
             relative = "editor",
             width = total_width,
-            height = pattern_height,
+            height = float_height,
             style = "minimal",
             focusable = false,
             title = " Patterns ",
@@ -128,11 +130,10 @@ function CandelaUi:create_window_configurations()
             width = total_width,
             height = prompt_height,
             style = "minimal",
-            title = " Add Regex ",
             title_pos = "left",
             border = "rounded",
             col = -1,
-            row = pattern_height,
+            row = pattern_height + 1,
             zindex = 15,
         },
     }
@@ -150,6 +151,12 @@ function CandelaUi:ensure_buffers()
 
     if not self.regex_buf or not vim.api.nvim_buf_is_valid(self.regex_buf ) then
         self.regex_buf = vim.api.nvim_create_buf(false, true)
+        vim.api.nvim_create_autocmd("BufLeave", {
+            buffer = self.regex_buf,
+            callback = function()
+                self:close_windows()
+            end
+        })
     end
 
     if not self.highlight_buf or not vim.api.nvim_buf_is_valid(self.highlight_buf ) then
@@ -162,8 +169,10 @@ function CandelaUi:ensure_buffers()
 
     if not self.prompt_buf or not vim.api.nvim_buf_is_valid(self.prompt_buf) then
         self.prompt_buf = vim.api.nvim_create_buf(false, true)
+        vim.bo[self.prompt_buf].buftype = "prompt"
+        vim.bo[self.prompt_buf].swapfile = false
+        vim.bo[self.prompt_buf].bufhidden = "wipe"
     end
-
 end
 
 -- Open windows based on config
@@ -176,18 +185,56 @@ function CandelaUi:open_windows()
     self.win_configs.regex.win = self.patterns_win
     self.win_configs.highlight.win = self.patterns_win
     self.win_configs.lightbox.win = self.patterns_win
-    self.win_configs.prompt.win = self.patterns_win
 
     self.colors_win = vim.api.nvim_open_win(self.colors_buf, false, self.win_configs.colors)
-    self.regex_win = vim.api.nvim_open_win(self.regex_buf, false, self.win_configs.regex)
-    self.highlight_buf = vim.api.nvim_open_win(self.highlight_buf, false, self.win_configs.highlight)
-    self.lightbox_buf = vim.api.nvim_open_win(self.lightbox_buf, false, self.win_configs.lightbox)
+    self.regex_win = vim.api.nvim_open_win(self.regex_buf, true, self.win_configs.regex)
+    self.highlight_win = vim.api.nvim_open_win(self.highlight_buf, false, self.win_configs.highlight)
+    self.lightbox_win = vim.api.nvim_open_win(self.lightbox_buf, false, self.win_configs.lightbox)
+end
+
+---@param operation string: one of (add|edit|newfrom)
+function CandelaUi:set_prompt_window(operation)
+    self.win_configs.prompt.win = self.patterns_win
+    vim.fn.prompt_setprompt(self.prompt.buf, " > ")
+    -- autocmd that starts insert mode on BufEnter
+
+    if operation == "add" then
+        self.win_configs.prompt.title = " Add Regex "
+        vim.fn.prompt_setcallback(self.prompt.buf, function(input)
+            -- TODO: add(input) function to add new pattern
+            -- TODO: update_window function
+        end)
+    elseif operation == "edit" then
+        self.win_configs.prompt.title = " Edit Regex "
+        -- TODO: curr_pattern = Candela.get_curr_pattern() to get currently selected pattern at the the time of edit
+        -- TODO: append curr_pattern.regex to self.prompt.buf lines
+        vim.fn.prompt_setcallback(self.prompt.buf, function(input)
+            -- TODO: edit(curr_pattern, input) function to edit existing pattern's regex
+            -- TODO: update_window function
+        end)
+    elseif operation == "newfrom" then
+        self.win_configs.prompt.title = " New Regex From Existing "
+        -- TODO: curr_pattern = Candela.get_curr_pattern() to get currently selected pattern at the the time of edit
+        -- TODO: append curr_pattern.regex to self.prompt.buf lines
+        vim.fn.prompt_setcallback(self.prompt.buf, function(input)
+            -- TODO: add(input) function to edit existing pattern's regex
+            -- TODO: update_window function
+        end)
+    else
+        vim.notify(string.format("Candela: invalid operation %s: must be one of (add|edit|newfrom)", operation))
+    end
+end
+
+---@param operation string: one of (add|edit|newfrom)
+function CandelaUi:display_prompt_window(operation)
+    self.win_configs.prompt = self:set_prompt_window(operation)
     self.prompt_win = vim.api.nvim_open_win(self.prompt_buf, true, self.win_configs.prompt)
+    vim.cmd("startinsert")
 end
 
 -- Check if the UI is open
 function CandelaUi:is_open()
-    return self.prompt_win and vim.api.nvim_win_is_valid(self.prompt_win)
+    return self.regex_win and vim.api.nvim_win_is_valid(self.regex_win)
 end
 
 -- Close all open windows
