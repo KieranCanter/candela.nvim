@@ -13,9 +13,16 @@
 --  * Syntax highlighting option true or false
 --  * Lightbox
 --    * separate buffer/window for only "lightbox" true patterns
+--
+--  * Neovim API equivalents
+--    * vim.api.nvim_<get|set>_option_value() = vim.bo, vim.b, vim.wo, vim.w, vim.t, vim.o, vim.go
+--    * vim.api.nvim_cmd() or vim.api.nvim_exec2() = vim.cmd() or vim.cmd [[]]
+--    * vim.api.nvim_win_get_cursor(0)[1] = vim.fn.line('.')
+--    * vim.api.nvim_win_get_cursor(0)[2] + 1 = vim.fn.line('.')
+--    * vim.api.nvim_buf_get_name(0) = vim.fn.expand('%:p') (path name)
 --]]
 
-local CandelaUi = require("candela.ui"):setup()
+local CandelaUi = require("candela.ui")
 local CandelaPatternList = require("candela.pattern_list")
 local CandelaConfig = require("candela.config")
 local CandelaCommands = require("candela.commands")
@@ -30,8 +37,8 @@ local Candela = {}
 function Candela:new()
     -- TODO: self.config = Config.get_default_config(),
     -- TODO: self.commands = CandelaCommands.setup(),
-    self.ui = CandelaUi:setup()
-    self.patterns = CandelaPatternList
+    self.ui = CandelaUi.setup()
+    self.patterns = CandelaPatternList.get()
 
     return self
 end
@@ -44,13 +51,14 @@ function Candela.setup(opts)
         local tail = table.concat(vim.list_slice(args, 2), " ")
 
         if subcommand == "" or subcommand == nil then
-            candela.ui:toggle()
+            CandelaUi.toggle_patterns()
         elseif subcommand == "add" then
-            candela.ui:display_prompt_window("add")
+            -- candela.ui.close_windows()
+            CandelaUi.display_prompt_window("add")
         elseif subcommand == "edit" then
-            candela.ui:display_prompt_window("edit")
-        elseif subcommand == "newfrom" then
-            candela.ui:display_prompt_window("newfrom")
+            CandelaUi.display_prompt_window("edit")
+        elseif subcommand == "copy" then
+            CandelaUi.display_prompt_window("copy")
         --[[
         elseif subcommand == "remove" then
             require("candela").remove(tail)

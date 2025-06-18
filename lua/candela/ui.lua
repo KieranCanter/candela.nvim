@@ -1,48 +1,51 @@
--- Module for initializing and manipulating the Candela buffers/windows
+-- Module for initializing and manipulating the user interface
 
 local CandelaPatternList = require("candela.pattern_list")
 
 ---@class CandelaUi
----@field patterns_buf number
----@field colors_buf number
----@field regex_buf number
----@field highlight_buf number
----@field lightbox_buf number
----@field prompt_buf number
----@field patterns_win number
----@field colors_win number
----@field regex_win number
----@field highlight_win number
----@field lightbox_win number
----@field prompt_win number
+---@field patterns_buf number|nil
+---@field colors_buf number|nil
+---@field regex_buf number|nil
+---@field highlight_buf number|nil
+---@field lightbox_buf number|nil
+---@field prompt_buf number|nil
+---@field patterns_win number|nil
+---@field colors_win number|nil
+---@field regex_win number|nil
+---@field highlight_win number|nil
+---@field lightbox_win number|nil
+---@field prompt_win number|nil
 ---@field win_configs table<string, vim.api.keyset.win_config>
 
 local CandelaUi = {}
+local ui = {
+    patterns_buf = nil,
+    colors_buf = nil,
+    regex_buf = nil,
+    highlight_buf = nil,
+    lightbox_buf = nil,
+    prompt_buf = nil,
+    patterns_win = nil,
+    colors_win = nil,
+    regex_win = nil,
+    highlight_win = nil,
+    lightbox_win = nil,
+    prompt_win = nil,
+    win_configs = {},
+}
 
 ---@return CandelaUi
-function CandelaUi:setup()
-    self.patterns_buf = nil
-    self.colors_buf = nil
-    self.regex_buf = nil
-    self.highlight_buf = nil
-    self.lightbox_buf = nil
-    self.prompt_buf = nil
-    self.patterns_win = nil
-    self.colors_win = nil
-    self.regex_win = nil
-    self.highlight_win = nil
-    self.lightbox_win = nil
-    self.prompt_win = nil
-
+function CandelaUi.setup(opts)
     local initial_height = 7 -- reasonable starting height TODO: make as a config option?
-    self.win_configs = self.create_window_configurations(initial_height)
+    -- TODO: add more window sizing config options?
+    ui.win_configs = CandelaUi.create_window_configurations(initial_height)
 
-    -- TODO: handle resizing of window when vim is resized
+    -- TODO: handle resizing of window when vim is resized with autocmd
 
-    return self
+    return ui
 end
 
-function CandelaUi.create_window_configurations(height)
+function CandelaUi.create_window_configurations(height) -- TODO: make window size config options?
     local win_width = vim.o.columns
     local win_height = vim.o.lines
 
@@ -142,53 +145,53 @@ function CandelaUi.create_window_configurations(height)
 end
 
 -- Ensure buffers exist and are valid
-function CandelaUi:ensure_buffers()
-    if not self.patterns_buf or not vim.api.nvim_buf_is_valid(self.patterns_buf) then
-        self.patterns_buf = vim.api.nvim_create_buf(false, true)
-        vim.api.nvim_command("set nomodifiable")
+function CandelaUi.ensure_buffers()
+    if not ui.patterns_buf or not vim.api.nvim_buf_is_valid(ui.patterns_buf) then
+        ui.patterns_buf = vim.api.nvim_create_buf(false, true)
+        vim.api.nvim_set_option_value("modifiable", false, { buf = ui.patterns_buf })
     end
 
-    if not self.colors_buf or not vim.api.nvim_buf_is_valid(self.colors_buf ) then
-        self.colors_buf = vim.api.nvim_create_buf(false, true)
-        vim.api.nvim_command("set nomodifiable")
+    if not ui.colors_buf or not vim.api.nvim_buf_is_valid(ui.colors_buf) then
+        ui.colors_buf = vim.api.nvim_create_buf(false, true)
+        vim.api.nvim_set_option_value("modifiable", false, { buf = ui.colors_buf })
     end
 
-    if not self.regex_buf or not vim.api.nvim_buf_is_valid(self.regex_buf ) then
-        self.regex_buf = vim.api.nvim_create_buf(false, true)
-        vim.api.nvim_command("set nomodifiable")
-        vim.api.nvim_create_autocmd("BufLeave", {
-            buffer = self.regex_buf,
+    if not ui.regex_buf or not vim.api.nvim_buf_is_valid(ui.regex_buf) then
+        ui.regex_buf = vim.api.nvim_create_buf(false, true)
+        vim.api.nvim_set_option_value("modifiable", false, { buf = ui.regex_buf })
+        vim.api.nvim_create_autocmd("BufHidden", {
+            buffer = ui.regex_buf,
             callback = function()
-                self:close_windows()
-            end
+                CandelaUi.close_windows()
+            end,
         })
     end
 
-    if not self.highlight_buf or not vim.api.nvim_buf_is_valid(self.highlight_buf ) then
-        self.highlight_buf = vim.api.nvim_create_buf(false, true)
-        vim.api.nvim_command("set nomodifiable")
+    if not ui.highlight_buf or not vim.api.nvim_buf_is_valid(ui.highlight_buf) then
+        ui.highlight_buf = vim.api.nvim_create_buf(false, true)
+        vim.api.nvim_set_option_value("modifiable", false, { buf = ui.highlight_buf })
     end
 
-    if not self.lightbox_buf or not vim.api.nvim_buf_is_valid(self.lightbox_buf ) then
-        self.lightbox_buf = vim.api.nvim_create_buf(false, true)
-        vim.api.nvim_command("set nomodifiable")
+    if not ui.lightbox_buf or not vim.api.nvim_buf_is_valid(ui.lightbox_buf) then
+        ui.lightbox_buf = vim.api.nvim_create_buf(false, true)
+        vim.api.nvim_set_option_value("modifiable", false, { buf = ui.lightbox_buf })
     end
 
-    if not self.prompt_buf or not vim.api.nvim_buf_is_valid(self.prompt_buf) then
-        self.prompt_buf = vim.api.nvim_create_buf(false, true)
-        vim.bo[self.prompt_buf].buftype = "prompt"
+    if not ui.prompt_buf or not vim.api.nvim_buf_is_valid(ui.prompt_buf) then
+        ui.prompt_buf = vim.api.nvim_create_buf(false, true)
+        vim.bo[ui.prompt_buf].buftype = "prompt"
 
         vim.api.nvim_create_autocmd("BufEnter", {
-            buffer = self.prompt_buf,
+            buffer = ui.prompt_buf,
             callback = function()
                 vim.cmd("startinsert")
             end,
         })
         vim.api.nvim_create_autocmd("BufLeave", {
-            buffer = self.prompt_buf,
+            buffer = ui.prompt_buf,
             callback = function()
-                self:close_prompt_window_and_buffer()
-                vim.api.nvim_set_current_win(self.regex_win)
+                CandelaUi.close_prompt_window_and_buffer()
+                vim.api.nvim_set_current_win(ui.regex_win)
             end,
         })
     end
@@ -196,115 +199,122 @@ end
 
 -- Open windows based on config
 ---@param enter boolean: whether to enter the regex window on open or not
-function CandelaUi:open_windows(enter)
-    if self:is_open() then
+function CandelaUi.open_windows(enter)
+    if CandelaUi.is_open() then
         return
     end
 
-    self:ensure_buffers()
+    CandelaUi.ensure_buffers()
 
-    self.patterns_win = vim.api.nvim_open_win(self.patterns_buf, false, self.win_configs.patterns)
+    ui.patterns_win = vim.api.nvim_open_win(ui.patterns_buf, false, ui.win_configs.patterns)
 
-    self.win_configs.colors.win = self.patterns_win
-    self.win_configs.regex.win = self.patterns_win
-    self.win_configs.highlight.win = self.patterns_win
-    self.win_configs.lightbox.win = self.patterns_win
+    ui.win_configs.colors.win = ui.patterns_win
+    ui.win_configs.regex.win = ui.patterns_win
+    ui.win_configs.highlight.win = ui.patterns_win
+    ui.win_configs.lightbox.win = ui.patterns_win
 
-    self.colors_win = vim.api.nvim_open_win(self.colors_buf, false, self.win_configs.colors)
-    self.regex_win = vim.api.nvim_open_win(self.regex_buf, enter, self.win_configs.regex)
-    self.highlight_win = vim.api.nvim_open_win(self.highlight_buf, false, self.win_configs.highlight)
-    self.lightbox_win = vim.api.nvim_open_win(self.lightbox_buf, false, self.win_configs.lightbox)
+    ui.colors_win = vim.api.nvim_open_win(ui.colors_buf, false, ui.win_configs.colors)
+    ui.regex_win = vim.api.nvim_open_win(ui.regex_buf, enter, ui.win_configs.regex)
+    ui.highlight_win = vim.api.nvim_open_win(ui.highlight_buf, false, ui.win_configs.highlight)
+    ui.lightbox_win = vim.api.nvim_open_win(ui.lightbox_buf, false, ui.win_configs.lightbox)
 end
 
----@param operation string: one of (add|edit|newfrom)
-function CandelaUi:set_prompt_window(operation)
-    self.win_configs.prompt.win = self.patterns_win
-    vim.fn.prompt_setprompt(self.prompt_buf, " > ")
+---@param operation string: one of (add|edit|copy)
+function CandelaUi.set_prompt_window(operation)
+    ui.win_configs.prompt.win = ui.patterns_win
+    vim.fn.prompt_setprompt(ui.prompt_buf, " > ")
 
     if operation == "add" then
-        self.win_configs.prompt.title = " Add Regex "
-        vim.fn.prompt_setcallback(self.prompt_buf, function(input)
+        ui.win_configs.prompt.title = " Add Regex "
+        vim.fn.prompt_setcallback(ui.prompt_buf, function(regex)
             -- TODO: add(input) function to add new pattern
             -- TODO: update_window function
-            vim.cmd("q")
+            CandelaPatternList.add(regex)
+            print(vim.inspect(CandelaPatternList.get()))
+            vim.api.nvim_cmd({ cmd = "q" }, {})
         end)
     elseif operation == "edit" then
-        self.win_configs.prompt.title = " Edit Regex "
+        ui.win_configs.prompt.title = " Edit Regex "
         -- TODO: curr_pattern = Candela.get_curr_pattern() to get currently selected pattern at the the time of edit
-        -- TODO: append curr_pattern.regex to self.prompt.buf lines
-        vim.fn.prompt_setcallback(self.prompt_buf, function(input)
+        -- TODO: append curr_pattern.regex to ui.prompt.buf lines
+        vim.fn.prompt_setcallback(ui.prompt_buf, function(input)
             -- TODO: edit(curr_pattern, input) function to edit existing pattern's regex
             -- TODO: update_window function
+            vim.api.nvim_cmd({ cmd = "q" }, {})
         end)
-    elseif operation == "newfrom" then
-        self.win_configs.prompt.title = " New Regex From Existing "
+    elseif operation == "copy" then
+        ui.win_configs.prompt.title = " New Regex From Existing "
         -- TODO: curr_pattern = Candela.get_curr_pattern() to get currently selected pattern at the the time of edit
-        -- TODO: append curr_pattern.regex to self.prompt.buf lines
-        vim.fn.prompt_setcallback(self.prompt_buf, function(input)
+        -- TODO: append curr_pattern.regex to ui.prompt.buf lines
+        vim.fn.prompt_setcallback(ui.prompt_buf, function(input)
             -- TODO: add(input) function to edit existing pattern's regex
             -- TODO: update_window function
+            vim.api.nvim_cmd({ cmd = "q" }, {})
         end)
     else
-        vim.notify(string.format("Candela: invalid operation %s: must be one of (add|edit|newfrom)", operation))
+        vim.notify(string.format("Candela: invalid operation %s: must be one of (add|edit|copy)", operation))
     end
 end
 
----@param operation string: one of (add|edit|newfrom)
-function CandelaUi:display_prompt_window(operation)
-    self:open_windows(false)
-    self:set_prompt_window(operation)
-    self.prompt_win = vim.api.nvim_open_win(self.prompt_buf, true, self.win_configs.prompt)
+---@param operation string: one of (add|edit|copy)
+function CandelaUi.display_prompt_window(operation)
+    if not CandelaUi.is_open() then
+        CandelaUi.open_windows(false)
+    end
+    CandelaUi.set_prompt_window(operation)
+    ui.prompt_win = vim.api.nvim_open_win(ui.prompt_buf, true, ui.win_configs.prompt)
 end
 
 -- Check if the UI is open
-function CandelaUi:is_open()
-    return self.regex_win and vim.api.nvim_win_is_valid(self.regex_win)
+function CandelaUi.is_open()
+    return ui.regex_win and vim.api.nvim_win_is_valid(ui.regex_win)
 end
 
 -- Close all open windows
-function CandelaUi:close_windows()
-    if self.patterns_win and vim.api.nvim_win_is_valid(self.patterns_win) then
-        vim.api.nvim_win_close(self.patterns_win, true)
-        self.patterns_win = nil
+function CandelaUi.close_windows()
+    if ui.patterns_win and vim.api.nvim_win_is_valid(ui.patterns_win) then
+        vim.api.nvim_win_close(ui.patterns_win, true)
+        ui.patterns_win = nil
     end
 
-    if self.colors_win and vim.api.nvim_win_is_valid(self.colors_win) then
-        vim.api.nvim_win_close(self.colors_win , true)
-        self.colors_win = nil
+    if ui.colors_win and vim.api.nvim_win_is_valid(ui.colors_win) then
+        vim.api.nvim_win_close(ui.colors_win, true)
+        ui.colors_win = nil
     end
 
-    if self.regex_win and vim.api.nvim_win_is_valid(self.regex_win) then
-        vim.api.nvim_win_close(self.regex_win , true)
-        self.regex_win = nil
+    if ui.regex_win and vim.api.nvim_win_is_valid(ui.regex_win) then
+        vim.api.nvim_win_close(ui.regex_win, true)
+        ui.regex_win = nil
     end
 
-    if self.highlight_win and vim.api.nvim_win_is_valid(self.highlight_win) then
-        vim.api.nvim_win_close(self.highlight_win , true)
-        self.highlight_win = nil
+    if ui.highlight_win and vim.api.nvim_win_is_valid(ui.highlight_win) then
+        vim.api.nvim_win_close(ui.highlight_win, true)
+        ui.highlight_win = nil
     end
 
-    if self.lightbox_win and vim.api.nvim_win_is_valid(self.lightbox_win) then
-        vim.api.nvim_win_close(self.lightbox_win, true)
-        self.lightbox_win = nil
+    if ui.lightbox_win and vim.api.nvim_win_is_valid(ui.lightbox_win) then
+        vim.api.nvim_win_close(ui.lightbox_win, true)
+        ui.lightbox_win = nil
     end
 end
 
 -- Close prompt window
-function CandelaUi:close_prompt_window_and_buffer()
-    if self.prompt_win and vim.api.nvim_win_is_valid(self.prompt_win) then
-        vim.api.nvim_win_close(self.prompt_win, true)
-        vim.api.nvim_buf_delete(self.prompt_buf, {force = true})
-        self.prompt_win = nil
-        self.prompt_buf = nil
+function CandelaUi.close_prompt_window_and_buffer()
+    if ui.prompt_win and vim.api.nvim_win_is_valid(ui.prompt_win) then
+        vim.api.nvim_win_close(ui.prompt_win, true)
+        vim.api.nvim_buf_delete(ui.prompt_buf, { force = true })
+        ui.prompt_win = nil
+        ui.prompt_buf = nil
     end
+    CandelaUi.ensure_buffers()
 end
 
--- Toggle UI
-function CandelaUi:toggle()
-    if self:is_open() then
-        self:close_windows()
+-- Toggle Patterns window
+function CandelaUi.toggle_patterns()
+    if CandelaUi.is_open() then
+        CandelaUi.close_windows()
     else
-        self:open_windows(true)
+        CandelaUi.open_windows(true)
     end
 end
 
