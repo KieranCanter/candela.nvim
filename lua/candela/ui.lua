@@ -1,6 +1,7 @@
 -- Module for initializing and manipulating the user interface
 
 local CandelaPatternList = require("candela.pattern_list")
+local CandelaWindow = require("candela.window")
 
 ---@class CandelaUi
 ---@field windows table<string, CandelaWindow>
