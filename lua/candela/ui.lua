@@ -3,19 +3,7 @@
 local CandelaPatternList = require("candela.pattern_list")
 
 ---@class CandelaUi
----@field patterns_buf number|nil
----@field colors_buf number|nil
----@field regex_buf number|nil
----@field highlight_buf number|nil
----@field lightbox_buf number|nil
----@field prompt_buf number|nil
----@field patterns_win number|nil
----@field colors_win number|nil
----@field regex_win number|nil
----@field highlight_win number|nil
----@field lightbox_win number|nil
----@field prompt_win number|nil
----@field win_configs table<string, vim.api.keyset.win_config>
+---@field windows table<string, CandelaWindow>
 
 local CandelaUi = {}
 local ui = {
@@ -33,6 +21,34 @@ local ui = {
     prompt_win = nil,
     win_configs = {},
 }
+--[[
+local ui= {
+    windows = {},
+}
+
+---@return CandelaUi
+function CandelaUi.setup(opts)
+    window_names = {
+        "patterns",
+        "colors",
+        "regex",
+        "highlight",
+        "lightbox",
+        "prompt"
+    }
+    for _, window in ipairs(window_names) do
+        ui.windows[window] = CandelaWindow.new({name = window}
+    end
+
+    local initial_height = 7 -- reasonable starting height TODO: make as a config option?
+    -- TODO: add more window sizing config options?
+    ui.win_configs = CandelaUi.create_window_configurations(initial_height)
+
+    -- TODO: handle resizing of window when vim is resized with autocmd
+
+    return ui
+end
+--]]
 
 ---@return CandelaUi
 function CandelaUi.setup(opts)
@@ -159,7 +175,7 @@ function CandelaUi.ensure_buffers()
     if not ui.regex_buf or not vim.api.nvim_buf_is_valid(ui.regex_buf) then
         ui.regex_buf = vim.api.nvim_create_buf(false, true)
         vim.api.nvim_set_option_value("modifiable", false, { buf = ui.regex_buf })
-        vim.api.nvim_create_autocmd("BufHidden", {
+        vim.api.nvim_create_autocmd("BufLeave", {
             buffer = ui.regex_buf,
             callback = function()
                 CandelaUi.close_windows()
