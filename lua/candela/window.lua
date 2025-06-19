@@ -19,16 +19,15 @@ function CandelaWindow.new(opts)
     return instance
 end
 
----@param window CandelaWindow
 ---@param key string
 ---@param val string|number
-function CandelaWindow.change_config(window, key, val)
-    if not window or not window.config then
-        vim.notify(string.format("Invalid window (win=%s, buf=%s) passed to change_config", window.win, window.buf)
+function CandelaWindow:change_config(key, val)
+    if not self or not self.config then
+        vim.notify(string.format("Invalid window (win=%s, buf=%s) passed to change_config", self.win, self.buf)
             , vim.log.levels.ERROR)
         return
     end
-    window.config[key] = val
+    self.config[key] = val
 end
 
 ---@param base_window CandelaWindow
@@ -47,62 +46,57 @@ function CandelaWindow.attach_win(base_window, parent_window)
 end
 
 -- Ensure buffer exists and is valid
----@param window CandelaWindow
-function CandelaWindow.ensure_buffer(window)
-    if not window.buf or not vim.api.nvim_buf_is_valid(window.buf) then
-        window.buf = vim.api.nvim_create_buf(false, true)
+function CandelaWindow:ensure_buffer()
+    if not self.buf or not vim.api.nvim_buf_is_valid(self.buf) then
+        self.buf = vim.api.nvim_create_buf(false, true)
     end
 end
 
 -- Open windows based on config
----@param window CandelaWindow
 ---@param enter boolean=false
-function CandelaWindow.open_window(window, enter)
-    if CandelaWindow.is_open(window) then
+function CandelaWindow:open_window(enter)
+    if self:is_open() then
         return
     end
 
-    CandelaWindow.ensure_buffer(window)
+    self:ensure_buffer()
     enter = enter or false
-    window.win = vim.api.nvim_open_win(window.buf, enter, window.config)
+    self.win = vim.api.nvim_open_win(self.buf, enter, self.config)
 end
 
 -- Check if the window is open
----@param window CandelaWindow
 ---@return boolean
-function CandelaWindow.is_open(window)
-    return window.win ~= nil and vim.api.nvim_win_is_valid(window.win)
+function CandelaWindow:is_open()
+    return self.win ~= nil and vim.api.nvim_win_is_valid(self.win)
 end
 
 -- Close window
----@param window CandelaWindow
 ---@param close_buf boolean=false
-function CandelaWindow.close_window(window, close_buf)
-    if not CandelaWindow.is_open(window) then
+function CandelaWindow:close_window(close_buf)
+    if not self:is_open() then
         return
     end
 
-    vim.api.nvim_win_close(window.win, true)
-    window.win = nil
+    vim.api.nvim_win_close(self.win, true)
+    self.win = nil
 
     close_buf = close_buf or false
     if close_buf then
-        vim.api.nvim_buf_delete(window.buf, { force = true })
-        window.buf = nil
+        vim.api.nvim_buf_delete(self.buf, { force = true })
+        self.buf = nil
     end
 end
 
 -- Toggle window
----@param window CandelaWindow
 ---@param enter boolean=false
 ---@param close_buf boolean=false
-function CandelaWindow.toggle(window, enter, close_buf)
-    if CandelaWindow.is_open(window) then
+function CandelaWindow:toggle(enter, close_buf)
+    if self:is_open() then
         close_buf = close_buf or false
-        CandelaWindow.close_window(window, close_buf)
+        self:close_window(close_buf)
     else
         enter = enter or false
-        CandelaWindow.open_window(window, enter)
+        self:open_window(enter)
     end
 end
 
