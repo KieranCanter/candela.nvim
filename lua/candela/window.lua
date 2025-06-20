@@ -7,7 +7,7 @@
 
 local CandelaWindow = {}
 
----@param opts table<string, string|number>: search api-win_config in vim docs for valid keys/values
+---@param opts table<string, string|number|boolean>: search api-win_config in vim docs for valid keys/values
 ---@return CandelaWindow
 function CandelaWindow.new(opts)
     local instance = {
@@ -16,6 +16,7 @@ function CandelaWindow.new(opts)
         config = vim.tbl_extend("force", {}, opts or {})
     }
 
+    setmetatable(instance, { __index = CandelaWindow })
     return instance
 end
 
@@ -30,23 +31,22 @@ function CandelaWindow:change_config(key, val)
     self.config[key] = val
 end
 
----@param base_window CandelaWindow
 ---@param parent_window CandelaWindow
-function CandelaWindow.attach_win(base_window, parent_window)
-    if not CandelaWindow.is_open(parent_window) then
+function CandelaWindow:attach_to(parent_window)
+    if not parent_window:is_open() then
         vim.notify(
             string.format(
                 "Cannot attach base window (win=%s, buf=%s) to parent window (win=%s, buf=%s) because it is not open",
-                base_window.win, base_window.buf, parent_window.win, parent_window.buf),
+                self.win, self.buf, parent_window.win, parent_window.buf),
             vim.log.levels.ERROR)
         return
     end
 
-    base_window.config.win = parent_window.win
+    self.config.win = parent_window.win
 end
 
 -- Ensure buffer exists and is valid
-function CandelaWindow:ensure_buffer()
+function CandelaWindow:_ensure_buffer()
     if not self.buf or not vim.api.nvim_buf_is_valid(self.buf) then
         self.buf = vim.api.nvim_create_buf(false, true)
     end
@@ -59,7 +59,7 @@ function CandelaWindow:open_window(enter)
         return
     end
 
-    self:ensure_buffer()
+    self:_ensure_buffer()
     enter = enter or false
     self.win = vim.api.nvim_open_win(self.buf, enter, self.config)
 end
