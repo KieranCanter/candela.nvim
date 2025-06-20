@@ -5,10 +5,10 @@ local CandelaPattern = require("candela.pattern")
 ---@class CandelaPatternList: CandelaPattern[]
 
 local CandelaPatternList = {}
-local patterns = {}
+CandelaPatternList.patterns = {}
 
 function CandelaPatternList.get()
-    return patterns
+    return CandelaPatternList.patterns
 end
 
 ---@param regex string
@@ -25,17 +25,17 @@ function CandelaPatternList.add(regex, color, highlight, lightbox)
     end
 
     local new_pattern = CandelaPattern.new(regex, color, highlight, lightbox)
-    table.insert(patterns, new_pattern)
+    table.insert(CandelaPatternList.patterns, new_pattern)
 end
 
 ---@param old_pattern_index number: index of pattern to edit
 ---@param new_regex string: new regex to change pattern to
 function CandelaPatternList.edit(old_pattern_index, new_regex)
-    patterns[old_pattern_index].regex = new_regex
+    CandelaPatternList.patterns[old_pattern_index].regex = new_regex
 end
 
 function CandelaPatternList.clear()
-    patterns = {}
+    CandelaPatternList.patterns = {}
 end
 
 return CandelaPatternList

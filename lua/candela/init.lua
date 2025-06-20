@@ -32,39 +32,37 @@ local CandelaCommands = require("candela.commands")
 ---@field patterns CandelaPattern[]
 
 local Candela = {}
-
----@return Candela
-function Candela:new()
-    -- TODO: self.config = Config.get_default_config(),
-    -- TODO: self.commands = CandelaCommands.setup(),
-    self.ui = CandelaUi.setup()
-    self.patterns = CandelaPatternList.get()
-
-    return self
-end
+Candela.ui = { windows = {} }
+Candela.patterns = {}
 
 function Candela.setup(opts)
-    local candela = Candela:new()
-    vim.api.nvim_create_user_command("Candela", function(opts)
-        local args = opts.fargs
+    opts = CandelaConfig.setup(opts)
+    -- TODO: self.commands = CandelaCommands.setup(),
+    Candela.ui = CandelaUi.new(opts)
+    Candela.patterns = CandelaPatternList.get()
+    vim.api.nvim_create_user_command("Candela", function(args)
+        local args = args.fargs
         local subcommand = args[1]
         local tail = table.concat(vim.list_slice(args, 2), " ")
 
         if subcommand == "" or subcommand == nil then
-            CandelaUi.toggle_patterns()
+            CandelaUi.toggle()
         elseif subcommand == "add" then
-            -- candela.ui.close_windows()
-            CandelaUi.display_prompt_window("add")
+            CandelaUi.show_patterns()
+            CandelaUi.show_prompt("add")
         elseif subcommand == "edit" then
-            CandelaUi.display_prompt_window("edit")
+            CandelaUi.show_patterns()
+            CandelaUi.show_prompt("edit")
         elseif subcommand == "copy" then
-            CandelaUi.display_prompt_window("copy")
+            CandelaUi.show_patterns()
+            CandelaUi.show_prompt("copy")
         --[[
         elseif subcommand == "remove" then
+            CandelaPatternList.remove(tail)
             require("candela").remove(tail)
-        elseif subcommand == "clear" then
-            require("candela").clear()
         --]]
+        elseif subcommand == "clear" then
+            Candela.ui.hide(CandelaUi.windows)
         else
             vim.notify("Candela: unsupported command: " .. subcommand, vim.log.levels.ERROR)
         end

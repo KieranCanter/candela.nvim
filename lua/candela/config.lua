@@ -1,18 +1,29 @@
 -- Module for defining user configuration
 
-local Config = {}
+--[[
+-- Config ideas:
+-- * window sizing
+-- * syntax highlighting
+-- * fold vs remove unlightboxed lines
+--]]
 
----@class Config
-Config.defaults = {
+---@class CandelaConfig
+---@field defaults table<string, any>
+---@field options table<string, any>
+local CandelaConfig = {}
+
+CandelaConfig.defaults = {
     -- Use log syntax highlighting
+    height = 7,
     syntax_highlighting = true,
 }
 
----@type Config
-Config.options = {}
+CandelaConfig.options = {}
 
-function Config.setup(opts)
-  Config.options = vim.tbl_deep_extend("force", {}, Config.defaults, opts or {})
+---@return CandelaConfig
+function CandelaConfig.setup(opts)
+    CandelaConfig.options = vim.tbl_deep_extend("force", vim.deepcopy(CandelaConfig.defaults), opts or {})
+    return CandelaConfig.options
 end
 
-return Config
+return CandelaConfig

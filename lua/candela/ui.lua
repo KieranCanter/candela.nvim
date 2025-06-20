@@ -7,62 +7,219 @@ local CandelaWindow = require("candela.window")
 ---@field windows table<string, CandelaWindow>
 
 local CandelaUi = {}
-local ui = {
-    patterns_buf = nil,
-    colors_buf = nil,
-    regex_buf = nil,
-    highlight_buf = nil,
-    lightbox_buf = nil,
-    prompt_buf = nil,
-    patterns_win = nil,
-    colors_win = nil,
-    regex_win = nil,
-    highlight_win = nil,
-    lightbox_win = nil,
-    prompt_win = nil,
-    win_configs = {},
-}
---[[
-local ui= {
-    windows = {},
-}
+CandelaUi.windows = {} -- singleton field
 
+---@param opts table<string, number>
 ---@return CandelaUi
+function CandelaUi.new(opts)
+    CandelaUi.setup(opts)
+    return CandelaUi
+end
+
+---@param opts table<string, number>
 function CandelaUi.setup(opts)
-    window_names = {
-        "patterns",
-        "colors",
-        "regex",
-        "highlight",
-        "lightbox",
-        "prompt"
-    }
-    for _, window in ipairs(window_names) do
-        ui.windows[window] = CandelaWindow.new({name = window}
+    local win_width = vim.o.columns
+    local win_height = vim.o.lines
+
+    local float_width = math.floor(win_width * 0.50) -- total window width before borders
+    local pattern_color_width = 9 -- 7 space hex code, 1 space margin on each side
+    local pattern_ops_width = 5 -- 1 space letter/symbol, 2 space margin on each side
+    -- fill rest of width with regex window, minus 2 for border (1 space on each side)
+    local pattern_regex_width = float_width - pattern_color_width - (pattern_ops_width * 2) - 2
+
+    local pattern_height = opts.height -- starting height
+    local prompt_height = 1 -- 1 space height for prompt
+    local float_height = pattern_height + 2 -- + prompt_height + 2
+
+    local total_width = float_width + 6 -- total window width after borders
+
+    -- Account for 2 border spaces worth of padding to center window in center of base window
+    local horz_center = math.floor((win_width - total_width - 2) / 2)
+    local vert_center = math.floor((win_height - pattern_height - prompt_height - 2) / 2)
+
+    local patterns = CandelaWindow.new({
+        relative = "editor",
+        width = total_width,
+        height = float_height,
+        style = "minimal",
+        focusable = false,
+        title = " Patterns ",
+        title_pos = "center",
+        border = "rounded",
+        col = horz_center,
+        row = vert_center,
+        zindex = 1,
+    })
+    local colors = CandelaWindow.new({
+        relative = "win",
+        width = pattern_color_width,
+        height = pattern_height,
+        style = "minimal",
+        focusable = false,
+        title = " Color ",
+        title_pos = "center",
+        border = "solid",
+        col = 0,
+        row = 0,
+        zindex = 10,
+    })
+    local regex = CandelaWindow.new({
+        relative = "win",
+        width = pattern_regex_width,
+        height = pattern_height,
+        style = "minimal",
+        title = " Regex ",
+        title_pos = "left",
+        border = "solid",
+        col = pattern_color_width + 2,
+        row = 0,
+        zindex = 10,
+    })
+    local highlight = CandelaWindow.new({
+        relative = "win",
+        width = pattern_ops_width,
+        height = pattern_height,
+        style = "minimal",
+        focusable = false,
+        title = " H ",
+        title_pos = "center",
+        border = "solid",
+        col = pattern_color_width + pattern_regex_width + 4,
+        row = 0,
+        zindex = 10,
+    })
+    local lightbox = CandelaWindow.new({
+        relative = "win",
+        width = pattern_ops_width,
+        height = pattern_height,
+        style = "minimal",
+        focusable = false,
+        title = " L ",
+        title_pos = "center",
+        border = "solid",
+        col = pattern_color_width + pattern_ops_width + pattern_regex_width + 6,
+        row = 0,
+        zindex = 10,
+    })
+    local prompt = CandelaWindow.new({
+        relative = "win",
+        width = total_width,
+        height = prompt_height,
+        style = "minimal",
+        title_pos = "left",
+        border = "rounded",
+        col = -1,
+        row = pattern_height + 1,
+        zindex = 15,
+    })
+
+    CandelaUi.windows.patterns = patterns
+    CandelaUi.windows.colors = colors
+    CandelaUi.windows.regex = regex
+    CandelaUi.windows.highlight = highlight
+    CandelaUi.windows.lightbox = lightbox
+    CandelaUi.windows.prompt = prompt
+
+    -- TODO: handle resizing of window when vim is resized with autocmd
+end
+
+-- Open patterns window
+function CandelaUi.show_patterns()
+    if CandelaUi.windows.patterns == nil then
+        vim.notify("Need patterns window to attach to", vim.log.levels.ERROR)
+    end
+    CandelaUi.windows.patterns:open_window() -- open patterns first to attach other windows
+
+    for name, win in pairs(CandelaUi.windows) do
+        if name ~= "patterns" and name ~= "prompt" then
+            win:attach_to(CandelaUi.windows.patterns)
+            if name == "regex" then
+                win:open_window(true)
+            else
+                win:open_window()
+            end
+        end
+    end
+end
+
+-- HACK: could probably make this better?
+---@param operation "add"|"edit"|"copy": type of operation to conduct
+function CandelaUi.show_prompt(operation)
+    CandelaUi.windows.prompt:attach_to(CandelaUi.windows.patterns)
+    vim.fn.prompt_setprompt(CandelaUi.windows.prompt.buf, " > ")
+
+    if operation == "add" then
+        CandelaUi.windows.prompt.config.title = " Add Regex "
+        vim.fn.prompt_setcallback(CandelaUi.windows.prompt.buf, function(regex)
+            -- TODO: add(input) function to add new pattern
+            -- TODO: update_window function
+            CandelaPatternList.add(regex)
+            print(vim.inspect(CandelaPatternList.get()))
+        end)
+    elseif operation == "edit" then
+        CandelaUi.windows.prompt.config.title = " Edit Regex "
+        -- TODO: curr_pattern = Candela.get_curr_pattern() to get currently selected pattern at the the time of edit
+        -- TODO: append curr_pattern.regex to ui.prompt.buf lines
+        vim.fn.prompt_setcallback(CandelaUi.windows.prompt.buf, function(input)
+            -- TODO: edit(curr_pattern, input) function to edit existing pattern's regex
+            -- TODO: update_window function
+        end)
+    elseif operation == "copy" then
+        CandelaUi.windows.prompt.config.title = " New Regex From Existing "
+        -- TODO: curr_pattern = Candela.get_curr_pattern() to get currently selected pattern at the the time of edit
+        -- TODO: append curr_pattern.regex to ui.prompt.buf lines
+        vim.fn.prompt_setcallback(CandelaUi.windows.prompt.buf, function(input)
+            -- TODO: add(input) function to edit existing pattern's regex
+            -- TODO: update_window function
+        end)
+    else
+        vim.notify(string.format("Candela: invalid operation \"%s\": must be one of (add|edit|copy)", operation))
+    end
+    vim.api.nvim_cmd({ cmd = "q" }, {})
+    CandelaUi.windows.prompt:open_window(true)
+end
+
+function CandelaUi.hide_all()
+    for name, win in pairs(CandelaUi.windows) do
+        if name == "prompt" and CandelaUi.windows.prompt.is_open() then
+            win:close_window(true)
+        else
+            win:close_window()
+        end
+    end
+end
+
+function CandelaUi.toggle()
+    if CandelaUi._is_open() then
+        CandelaUi.hide_all()
+    else
+        CandelaUi.show_patterns()
+    end
+end
+
+---@return boolean
+function CandelaUi._is_open()
+    for _, window in pairs(CandelaUi.windows) do
+        if window:is_open() then
+            return true
+        end
     end
 
-    local initial_height = 7 -- reasonable starting height TODO: make as a config option?
-    -- TODO: add more window sizing config options?
-    ui.win_configs = CandelaUi.create_window_configurations(initial_height)
-
-    -- TODO: handle resizing of window when vim is resized with autocmd
-
-    return ui
+    return false
 end
---]]
 
+-- TODO: find place to set buffer options set in ensure_buffers()
+
+--[[
 ---@return CandelaUi
 function CandelaUi.setup(opts)
-    local initial_height = 7 -- reasonable starting height TODO: make as a config option?
-    -- TODO: add more window sizing config options?
     ui.win_configs = CandelaUi.create_window_configurations(initial_height)
 
-    -- TODO: handle resizing of window when vim is resized with autocmd
 
     return ui
 end
 
-function CandelaUi.create_window_configurations(height) -- TODO: make window size config options?
+function CandelaUi.create_window_configurations(height) 
     local win_width = vim.o.columns
     local win_height = vim.o.lines
 
@@ -334,5 +491,6 @@ function CandelaUi.toggle_patterns()
         CandelaUi.open_windows(true)
     end
 end
+--]]
 
 return CandelaUi
