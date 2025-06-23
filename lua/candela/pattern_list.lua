@@ -25,6 +25,12 @@ function CandelaPatternList.add(regex, color, highlight, lightbox)
     end
 
     local new_pattern = CandelaPattern.new(regex, color, highlight, lightbox)
+    for _, pattern in ipairs(CandelaPatternList.patterns) do
+        if pattern.regex == new_pattern.regex then
+            vim.notify(string.format("Regex /%s/ already exists.", pattern.regex), vim.log.levels.ERROR)
+            return
+        end
+    end
     table.insert(CandelaPatternList.patterns, new_pattern)
 end
 
