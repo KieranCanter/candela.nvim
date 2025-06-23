@@ -2,6 +2,7 @@
 
 local CandelaPatternList = require("candela.pattern_list")
 local CandelaWindow = require("candela.window")
+local candela_group = vim.api.nvim_create_augroup("Candela", { clear = true })
 
 ---@class CandelaUi
 ---@field windows table<string, CandelaWindow>
@@ -121,10 +122,31 @@ function CandelaUi.setup(opts)
     CandelaUi.windows.prompt = prompt
 
     -- TODO: handle resizing of window when vim is resized with autocmd
+
+    for name, window in pairs(CandelaUi.windows) do
+        window:ensure_buffer()
+        vim.api.nvim_set_option_value("swapfile", false, { buf = window.buf })
+        vim.api.nvim_set_option_value("filetype", "candela", { buf = window.buf })
+        if name ~= "prompt" then
+            vim.api.nvim_set_option_value("modifiable", false, { buf = window.buf })
+        end
+    end
+
+    vim.api.nvim_create_autocmd("BufHidden", {
+        group = candela_group,
+        buffer = CandelaUi.windows.regex.buf,
+        callback = function()
+            CandelaUi.hide_patterns()
+        end,
+    })
 end
 
 -- Open patterns window
 function CandelaUi.show_patterns()
+    if CandelaUi._is_open() then
+        return
+    end
+
     if CandelaUi.windows.patterns == nil then
         vim.notify("Need patterns window to attach to", vim.log.levels.ERROR)
     end
@@ -143,10 +165,29 @@ function CandelaUi.show_patterns()
 end
 
 -- HACK: could probably make this better?
+-- HACK: REFACTOR PROMPT WINDOW TO NOT DELETE BUFFER BUT INSTEAD JUST WIPE THE BUFFER CONTENT
 ---@param operation "add"|"edit"|"copy": type of operation to conduct
 function CandelaUi.show_prompt(operation)
+    CandelaUi.windows.prompt:ensure_buffer()
     CandelaUi.windows.prompt:attach_to(CandelaUi.windows.patterns)
-    vim.fn.prompt_setprompt(CandelaUi.windows.prompt.buf, " > ")
+    vim.api.nvim_set_option_value("buftype", "prompt", { buf = CandelaUi.windows.prompt.buf })
+
+    vim.api.nvim_create_autocmd("BufEnter", {
+        group = candela_group,
+        buffer = CandelaUi.windows.prompt.buf,
+        callback = function()
+            vim.fn.prompt_setprompt(CandelaUi.windows.prompt.buf, " > ")
+            vim.api.nvim_cmd( { cmd = "startinsert" }, {})
+        end,
+    })
+    vim.api.nvim_create_autocmd("BufLeave", {
+        group = candela_group,
+        buffer = CandelaUi.windows.prompt.buf,
+        callback = function()
+            CandelaUi.hide_prompt()
+            vim.api.nvim_set_current_win(CandelaUi.windows.regex.win)
+        end,
+    })
 
     if operation == "add" then
         CandelaUi.windows.prompt.config.title = " Add Regex "
@@ -155,6 +196,7 @@ function CandelaUi.show_prompt(operation)
             -- TODO: update_window function
             CandelaPatternList.add(regex)
             print(vim.inspect(CandelaPatternList.get()))
+            vim.api.nvim_cmd({ cmd = "q" }, {})
         end)
     elseif operation == "edit" then
         CandelaUi.windows.prompt.config.title = " Edit Regex "
@@ -163,6 +205,7 @@ function CandelaUi.show_prompt(operation)
         vim.fn.prompt_setcallback(CandelaUi.windows.prompt.buf, function(input)
             -- TODO: edit(curr_pattern, input) function to edit existing pattern's regex
             -- TODO: update_window function
+            vim.api.nvim_cmd({ cmd = "q" }, {})
         end)
     elseif operation == "copy" then
         CandelaUi.windows.prompt.config.title = " New Regex From Existing "
@@ -171,27 +214,32 @@ function CandelaUi.show_prompt(operation)
         vim.fn.prompt_setcallback(CandelaUi.windows.prompt.buf, function(input)
             -- TODO: add(input) function to edit existing pattern's regex
             -- TODO: update_window function
+            vim.api.nvim_cmd({ cmd = "q" }, {})
         end)
     else
         vim.notify(string.format("Candela: invalid operation \"%s\": must be one of (add|edit|copy)", operation))
     end
-    vim.api.nvim_cmd({ cmd = "q" }, {})
     CandelaUi.windows.prompt:open_window(true)
 end
 
-function CandelaUi.hide_all()
+function CandelaUi.hide_patterns()
     for name, win in pairs(CandelaUi.windows) do
-        if name == "prompt" and CandelaUi.windows.prompt.is_open() then
-            win:close_window(true)
-        else
+        if name ~= "prompt" and win:is_open() then
             win:close_window()
         end
     end
 end
 
+function CandelaUi.hide_prompt()
+    if CandelaUi.windows.prompt:is_open() then
+        CandelaUi.windows.prompt:close_window(true)
+    end
+end
+
 function CandelaUi.toggle()
     if CandelaUi._is_open() then
-        CandelaUi.hide_all()
+        CandelaUi.hide_prompt()
+        CandelaUi.hide_patterns()
     else
         CandelaUi.show_patterns()
     end

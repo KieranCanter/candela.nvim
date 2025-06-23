@@ -46,7 +46,7 @@ function CandelaWindow:attach_to(parent_window)
 end
 
 -- Ensure buffer exists and is valid
-function CandelaWindow:_ensure_buffer()
+function CandelaWindow:ensure_buffer()
     if not self.buf or not vim.api.nvim_buf_is_valid(self.buf) then
         self.buf = vim.api.nvim_create_buf(false, true)
     end
@@ -59,7 +59,7 @@ function CandelaWindow:open_window(enter)
         return
     end
 
-    self:_ensure_buffer()
+    self:ensure_buffer()
     enter = enter or false
     self.win = vim.api.nvim_open_win(self.buf, enter, self.config)
 end
