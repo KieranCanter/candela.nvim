@@ -165,28 +165,40 @@ function CandelaUi.show_patterns()
     end
 end
 
--- HACK: could probably make this better?
--- HACK: REFACTOR PROMPT WINDOW TO NOT DELETE BUFFER BUT INSTEAD JUST WIPE THE BUFFER CONTENT
+-- HACK: could probably make this better/clean up prompt window/buffer handling consolidate to one for patterns + prompt?
 ---@param operation "add"|"edit"|"copy": type of operation to conduct
 function CandelaUi.show_prompt(operation)
     CandelaUi.windows.prompt:ensure_buffer()
     CandelaUi.windows.prompt:attach_to(CandelaUi.windows.patterns)
+    vim.fn.prompt_setprompt(CandelaUi.windows.prompt.buf, " > ")
     vim.api.nvim_set_option_value("buftype", "prompt", { buf = CandelaUi.windows.prompt.buf })
 
     vim.api.nvim_create_autocmd("BufEnter", {
         group = candela_group,
         buffer = CandelaUi.windows.prompt.buf,
+        desc = "Start the user in insert mode upon entering prompt window",
         callback = function()
-            vim.fn.prompt_setprompt(CandelaUi.windows.prompt.buf, " > ")
             vim.api.nvim_cmd( { cmd = "startinsert" }, {})
         end,
     })
-    vim.api.nvim_create_autocmd("BufLeave", {
+    vim.api.nvim_create_autocmd("WinLeave", {
         group = candela_group,
         buffer = CandelaUi.windows.prompt.buf,
+        desc = "Ensure the regex window is focused after leaving prompt window",
         callback = function()
             CandelaUi.hide_prompt()
-            vim.api.nvim_set_current_win(CandelaUi.windows.regex.win)
+            vim.defer_fn(function ()
+                vim.api.nvim_set_current_win(CandelaUi.windows.regex.win)
+            end, 1)
+        end,
+    })
+    vim.api.nvim_create_autocmd("QuitPre", {
+        group = candela_group,
+        desc = "Delete the prompt buffer right before quitting to prevent neovim asking to save prompt",
+        callback = function()
+            if CandelaUi.windows.prompt.buf and vim.api.nvim_buf_is_valid(CandelaUi.windows.prompt.buf) then
+                vim.api.nvim_buf_delete(CandelaUi.windows.prompt.buf, { force = true })
+            end
         end,
     })
 
@@ -199,10 +211,6 @@ function CandelaUi.show_prompt(operation)
             vim.api.nvim_cmd({ cmd = "q" }, {})
         end)
     elseif operation == "edit" then
-        if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
-            vim.notify("Must be in patterns window to edit regex", vim.log.levels.ERROR)
-            return
-        end
         if #CandelaPatternList.patterns == 0 then
             vim.notify("Must need at least one pattern to edit", vim.log.levels.ERROR)
             return
@@ -211,10 +219,9 @@ function CandelaUi.show_prompt(operation)
         CandelaUi.windows.prompt.config.title = " Edit Regex "
         local curr_line = vim.api.nvim_win_get_cursor(0)[1]
         local curr_pattern = CandelaPatternList.get_pattern(curr_line)
-        -- TODO: FIX WHY PROMPT BUFFER LINES ARE NOT BEING SET
-        -- TODO: also fix being asked to save before quitting prompt buffer (delete after BufWritePre?)
-        vim.api.nvim_buf_set_lines(CandelaUi.windows.prompt.buf, 0, -1, false, { curr_pattern.regex })
-        print(vim.inspect(vim.api.nvim_buf_get_lines(CandelaUi.windows.prompt.buf, 0, -1, false)))
+        vim.schedule(function ()
+            vim.api.nvim_paste(curr_pattern.regex, false, -1)
+        end)
 
         vim.fn.prompt_setcallback(CandelaUi.windows.prompt.buf, function(regex)
             CandelaPatternList.edit(curr_line, regex)
@@ -223,17 +230,28 @@ function CandelaUi.show_prompt(operation)
             vim.api.nvim_cmd({ cmd = "q" }, {})
         end)
     elseif operation == "copy" then
-        CandelaUi.windows.prompt.config.title = " New Regex from Existing "
-        -- TODO: curr_pattern = Candela.get_curr_pattern() to get currently selected pattern at the the time of edit
-        -- TODO: append curr_pattern.regex to ui.prompt.buf lines
-        vim.fn.prompt_setcallback(CandelaUi.windows.prompt.buf, function(input)
-            -- TODO: add(input) function to edit existing pattern's regex
-            -- TODO: update_window function
+        CandelaUi.windows.prompt.config.title = " Copy Regex "
+        if #CandelaPatternList.patterns == 0 then
+            vim.notify("Must need at least one pattern to copy", vim.log.levels.ERROR)
+            return
+        end
+
+        local curr_line = vim.api.nvim_win_get_cursor(0)[1]
+        local curr_pattern = CandelaPatternList.get_pattern(curr_line)
+        vim.schedule(function ()
+            vim.api.nvim_paste(curr_pattern.regex, false, -1)
+        end)
+
+        vim.fn.prompt_setcallback(CandelaUi.windows.prompt.buf, function(regex)
+            CandelaPatternList.add(regex)
+            CandelaUi.update_lines()
+            CandelaUi.resize_height()
             vim.api.nvim_cmd({ cmd = "q" }, {})
         end)
     else
         vim.notify(string.format("Candela: invalid operation \"%s\": must be one of (add|edit|copy)", operation))
     end
+
     CandelaUi.windows.prompt:open_window(true)
 end
 

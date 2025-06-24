@@ -29,7 +29,7 @@ local CandelaCommands = require("candela.commands")
 
 ---@class Candela
 ---@field ui CandelaUi
----@field patterns CandelaPattern[]
+---@field patterns CandelaPattern[]|nil
 
 local Candela = {}
 Candela.ui = { windows = {} }
@@ -40,6 +40,7 @@ function Candela.setup(opts)
     -- TODO: self.commands = CandelaCommands.setup(),
     Candela.ui = CandelaUi.new(opts)
     Candela.patterns = CandelaPatternList.get()
+    -- HACK: find better way to set up user commands? Candela (no args), Candela add/edit/copy (one arg), Candela remove (two args)
     vim.api.nvim_create_user_command("Candela", function(args)
         local args = args.fargs
         local subcommand = args[1]
@@ -51,18 +52,30 @@ function Candela.setup(opts)
             CandelaUi.show_patterns()
             CandelaUi.show_prompt("add")
         elseif subcommand == "edit" then
+            if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
+                vim.notify("Must be in patterns window to edit regex", vim.log.levels.ERROR)
+                return
+            end
             CandelaUi.show_patterns()
             CandelaUi.show_prompt("edit")
         elseif subcommand == "copy" then
+            if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
+                vim.notify("Must be in patterns window to copy regex", vim.log.levels.ERROR)
+                return
+            end
             CandelaUi.show_patterns()
             CandelaUi.show_prompt("copy")
-        --[[
         elseif subcommand == "remove" then
-            CandelaPatternList.remove(tail)
-            require("candela").remove(tail)
-        --]]
+            -- TODO: Implement remove
+            if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
+                vim.notify("Must be in patterns window to remove regex", vim.log.levels.ERROR)
+                return
+            end
+            print(tail)
         elseif subcommand == "clear" then
-            Candela.ui.hide(CandelaUi.windows)
+            -- TODO: Implement clear
+            --Candela.patterns = {}
+            --CandelaUi.show_patterns()
         else
             vim.notify("Candela: unsupported command: " .. subcommand, vim.log.levels.ERROR)
         end

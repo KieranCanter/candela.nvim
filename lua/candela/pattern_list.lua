@@ -22,7 +22,7 @@ end
 ---@param highlight? boolean = true
 ---@param lightbox? boolean = true
 function CandelaPatternList.add(regex, color, highlight, lightbox)
-    if regex == nil then
+    if regex == "" then
         vim.notify("Regex cannot be empty", vim.log.levels.ERROR)
         return
     end
@@ -49,10 +49,6 @@ end
 ---@param new_regex string: new regex to change pattern to
 function CandelaPatternList.edit(old_pattern_index, new_regex)
     CandelaPatternList.patterns[old_pattern_index].regex = new_regex
-end
-
-function CandelaPatternList.clear()
-    CandelaPatternList.patterns = {}
 end
 
 return CandelaPatternList

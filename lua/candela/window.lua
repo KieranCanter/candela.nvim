@@ -71,29 +71,20 @@ function CandelaWindow:is_open()
 end
 
 -- Close window
----@param close_buf boolean=false
-function CandelaWindow:close_window(close_buf)
+function CandelaWindow:close_window()
     if not self:is_open() then
         return
     end
 
     vim.api.nvim_win_close(self.win, true)
     self.win = nil
-
-    close_buf = close_buf or false
-    if close_buf then
-        vim.api.nvim_buf_delete(self.buf, { force = true })
-        self.buf = nil
-    end
 end
 
 -- Toggle window
 ---@param enter boolean=false
----@param close_buf boolean=false
-function CandelaWindow:toggle(enter, close_buf)
+function CandelaWindow:toggle(enter)
     if self:is_open() then
-        close_buf = close_buf or false
-        self:close_window(close_buf)
+        self:close_window()
     else
         enter = enter or false
         self:open_window(enter)
