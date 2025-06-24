@@ -7,8 +7,14 @@ local CandelaPattern = require("candela.pattern")
 local CandelaPatternList = {}
 CandelaPatternList.patterns = {}
 
+---@return CandelaPatternList
 function CandelaPatternList.get()
     return CandelaPatternList.patterns
+end
+
+---@return CandelaPattern
+function CandelaPatternList.get_pattern(index)
+    return CandelaPatternList.patterns[index]
 end
 
 ---@param regex string
@@ -16,6 +22,11 @@ end
 ---@param highlight? boolean = true
 ---@param lightbox? boolean = true
 function CandelaPatternList.add(regex, color, highlight, lightbox)
+    if regex == nil then
+        vim.notify("Regex cannot be empty", vim.log.levels.ERROR)
+        return
+    end
+
     color = color or "#FFFFFF" -- TODO: implement function to generate color from pool of colors
     if highlight == nil then
         highlight = true

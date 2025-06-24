@@ -51,10 +51,10 @@ function CandelaUi.setup(opts)
         row = vert_center,
         zindex = 1,
     })
-    local colors = CandelaWindow.new({
+    local color = CandelaWindow.new({
         relative = "win",
         width = pattern_color_width,
-        height = pattern_height,
+        height = patterns.config.height - 2,
         style = "minimal",
         focusable = false,
         title = " Color ",
@@ -67,7 +67,7 @@ function CandelaUi.setup(opts)
     local regex = CandelaWindow.new({
         relative = "win",
         width = pattern_regex_width,
-        height = pattern_height,
+        height = patterns.config.height - 2,
         style = "minimal",
         title = " Regex ",
         title_pos = "left",
@@ -79,7 +79,7 @@ function CandelaUi.setup(opts)
     local highlight = CandelaWindow.new({
         relative = "win",
         width = pattern_ops_width,
-        height = pattern_height,
+        height = patterns.config.height - 2,
         style = "minimal",
         focusable = false,
         title = " H ",
@@ -92,7 +92,7 @@ function CandelaUi.setup(opts)
     local lightbox = CandelaWindow.new({
         relative = "win",
         width = pattern_ops_width,
-        height = pattern_height,
+        height = patterns.config.height - 2,
         style = "minimal",
         focusable = false,
         title = " L ",
@@ -115,7 +115,7 @@ function CandelaUi.setup(opts)
     })
 
     CandelaUi.windows.patterns = patterns
-    CandelaUi.windows.colors = colors
+    CandelaUi.windows.color = color
     CandelaUi.windows.regex = regex
     CandelaUi.windows.highlight = highlight
     CandelaUi.windows.lightbox = lightbox
@@ -150,14 +150,15 @@ function CandelaUi.show_patterns()
     if CandelaUi.windows.patterns == nil then
         vim.notify("Need patterns window to attach to", vim.log.levels.ERROR)
     end
+
     CandelaUi.windows.patterns:open_window() -- open patterns first to attach other windows
 
     for name, win in pairs(CandelaUi.windows) do
-        if name ~= "patterns" and name ~= "prompt" then
+        if name ~= "patterns" then
             win:attach_to(CandelaUi.windows.patterns)
             if name == "regex" then
                 win:open_window(true)
-            else
+            elseif name ~= "prompt" then
                 win:open_window()
             end
         end
@@ -192,19 +193,33 @@ function CandelaUi.show_prompt(operation)
     if operation == "add" then
         CandelaUi.windows.prompt.config.title = " Add Regex "
         vim.fn.prompt_setcallback(CandelaUi.windows.prompt.buf, function(regex)
-            -- TODO: add(input) function to add new pattern
-            -- TODO: update_window function
             CandelaPatternList.add(regex)
-            print(vim.inspect(CandelaPatternList.get()))
+            CandelaUi.update_lines()
+            CandelaUi.resize_height()
             vim.api.nvim_cmd({ cmd = "q" }, {})
         end)
     elseif operation == "edit" then
+        if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
+            vim.notify("Must be in patterns window to edit regex", vim.log.levels.ERROR)
+            return
+        end
+        if #CandelaPatternList.patterns == 0 then
+            vim.notify("Must need at least one pattern to edit", vim.log.levels.ERROR)
+            return
+        end
+
         CandelaUi.windows.prompt.config.title = " Edit Regex "
-        -- TODO: curr_pattern = Candela.get_curr_pattern() to get currently selected pattern at the the time of edit
-        -- TODO: append curr_pattern.regex to ui.prompt.buf lines
-        vim.fn.prompt_setcallback(CandelaUi.windows.prompt.buf, function(input)
-            -- TODO: edit(curr_pattern, input) function to edit existing pattern's regex
-            -- TODO: update_window function
+        local curr_line = vim.api.nvim_win_get_cursor(0)[1]
+        local curr_pattern = CandelaPatternList.get_pattern(curr_line)
+        -- TODO: FIX WHY PROMPT BUFFER LINES ARE NOT BEING SET
+        -- TODO: also fix being asked to save before quitting prompt buffer (delete after BufWritePre?)
+        vim.api.nvim_buf_set_lines(CandelaUi.windows.prompt.buf, 0, -1, false, { curr_pattern.regex })
+        print(vim.inspect(vim.api.nvim_buf_get_lines(CandelaUi.windows.prompt.buf, 0, -1, false)))
+
+        vim.fn.prompt_setcallback(CandelaUi.windows.prompt.buf, function(regex)
+            CandelaPatternList.edit(curr_line, regex)
+            CandelaUi.update_lines()
+            CandelaUi.resize_height()
             vim.api.nvim_cmd({ cmd = "q" }, {})
         end)
     elseif operation == "copy" then
@@ -222,6 +237,63 @@ function CandelaUi.show_prompt(operation)
     CandelaUi.windows.prompt:open_window(true)
 end
 
+---@param name string: Field name
+---@param field string|boolean: CandelaPattern[field]
+---@return string: String to input into buffer lines
+local function _format_field(name, field)
+    if type(field) == "boolean" then
+        return field and "  ✓  " or "  ✘  "
+    elseif name == "regex" then
+        return ("/" .. field .. "/") or ""
+    else
+        return field or ""
+    end
+end
+
+-- Update lines of the patterns buffers
+function CandelaUi.update_lines()
+    local all_lines = {
+        color = {},
+        regex = {},
+        highlight = {},
+        lightbox = {},
+    }
+
+    for _, pattern in ipairs(CandelaPatternList.patterns) do
+        for field, _ in pairs(all_lines) do
+            table.insert(all_lines[field], _format_field(field, pattern[field]))
+        end
+    end
+
+    for field, lines in pairs(all_lines) do
+        vim.api.nvim_set_option_value("modifiable", true, { buf = CandelaUi.windows[field].buf })
+        vim.api.nvim_buf_set_lines(CandelaUi.windows[field].buf, 0, -1, false, lines)
+        vim.api.nvim_set_option_value("modifiable", false, { buf = CandelaUi.windows[field].buf })
+    end
+end
+
+-- if the number of patterns in list exceeds the height of the current height, increase height of patterns windows
+function CandelaUi.resize_height()
+    local curr_height = vim.api.nvim_win_get_height(CandelaUi.windows.regex.win) -- Num of shown entries
+    if #CandelaPatternList.patterns > curr_height then
+        local new_height = math.min(CandelaUi.windows.patterns.config.height + 1, vim.o.lines - 6)
+        local prompt_height = CandelaUi.windows.prompt.config.height
+        local new_vert_center = math.floor((vim.o.lines - new_height - prompt_height - 2) / 2)
+        CandelaUi.windows.patterns.config.row = new_vert_center
+        CandelaUi.windows.patterns.config.height = new_height
+        vim.api.nvim_win_set_config(CandelaUi.windows.patterns.win, CandelaUi.windows.patterns.config)
+
+        for name, win in pairs(CandelaUi.windows) do
+            if name ~= "prompt" and name ~= "patterns" then
+                win.config.height = CandelaUi.windows.patterns.config.height - 2
+                vim.api.nvim_win_set_config(win.win, win.config)
+            end
+        end
+        CandelaUi.windows.prompt.config.row = CandelaUi.windows.patterns.config.height
+        vim.api.nvim_win_set_config(CandelaUi.windows.prompt.win, CandelaUi.windows.prompt.config)
+    end
+end
+
 function CandelaUi.hide_patterns()
     for name, win in pairs(CandelaUi.windows) do
         if name ~= "prompt" and win:is_open() then
@@ -232,7 +304,9 @@ end
 
 function CandelaUi.hide_prompt()
     if CandelaUi.windows.prompt:is_open() then
-        CandelaUi.windows.prompt:close_window(true)
+        -- CandelaUi.windows.prompt:close_window(true)
+        -- HACK: testing not deleting prompt buffer on hide
+        CandelaUi.windows.prompt:close_window()
     end
 end
 
