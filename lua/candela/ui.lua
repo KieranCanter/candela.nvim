@@ -166,6 +166,7 @@ function CandelaUi.show_patterns()
 end
 
 -- HACK: could probably make this better/clean up prompt window/buffer handling consolidate to one for patterns + prompt?
+-- HACK: should probably split operations up into separate functions to reduce conditional processing
 ---@param operation "add"|"edit"|"copy": type of operation to conduct
 function CandelaUi.show_prompt(operation)
     CandelaUi.windows.prompt:ensure_buffer()
@@ -210,6 +211,8 @@ function CandelaUi.show_prompt(operation)
             CandelaUi.resize_height()
             vim.api.nvim_cmd({ cmd = "q" }, {})
         end)
+
+        CandelaUi.windows.prompt:open_window(true)
     elseif operation == "edit" then
         if #CandelaPatternList.patterns == 0 then
             vim.notify("Must need at least one pattern to edit", vim.log.levels.ERROR)
@@ -226,9 +229,10 @@ function CandelaUi.show_prompt(operation)
         vim.fn.prompt_setcallback(CandelaUi.windows.prompt.buf, function(regex)
             CandelaPatternList.edit(curr_line, regex)
             CandelaUi.update_lines()
-            CandelaUi.resize_height()
             vim.api.nvim_cmd({ cmd = "q" }, {})
         end)
+
+        CandelaUi.windows.prompt:open_window(true)
     elseif operation == "copy" then
         CandelaUi.windows.prompt.config.title = " Copy Regex "
         if #CandelaPatternList.patterns == 0 then
@@ -248,11 +252,60 @@ function CandelaUi.show_prompt(operation)
             CandelaUi.resize_height()
             vim.api.nvim_cmd({ cmd = "q" }, {})
         end)
-    else
-        vim.notify(string.format("Candela: invalid operation \"%s\": must be one of (add|edit|copy)", operation))
-    end
 
-    CandelaUi.windows.prompt:open_window(true)
+        CandelaUi.windows.prompt:open_window(true)
+    elseif operation == "remove" then
+        if #CandelaPatternList.patterns == 0 then
+            vim.notify("Must need at least one pattern to remove", vim.log.levels.ERROR)
+            return
+        end
+
+        local curr_line = vim.api.nvim_win_get_cursor(0)[1]
+        CandelaPatternList.remove(curr_line)
+        CandelaUi.update_lines()
+        CandelaUi.resize_height() -- TODO: Shrink height if size decreases
+    elseif operation == "change_color" then
+        if #CandelaPatternList.patterns == 0 then
+            vim.notify("Must need at least one pattern to change color", vim.log.levels.ERROR)
+            return
+        end
+
+        CandelaUi.windows.prompt.config.title = " Change Color "
+        local curr_line = vim.api.nvim_win_get_cursor(0)[1]
+        local curr_pattern = CandelaPatternList.get_pattern(curr_line)
+        vim.schedule(function ()
+            vim.api.nvim_paste(curr_pattern.color, false, -1)
+        end)
+
+        vim.fn.prompt_setcallback(CandelaUi.windows.prompt.buf, function(color)
+            CandelaPatternList.change_color(curr_line, color)
+            CandelaUi.update_lines()
+            CandelaUi.resize_height()
+            vim.api.nvim_cmd({ cmd = "q" }, {})
+        end)
+
+        CandelaUi.windows.prompt:open_window(true)
+    elseif operation == "toggle_highlight" then
+        if #CandelaPatternList.patterns == 0 then
+            vim.notify("Must need at least one pattern to toggle highlight", vim.log.levels.ERROR)
+            return
+        end
+
+        local curr_line = vim.api.nvim_win_get_cursor(0)[1]
+        CandelaPatternList.toggle_highlight(curr_line)
+        CandelaUi.update_lines()
+    elseif operation == "toggle_lightbox" then
+        if #CandelaPatternList.patterns == 0 then
+            vim.notify("Must need at least one pattern to toggle lightbox", vim.log.levels.ERROR)
+            return
+        end
+
+        local curr_line = vim.api.nvim_win_get_cursor(0)[1]
+        CandelaPatternList.toggle_lightbox(curr_line)
+        CandelaUi.update_lines()
+    else
+        vim.notify(string.format("Candela: invalid operation \"%s\"", operation))
+    end
 end
 
 ---@param name string: Field name
@@ -290,7 +343,7 @@ function CandelaUi.update_lines()
     end
 end
 
--- if the number of patterns in list exceeds the height of the current height, increase height of patterns windows
+-- If the number of patterns in list exceeds the height of the current height, increase height of patterns windows
 function CandelaUi.resize_height()
     local curr_height = vim.api.nvim_win_get_height(CandelaUi.windows.regex.win) -- Num of shown entries
     if #CandelaPatternList.patterns > curr_height then
@@ -319,11 +372,9 @@ function CandelaUi.hide_patterns()
         end
     end
 end
-
+-- HACK: FIX THESE SHITS
 function CandelaUi.hide_prompt()
     if CandelaUi.windows.prompt:is_open() then
-        -- CandelaUi.windows.prompt:close_window(true)
-        -- HACK: testing not deleting prompt buffer on hide
         CandelaUi.windows.prompt:close_window()
     end
 end

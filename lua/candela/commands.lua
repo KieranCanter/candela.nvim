@@ -1,11 +1,64 @@
 -- Module for defining commands
+local CandelaUi = require("candela.ui")
+local CandelaPatternList = require("candela.pattern_list")
 
 local CandelaCommands = {}
 
-function CandelaCommands.setup()
-    vim.api.nvim_create_user_command("Candela", function()
-        require("candela.ui"):toggle()
-    end, {})
+---@param args table<string, any>
+function CandelaCommands.dispatch(args)
+    local subcommand = args[1]
+    local tail = { unpack(args, 2) }
+
+    if not subcommand or subcommand == "" then
+        CandelaUi.toggle()
+    elseif subcommand == "add" then
+        CandelaUi.show_patterns() -- TODO: put show_patterns() as part of show_prompt()
+        CandelaUi.show_prompt("add")
+    elseif subcommand == "edit" then
+        if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
+            vim.notify("Candela: must be in patterns window to edit regex", vim.log.levels.ERROR)
+            return
+        end
+        CandelaUi.show_prompt("edit")
+    elseif subcommand == "copy" then
+        if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
+            vim.notify("Candela: must be in patterns window to copy regex", vim.log.levels.ERROR)
+            return
+        end
+        CandelaUi.show_prompt("copy")
+    elseif subcommand == "remove" then
+        if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
+            vim.notify("Candela: must be in patterns window to remove regex", vim.log.levels.ERROR)
+            return
+        end
+        CandelaUi.show_prompt("remove")
+        --CandelaUi.update_lines() -- TODO: put in ui_remove()
+    elseif subcommand == "change_color" then
+        if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
+            vim.notify("Candela: must be in patterns window to remove regex", vim.log.levels.ERROR)
+            return
+        end
+        CandelaUi.show_prompt("change_color") -- TODO: implement change_color in UI
+    elseif subcommand == "toggle_highlight" then
+        if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
+            vim.notify("Candela: must be in patterns window to remove regex", vim.log.levels.ERROR)
+            return
+        end
+        CandelaUi.show_prompt("toggle_highlight") -- TODO: implement change_color in UI
+        --CandelaUi.update_lines() -- TODO: put in ui_toggle_highlight()
+    elseif subcommand == "toggle_lightbox" then
+        if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
+            vim.notify("Candela: must be in patterns window to remove regex", vim.log.levels.ERROR)
+            return
+        end
+        CandelaUi.show_prompt("toggle_lightbox") -- TODO: implement change_color in UI
+        --CandelaUi.update_lines() -- TODO: put in ui_toggle_lightbox()
+    elseif subcommand == "clear" then
+        CandelaPatternList.clear()
+        CandelaUi.update_lines()
+    else
+        vim.notify("Candela: unsupported command \"" .. subcommand .. "\"", vim.log.levels.ERROR)
+    end
 end
 
 return CandelaCommands

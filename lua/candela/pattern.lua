@@ -24,33 +24,44 @@ function CandelaPattern.new(regex, color, highlight, lightbox)
     return instance
 end
 
+---@param pattern CandelaPattern
+---@param regex string
+function CandelaPattern.edit_regex(pattern, regex)
+    pattern.regex = regex
+end
+
 ---@param color string
 ---@return boolean
 local function _is_valid_color(color)
     local valid_pattern = "#%x%x%x%x%x%x"
     if not string.match(color, valid_pattern) then
-        -- TODO: notify error or something
         return false
     end
     return true
 end
 
 
+---@param pattern CandelaPattern
 ---@param new_color string
-function CandelaPattern:change_color(new_color)
+function CandelaPattern.change_color(pattern, new_color)
     if _is_valid_color(new_color) then
-        self.color = new_color
+        pattern.color = new_color
     else
-        -- TODO: notify error or something
+        vim.notify(string.format(
+            "Candela: \"%s\" is not a valid hex code", new_color),
+            vim.log.levels.ERROR
+        )
     end
 end
 
-function CandelaPattern:toggle_highlight()
-    self.highlight = not self.highlight
+---@param pattern CandelaPattern
+function CandelaPattern.toggle_highlight(pattern)
+    pattern.highlight = not pattern.highlight
 end
 
-function CandelaPattern:toggle_lightbox()
-    self.lightbox = not self.lightbox
+---@param pattern CandelaPattern
+function CandelaPattern.toggle_lightbox(pattern)
+    pattern.lightbox = not pattern.lightbox
 end
 
 return CandelaPattern

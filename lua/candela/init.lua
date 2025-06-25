@@ -37,60 +37,16 @@ Candela.patterns = {}
 
 function Candela.setup(opts)
     opts = CandelaConfig.setup(opts)
-    -- TODO: self.commands = CandelaCommands.setup(),
     Candela.ui = CandelaUi.new(opts)
-    Candela.patterns = CandelaPatternList.get()
-    -- HACK: find better way to set up user commands? Candela (no args), Candela add/edit/copy (one arg), Candela remove (two args)
-    vim.api.nvim_create_user_command("Candela", function(args)
-        local args = args.fargs
-        local subcommand = args[1]
-        local tail = table.concat(vim.list_slice(args, 2), " ")
+    Candela.patterns = CandelaPatternList.patterns
 
-        if subcommand == "" or subcommand == nil then
-            CandelaUi.toggle()
-        elseif subcommand == "add" then
-            CandelaUi.show_patterns()
-            CandelaUi.show_prompt("add")
-        elseif subcommand == "edit" then
-            if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
-                vim.notify("Must be in patterns window to edit regex", vim.log.levels.ERROR)
-                return
-            end
-            CandelaUi.show_patterns()
-            CandelaUi.show_prompt("edit")
-        elseif subcommand == "copy" then
-            if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
-                vim.notify("Must be in patterns window to copy regex", vim.log.levels.ERROR)
-                return
-            end
-            CandelaUi.show_patterns()
-            CandelaUi.show_prompt("copy")
-        elseif subcommand == "remove" then
-            -- TODO: Implement remove
-            if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
-                vim.notify("Must be in patterns window to remove regex", vim.log.levels.ERROR)
-                return
-            end
-            print(tail)
-        elseif subcommand == "clear" then
-            -- TODO: Implement clear
-            --Candela.patterns = {}
-            --CandelaUi.show_patterns()
-        else
-            vim.notify("Candela: unsupported command: " .. subcommand, vim.log.levels.ERROR)
-        end
+    vim.api.nvim_create_user_command("Candela", function(args)
+        CandelaCommands.dispatch(args.fargs)
     end, {
         nargs = "?",
         desc = "Regex highlighter",
-        complete = function(_, line)
-            local completions = { "add"--[[, "clear", "remove"]] }
-            local split = vim.split(line, " ")
-            if #split == 2 then
-                return vim.tbl_filter(function(c)
-                    return vim.startswith(c, split[2])
-                end, completions)
-            end
-            return {}
+        complete = function()
+           return { "add", "edit", "copy", "remove", "clear", "change_color", "toggle_highlight", "toggle_lightbox" }
         end,
     })
 end
