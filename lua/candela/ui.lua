@@ -2,7 +2,11 @@
 
 local CandelaPatternList = require("candela.pattern_list")
 local CandelaWindow = require("candela.window")
-local candela_group = vim.api.nvim_create_augroup("Candela", { clear = true })
+local CandelaEngine = require("candela.engine")
+local CandelaHighlighter = require("candela.highlighter")
+local CandelaConfig = require("candela.config")
+
+local candela_augroup = vim.api.nvim_create_augroup("Candela", { clear = true })
 
 ---@class CandelaUi
 ---@field windows table<string, CandelaWindow>
@@ -132,8 +136,10 @@ function CandelaUi.setup(opts)
         end
     end
 
+    CandelaConfig.set_keymaps(CandelaUi.windows.regex.buf)
+
     vim.api.nvim_create_autocmd("BufHidden", {
-        group = candela_group,
+        group = candela_augroup,
         buffer = CandelaUi.windows.regex.buf,
         callback = function()
             CandelaUi.hide_patterns()
@@ -143,9 +149,27 @@ end
 
 -- Open patterns window
 function CandelaUi.show_patterns()
+    -- HACK: TESTING HIGHLIGHTS
+    --local identifier = vim.api.nvim_buf_set_extmark(vim.api.nvim_get_current_buf(), candela_ns, 2, 0, {
+    --    hl_group = "pattern1",
+    --    end_row = 2,
+    --    end_col = 58,
+    --    --line_hl_group = ""
+    --    --cursorline_hl_group = ""
+    --})
+    -- HACK:
+    
     if CandelaUi._is_open() then
         return
     end
+
+    test_pattern = {
+        color = "#D06060",
+        regex = "test!.*",
+        highlight = true,
+        lightbox = true,
+    }
+    CandelaHighlighter.highlight_matches(0, test_pattern)
 
     if CandelaUi.windows.patterns == nil then
         vim.notify("Need patterns window to attach to", vim.log.levels.ERROR)
@@ -175,7 +199,7 @@ function CandelaUi.show_prompt(operation)
     vim.api.nvim_set_option_value("buftype", "prompt", { buf = CandelaUi.windows.prompt.buf })
 
     vim.api.nvim_create_autocmd("BufEnter", {
-        group = candela_group,
+        group = candela_augroup,
         buffer = CandelaUi.windows.prompt.buf,
         desc = "Start the user in insert mode upon entering prompt window",
         callback = function()
@@ -183,7 +207,7 @@ function CandelaUi.show_prompt(operation)
         end,
     })
     vim.api.nvim_create_autocmd("WinLeave", {
-        group = candela_group,
+        group = candela_augroup,
         buffer = CandelaUi.windows.prompt.buf,
         desc = "Ensure the regex window is focused after leaving prompt window",
         callback = function()
@@ -194,7 +218,7 @@ function CandelaUi.show_prompt(operation)
         end,
     })
     vim.api.nvim_create_autocmd("QuitPre", {
-        group = candela_group,
+        group = candela_augroup,
         desc = "Delete the prompt buffer right before quitting to prevent neovim asking to save prompt",
         callback = function()
             if CandelaUi.windows.prompt.buf and vim.api.nvim_buf_is_valid(CandelaUi.windows.prompt.buf) then

@@ -34,7 +34,7 @@ end
 ---@return boolean
 local function _is_valid_color(color)
     local valid_pattern = "#%x%x%x%x%x%x"
-    if not string.match(color, valid_pattern) then
+    if not string.match(color, valid_pattern) or string.len(color) ~= 7 then
         return false
     end
     return true

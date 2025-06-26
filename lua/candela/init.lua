@@ -24,8 +24,8 @@
 
 local CandelaUi = require("candela.ui")
 local CandelaPatternList = require("candela.pattern_list")
-local CandelaConfig = require("candela.config")
 local CandelaCommands = require("candela.commands")
+local CandelaConfig = require("candela.config")
 
 ---@class Candela
 ---@field ui CandelaUi
@@ -36,10 +36,6 @@ Candela.ui = { windows = {} }
 Candela.patterns = {}
 
 function Candela.setup(opts)
-    opts = CandelaConfig.setup(opts)
-    Candela.ui = CandelaUi.new(opts)
-    Candela.patterns = CandelaPatternList.patterns
-
     vim.api.nvim_create_user_command("Candela", function(args)
         CandelaCommands.dispatch(args.fargs)
     end, {
@@ -49,6 +45,10 @@ function Candela.setup(opts)
            return { "add", "edit", "copy", "remove", "clear", "change_color", "toggle_highlight", "toggle_lightbox" }
         end,
     })
+
+    opts = CandelaConfig.setup(opts)
+    Candela.ui = CandelaUi.new(opts)
+    Candela.patterns = CandelaPatternList.patterns
 end
 
 return Candela
