@@ -20,6 +20,7 @@ function CandelaWindow.new(opts)
     return instance
 end
 
+---@param self CandelaWindow
 ---@param key string
 ---@param val string|number
 function CandelaWindow:change_config(key, val)
@@ -31,6 +32,7 @@ function CandelaWindow:change_config(key, val)
     self.config[key] = val
 end
 
+---@param self CandelaWindow
 ---@param parent_window CandelaWindow
 function CandelaWindow:attach_to(parent_window)
     if not parent_window:is_open() then
@@ -53,6 +55,7 @@ function CandelaWindow:ensure_buffer()
 end
 
 -- Open windows based on config
+---@param self CandelaWindow
 ---@param enter boolean=false
 function CandelaWindow:open_window(enter)
     if self:is_open() then
@@ -65,12 +68,14 @@ function CandelaWindow:open_window(enter)
 end
 
 -- Check if the window is open
+---@param self CandelaWindow
 ---@return boolean
 function CandelaWindow:is_open()
     return self.win ~= nil and vim.api.nvim_win_is_valid(self.win)
 end
 
 -- Close window
+---@param self CandelaWindow
 function CandelaWindow:close_window()
     if not self:is_open() then
         return
@@ -78,17 +83,6 @@ function CandelaWindow:close_window()
 
     vim.api.nvim_win_close(self.win, true)
     self.win = nil
-end
-
--- Toggle window
----@param enter boolean=false
-function CandelaWindow:toggle(enter)
-    if self:is_open() then
-        self:close_window()
-    else
-        enter = enter or false
-        self:open_window(enter)
-    end
 end
 
 return CandelaWindow

@@ -136,7 +136,10 @@ function CandelaUi.setup(opts)
         end
     end
 
-    CandelaConfig.set_keymaps(CandelaUi.windows.regex.buf)
+    CandelaConfig.set_keymaps()
+    CandelaConfig.set_patterns_keymaps(CandelaUi.windows.regex.buf)
+    CandelaConfig.set_prompt_keymaps(CandelaUi.windows.prompt.buf)
+
 
     vim.api.nvim_create_autocmd("BufHidden", {
         group = candela_augroup,
@@ -149,27 +152,9 @@ end
 
 -- Open patterns window
 function CandelaUi.show_patterns()
-    -- HACK: TESTING HIGHLIGHTS
-    --local identifier = vim.api.nvim_buf_set_extmark(vim.api.nvim_get_current_buf(), candela_ns, 2, 0, {
-    --    hl_group = "pattern1",
-    --    end_row = 2,
-    --    end_col = 58,
-    --    --line_hl_group = ""
-    --    --cursorline_hl_group = ""
-    --})
-    -- HACK:
-    
-    if CandelaUi._is_open() then
+    if CandelaUi.windows.regex:is_open() then
         return
     end
-
-    test_pattern = {
-        color = "#D06060",
-        regex = "test!.*",
-        highlight = true,
-        lightbox = true,
-    }
-    CandelaHighlighter.highlight_matches(0, test_pattern)
 
     if CandelaUi.windows.patterns == nil then
         vim.notify("Need patterns window to attach to", vim.log.levels.ERROR)
@@ -190,8 +175,8 @@ function CandelaUi.show_patterns()
 end
 
 -- HACK: could probably make this better/clean up prompt window/buffer handling consolidate to one for patterns + prompt?
--- HACK: should probably split operations up into separate functions to reduce conditional processing
----@param operation "add"|"edit"|"copy": type of operation to conduct
+-- HACK: should probably split operations up into separate functions to reduce conditional processing/new file for operations?
+---@param operation string: type of operation to conduct
 function CandelaUi.show_prompt(operation)
     CandelaUi.windows.prompt:ensure_buffer()
     CandelaUi.windows.prompt:attach_to(CandelaUi.windows.patterns)
@@ -230,12 +215,14 @@ function CandelaUi.show_prompt(operation)
     if operation == "add" then
         CandelaUi.windows.prompt.config.title = " Add Regex "
         vim.fn.prompt_setcallback(CandelaUi.windows.prompt.buf, function(regex)
-            CandelaPatternList.add(regex)
-            CandelaUi.update_lines()
-            CandelaUi.resize_height()
-            vim.api.nvim_cmd({ cmd = "q" }, {})
+            local new_pattern = CandelaPatternList.add(regex)
+            if new_pattern ~= nil then
+                CandelaUi.update_lines()
+                CandelaUi.resize_height()
+                CandelaUi.hide_prompt()
+                --CandelaHighlighter.highlight_matches(CandelaUi.base_buf, new_pattern)
+            end
         end)
-
         CandelaUi.windows.prompt:open_window(true)
     elseif operation == "edit" then
         if #CandelaPatternList.patterns == 0 then
@@ -253,7 +240,7 @@ function CandelaUi.show_prompt(operation)
         vim.fn.prompt_setcallback(CandelaUi.windows.prompt.buf, function(regex)
             CandelaPatternList.edit(curr_line, regex)
             CandelaUi.update_lines()
-            vim.api.nvim_cmd({ cmd = "q" }, {})
+            CandelaUi.hide_prompt()
         end)
 
         CandelaUi.windows.prompt:open_window(true)
@@ -274,7 +261,7 @@ function CandelaUi.show_prompt(operation)
             CandelaPatternList.add(regex)
             CandelaUi.update_lines()
             CandelaUi.resize_height()
-            vim.api.nvim_cmd({ cmd = "q" }, {})
+            CandelaUi.hide_prompt()
         end)
 
         CandelaUi.windows.prompt:open_window(true)
@@ -305,7 +292,7 @@ function CandelaUi.show_prompt(operation)
             CandelaPatternList.change_color(curr_line, color)
             CandelaUi.update_lines()
             CandelaUi.resize_height()
-            vim.api.nvim_cmd({ cmd = "q" }, {})
+            CandelaUi.hide_prompt()
         end)
 
         CandelaUi.windows.prompt:open_window(true)
@@ -396,7 +383,7 @@ function CandelaUi.hide_patterns()
         end
     end
 end
--- HACK: FIX THESE SHITS
+
 function CandelaUi.hide_prompt()
     if CandelaUi.windows.prompt:is_open() then
         CandelaUi.windows.prompt:close_window()
@@ -404,23 +391,13 @@ function CandelaUi.hide_prompt()
 end
 
 function CandelaUi.toggle()
-    if CandelaUi._is_open() then
+    if CandelaUi.windows.prompt:is_open() then
         CandelaUi.hide_prompt()
+    elseif CandelaUi.windows.regex:is_open() then
         CandelaUi.hide_patterns()
     else
         CandelaUi.show_patterns()
     end
-end
-
----@return boolean
-function CandelaUi._is_open()
-    for _, window in pairs(CandelaUi.windows) do
-        if window:is_open() then
-            return true
-        end
-    end
-
-    return false
 end
 
 return CandelaUi

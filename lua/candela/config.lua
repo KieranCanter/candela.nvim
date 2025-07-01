@@ -26,8 +26,8 @@ function CandelaConfig.setup(opts)
     return CandelaConfig.options
 end
 
-function CandelaConfig.set_keymaps(buffer)
-    -- NOTE: Global keymaps (leader commands)
+function CandelaConfig.set_keymaps()
+    -- NOTE: Only for dev purposes
     vim.api.nvim_set_keymap(
         "n",
         "<leader>cds",
@@ -48,86 +48,29 @@ function CandelaConfig.set_keymaps(buffer)
             desc = "Add Candela pattern"
         }
     )
-    vim.api.nvim_set_keymap(
-        "n",
-        "<leader>cde",
-        [[:Candela edit<CR>]],
-        {
-            noremap = true,
-            silent = true,
-            desc = "Edit Candela pattern"
-        }
-    )
-    vim.api.nvim_set_keymap(
-        "n",
-        "<leader>cdc",
-        [[:Candela copy<CR>]],
-        {
-            noremap = true,
-            silent = true,
-            desc = "Copy Candela pattern"
-        }
-    )
-    vim.api.nvim_set_keymap(
-        "n",
-        "<leader>cdr",
-        [[:Candela remove<CR>]],
-        {
-            noremap = true,
-            silent = true,
-            desc = "Remove Candela pattern"
-        }
-    )
-    vim.api.nvim_set_keymap(
-        "n",
-        "<leader>cd<backspace>",
-        [[:Candela clear<CR>]],
-        {
-            noremap = true,
-            silent = true,
-            desc = "Clear all Candela patterns"
-        }
-    )
-    vim.api.nvim_set_keymap(
-        "n",
-        "<leader>cd<CR>",
-        [[:Candela change_color<CR>]],
-        {
-            noremap = true,
-            silent = true,
-            desc = "Change Candela pattern color"
-        }
-    )
-    vim.api.nvim_set_keymap(
-        "n",
-        "<leader>cdh",
-        [[:Candela toggle_highlight<CR>]],
-        {
-            noremap = true,
-            silent = true,
-            desc = "Toggle Candela pattern highlight"
-        }
-    )
-    vim.api.nvim_set_keymap(
-        "n",
-        "<leader>cdl",
-        [[:Candela toggle_lightbox<CR>]],
-        {
-            noremap = true,
-            silent = true,
-            desc = "Toggle Candela pattern lightbox"
-        }
-    )
+end
 
-    -- NOTE: Buffer keymaps (quick commands)
-    vim.api.nvim_set_keymap(
+function CandelaConfig.set_patterns_keymaps(buffer)
+    vim.api.nvim_buf_set_keymap(
+        buffer,
         "n",
         "q",
         [[:Candela<CR>]],
         {
             noremap = true,
             silent = true,
-            desc = "Toggle Candela patterns window",
+            desc = "Close Candela",
+        }
+    )
+    vim.api.nvim_buf_set_keymap(
+        buffer,
+        "n",
+        "<ESC>",
+        [[:Candela<CR>]],
+        {
+            noremap = true,
+            silent = true,
+            desc = "Close Candela"
         }
     )
     vim.api.nvim_buf_set_keymap(
@@ -188,7 +131,7 @@ function CandelaConfig.set_keymaps(buffer)
     vim.api.nvim_buf_set_keymap(
         buffer,
         "n",
-        "<CR>",
+        "C",
         [[:Candela change_color<CR>]],
         {
             noremap = true,
@@ -216,6 +159,31 @@ function CandelaConfig.set_keymaps(buffer)
             noremap = true,
             silent = true,
             desc = "Toggle Candela pattern lightbox"
+        }
+    )
+end
+
+function CandelaConfig.set_prompt_keymaps(buffer)
+    vim.api.nvim_buf_set_keymap(
+        buffer,
+        "n",
+        "q",
+        [[:Candela<CR>]],
+        {
+            noremap = true,
+            silent = true,
+            desc = "Close Prompt",
+        }
+    )
+    vim.api.nvim_buf_set_keymap(
+        buffer,
+        "n",
+        "<ESC>",
+        [[:Candela<CR>]],
+        {
+            noremap = true,
+            silent = true,
+            desc = "Close Prompt"
         }
     )
 end

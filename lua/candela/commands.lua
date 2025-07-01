@@ -12,7 +12,7 @@ function CandelaCommands.dispatch(args)
     if not subcommand or subcommand == "" then
         CandelaUi.toggle()
     elseif subcommand == "add" then
-        CandelaUi.show_patterns() -- TODO: put show_patterns() as part of show_prompt()
+        CandelaUi.show_patterns()
         CandelaUi.show_prompt("add")
     elseif subcommand == "edit" then
         if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
@@ -32,7 +32,6 @@ function CandelaCommands.dispatch(args)
             return
         end
         CandelaUi.show_prompt("remove")
-        --CandelaUi.update_lines() -- TODO: put in ui_remove()
     elseif subcommand == "change_color" then
         if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
             vim.notify("Candela: must be in patterns window to remove regex", vim.log.levels.ERROR)

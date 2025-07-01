@@ -21,13 +21,14 @@ function CandelaPattern.new(regex, color, highlight, lightbox)
         lightbox = lightbox,
     }
 
+    setmetatable(instance, { __index = CandelaPattern })
     return instance
 end
 
----@param pattern CandelaPattern
+---@param self CandelaPattern
 ---@param regex string
-function CandelaPattern.edit_regex(pattern, regex)
-    pattern.regex = regex
+function CandelaPattern:edit_regex(regex)
+    self.regex = regex
 end
 
 ---@param color string
@@ -41,11 +42,11 @@ local function _is_valid_color(color)
 end
 
 
----@param pattern CandelaPattern
+---@param self CandelaPattern
 ---@param new_color string
-function CandelaPattern.change_color(pattern, new_color)
+function CandelaPattern:change_color(new_color)
     if _is_valid_color(new_color) then
-        pattern.color = new_color
+        self.color = new_color
     else
         vim.notify(string.format(
             "Candela: \"%s\" is not a valid hex code", new_color),
@@ -54,14 +55,14 @@ function CandelaPattern.change_color(pattern, new_color)
     end
 end
 
----@param pattern CandelaPattern
-function CandelaPattern.toggle_highlight(pattern)
-    pattern.highlight = not pattern.highlight
+---@param self CandelaPattern
+function CandelaPattern:toggle_highlight()
+    self.highlight = not self.highlight
 end
 
----@param pattern CandelaPattern
-function CandelaPattern.toggle_lightbox(pattern)
-    pattern.lightbox = not pattern.lightbox
+---@param self CandelaPattern
+function CandelaPattern:toggle_lightbox()
+    self.lightbox = not self.lightbox
 end
 
 return CandelaPattern
