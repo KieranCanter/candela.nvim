@@ -37,21 +37,19 @@ function CandelaCommands.dispatch(args)
             vim.notify("Candela: must be in patterns window to remove regex", vim.log.levels.ERROR)
             return
         end
-        CandelaUi.show_prompt("change_color") -- TODO: implement change_color in UI
+        CandelaUi.show_prompt("change_color")
     elseif subcommand == "toggle_highlight" then
         if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
             vim.notify("Candela: must be in patterns window to remove regex", vim.log.levels.ERROR)
             return
         end
-        CandelaUi.show_prompt("toggle_highlight") -- TODO: implement change_color in UI
-        --CandelaUi.update_lines() -- TODO: put in ui_toggle_highlight()
+        CandelaUi.show_prompt("toggle_highlight")
     elseif subcommand == "toggle_lightbox" then
         if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
             vim.notify("Candela: must be in patterns window to remove regex", vim.log.levels.ERROR)
             return
         end
-        CandelaUi.show_prompt("toggle_lightbox") -- TODO: implement change_color in UI
-        --CandelaUi.update_lines() -- TODO: put in ui_toggle_lightbox()
+        CandelaUi.show_prompt("toggle_lightbox")
     elseif subcommand == "clear" then
         CandelaPatternList.clear()
         CandelaUi.update_lines()

@@ -387,6 +387,7 @@ end
 function CandelaUi.hide_prompt()
     if CandelaUi.windows.prompt:is_open() then
         CandelaUi.windows.prompt:close_window()
+        vim.api.nvim_buf_set_lines(CandelaUi.windows.prompt.buf, 0, -1, false, {})
     end
 end
 
