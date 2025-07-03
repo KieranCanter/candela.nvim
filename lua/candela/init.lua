@@ -20,6 +20,12 @@
 --    * vim.api.nvim_win_get_cursor(0)[1] = vim.fn.line('.')
 --    * vim.api.nvim_win_get_cursor(0)[2] + 1 = vim.fn.line('.')
 --    * vim.api.nvim_buf_get_name(0) = vim.fn.expand('%:p') (path name)
+--
+--  * future improvements
+--    * TODO: attach number of matches to pattern class as field and include in ui (new window?)
+--    * automatically rerun highlighting on buffer change
+--    * highlight the color's bg in ui the hex code's appropriate color
+--    * implement a good method of color picking?
 --]]
 
 local CandelaUi = require("candela.ui")

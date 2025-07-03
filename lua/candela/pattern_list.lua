@@ -13,25 +13,23 @@ function CandelaPatternList.get_pattern(index)
 end
 
 ---@param regex string
----@param color? string --|generate_color()
----@param highlight? boolean = true
----@param lightbox? boolean = true
 ---@return CandelaPattern | nil
-function CandelaPatternList.add(regex, color, highlight, lightbox)
+function CandelaPatternList.add(regex)
     if regex == "" then
-        vim.notify("Regex cannot be empty", vim.log.levels.ERROR)
+        vim.notify("Candela: Regex cannot be empty", vim.log.levels.ERROR)
+        return
+    end
+    if require("candela.ui").base_buf == "" then
+        vim.notify("Candela: No valid base buffer", vim.log.levels.ERROR)
         return
     end
 
-    color = color or "#FFFFFF" -- TODO: implement function to generate color from pool of colors
-    if highlight == nil then
-        highlight = true
-    end
-    if lightbox == nil then
-        lightbox = true
-    end
+    local color = "#6666DD" -- TODO: implement function to generate color from pool of colors
+    local highlight = true
+    local lightbox = true
+    local count = 0
 
-    local new_pattern = CandelaPattern.new(regex, color, highlight, lightbox)
+    local new_pattern = CandelaPattern.new(regex, color, highlight, lightbox, count)
     for _, pattern in ipairs(CandelaPatternList.patterns) do
         if pattern.regex == new_pattern.regex then
             vim.notify(string.format("Regex /%s/ already exists.", pattern.regex), vim.log.levels.ERROR)

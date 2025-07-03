@@ -10,6 +10,7 @@ local candela_augroup = vim.api.nvim_create_augroup("Candela", { clear = true })
 
 ---@class CandelaUi
 ---@field windows table<string, CandelaWindow>
+---@field base_buf number
 
 local CandelaUi = {}
 CandelaUi.windows = {} -- singleton field
@@ -152,6 +153,9 @@ end
 
 -- Open patterns window
 function CandelaUi.show_patterns()
+    if CandelaUi.base_buf == nil or vim.api.nvim_buf_get_name(CandelaUi.base_buf) == "" then
+        CandelaUi.base_buf = vim.api.nvim_get_current_buf()
+    end
     if CandelaUi.windows.regex:is_open() then
         return
     end
@@ -220,7 +224,7 @@ function CandelaUi.show_prompt(operation)
                 CandelaUi.update_lines()
                 CandelaUi.resize_height()
                 CandelaUi.hide_prompt()
-                --CandelaHighlighter.highlight_matches(CandelaUi.base_buf, new_pattern)
+                CandelaHighlighter.highlight_matches(CandelaUi.base_buf, new_pattern, CandelaEngine.ripgrep_lines)
             end
         end)
         CandelaUi.windows.prompt:open_window(true)

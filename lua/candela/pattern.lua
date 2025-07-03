@@ -5,6 +5,7 @@
 ---@field color string
 ---@field highlight boolean
 ---@field lightbox boolean
+---@field count boolean
 
 local CandelaPattern = {}
 
@@ -13,12 +14,13 @@ local CandelaPattern = {}
 ---@param highlight boolean:
 ---@param lightbox boolean:
 ---@return CandelaPattern
-function CandelaPattern.new(regex, color, highlight, lightbox)
+function CandelaPattern.new(regex, color, highlight, lightbox, count)
     local instance = {
         regex = regex,
         color = color,
         highlight = highlight,
         lightbox = lightbox,
+        count = count,
     }
 
     setmetatable(instance, { __index = CandelaPattern })
