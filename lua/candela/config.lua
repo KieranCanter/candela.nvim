@@ -28,7 +28,7 @@ function CandelaConfig.setup(opts)
 end
 
 function CandelaConfig.set_keymaps()
-    -- NOTE: Only for dev purposes
+    -- NOTE: Only for dev purposes, leave for user to create
     vim.api.nvim_set_keymap(
         "n",
         "<leader>cds",
@@ -160,6 +160,17 @@ function CandelaConfig.set_patterns_keymaps(buffer)
             noremap = true,
             silent = true,
             desc = "Toggle Candela pattern lightbox"
+        }
+    )
+    vim.api.nvim_buf_set_keymap(
+        buffer,
+        "n",
+        "?",
+        [[:Candela help<CR>]],
+        {
+            noremap = true,
+            silent = true,
+            desc = "Display Candela keymaps"
         }
     )
 end

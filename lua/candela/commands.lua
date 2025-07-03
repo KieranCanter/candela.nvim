@@ -3,6 +3,8 @@ local CandelaUi = require("candela.ui")
 local CandelaPatternList = require("candela.pattern_list")
 
 local CandelaCommands = {}
+CandelaCommands.commands = { "add", "edit", "copy", "remove", "clear", "change_color", "toggle_highlight", "toggle_lightbox" }
+-- TODO: add above commands as variables to CandelaCommands holding functions to each command
 
 ---@param args table<string, any>
 function CandelaCommands.dispatch(args)
@@ -32,6 +34,14 @@ function CandelaCommands.dispatch(args)
             return
         end
         CandelaUi.show_prompt("remove")
+    elseif subcommand == "clear" then
+        if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
+            vim.notify("Candela: must be in patterns window to clear all", vim.log.levels.ERROR)
+            return
+        end
+        CandelaUi.show_prompt("clear")
+        --CandelaPatternList.clear()
+        --CandelaUi.update_lines()
     elseif subcommand == "change_color" then
         if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
             vim.notify("Candela: must be in patterns window to remove regex", vim.log.levels.ERROR)
@@ -50,9 +60,6 @@ function CandelaCommands.dispatch(args)
             return
         end
         CandelaUi.show_prompt("toggle_lightbox")
-    elseif subcommand == "clear" then
-        CandelaPatternList.clear()
-        CandelaUi.update_lines()
     else
         vim.notify("Candela: unsupported command \"" .. subcommand .. "\"", vim.log.levels.ERROR)
     end

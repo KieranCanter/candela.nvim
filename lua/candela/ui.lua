@@ -191,7 +191,7 @@ function CandelaUi.show_patterns()
         end
     end
 
-    vim.wo[CandelaUi.windows.count.win].winhighlight = "Normal:LineNr"
+    vim.wo[CandelaUi.windows.count.win].winhighlight = "Normal:Comment"
 end
 
 -- HACK: could probably make this better/clean up prompt window/buffer handling consolidate to one for patterns + prompt?
@@ -247,7 +247,7 @@ function CandelaUi.show_prompt(operation)
         CandelaUi.windows.prompt:open_window(true)
     elseif operation == "edit" then
         if #CandelaPatternList.patterns == 0 then
-            vim.notify("Must need at least one pattern to edit", vim.log.levels.ERROR)
+            vim.notify("Candela: no patterns to edit", vim.log.levels.ERROR)
             return
         end
 
@@ -259,7 +259,10 @@ function CandelaUi.show_prompt(operation)
         end)
 
         vim.fn.prompt_setcallback(CandelaUi.windows.prompt.buf, function(regex)
-            CandelaPatternList.edit(curr_line, regex)
+            CandelaHighlighter.remove_highlight(CandelaUi.base_buf, curr_pattern.regex)
+            local new_pattern = CandelaPatternList.edit(curr_line, regex)
+            new_pattern.count =
+                CandelaHighlighter.highlight_matches(CandelaUi.base_buf, new_pattern, CandelaEngine.ripgrep_lines)
             CandelaUi.update_lines()
             CandelaUi.hide_prompt()
         end)
@@ -268,7 +271,7 @@ function CandelaUi.show_prompt(operation)
     elseif operation == "copy" then
         CandelaUi.windows.prompt.config.title = " Copy Regex "
         if #CandelaPatternList.patterns == 0 then
-            vim.notify("Must need at least one pattern to copy", vim.log.levels.ERROR)
+            vim.notify("Candela: no patterns to copy", vim.log.levels.ERROR)
             return
         end
 
@@ -279,7 +282,9 @@ function CandelaUi.show_prompt(operation)
         end)
 
         vim.fn.prompt_setcallback(CandelaUi.windows.prompt.buf, function(regex)
-            CandelaPatternList.add(regex)
+            local new_pattern = CandelaPatternList.add(regex)
+            new_pattern.count =
+                CandelaHighlighter.highlight_matches(CandelaUi.base_buf, new_pattern, CandelaEngine.ripgrep_lines)
             CandelaUi.update_lines()
             CandelaUi.resize_height()
             CandelaUi.hide_prompt()
@@ -288,17 +293,32 @@ function CandelaUi.show_prompt(operation)
         CandelaUi.windows.prompt:open_window(true)
     elseif operation == "remove" then
         if #CandelaPatternList.patterns == 0 then
-            vim.notify("Must need at least one pattern to remove", vim.log.levels.ERROR)
+            vim.notify("Candela: no patterns to remove", vim.log.levels.ERROR)
             return
         end
 
         local curr_line = vim.api.nvim_win_get_cursor(0)[1]
+        local curr_pattern = CandelaPatternList.get_pattern(curr_line)
         CandelaPatternList.remove(curr_line)
+        CandelaHighlighter.remove_highlight(CandelaUi.base_buf, curr_pattern.regex)
+        CandelaUi.update_lines()
+        CandelaUi.resize_height() -- TODO: Shrink height if size decreases
+    elseif operation == "clear" then
+        if #CandelaPatternList.patterns == 0 then
+            vim.notify("Candela: no patterns to clear", vim.log.levels.ERROR)
+            return
+        end
+
+        local patterns = CandelaPatternList.patterns
+        CandelaPatternList.clear()
+        for _, pattern in ipairs(patterns) do
+            CandelaHighlighter.remove_highlight(CandelaUi.base_buf, pattern.regex)
+        end
         CandelaUi.update_lines()
         CandelaUi.resize_height() -- TODO: Shrink height if size decreases
     elseif operation == "change_color" then
         if #CandelaPatternList.patterns == 0 then
-            vim.notify("Must need at least one pattern to change color", vim.log.levels.ERROR)
+            vim.notify("Candela: no patterns to change color", vim.log.levels.ERROR)
             return
         end
 
@@ -310,7 +330,8 @@ function CandelaUi.show_prompt(operation)
         end)
 
         vim.fn.prompt_setcallback(CandelaUi.windows.prompt.buf, function(color)
-            CandelaPatternList.change_color(curr_line, color)
+            local new_pattern = CandelaPatternList.change_color(curr_line, color)
+            CandelaHighlighter.change_highlight_color(CandelaUi.base_buf, curr_pattern.regex, new_pattern.color)
             CandelaUi.update_lines()
             CandelaUi.resize_height()
             CandelaUi.hide_prompt()
@@ -319,21 +340,28 @@ function CandelaUi.show_prompt(operation)
         CandelaUi.windows.prompt:open_window(true)
     elseif operation == "toggle_highlight" then
         if #CandelaPatternList.patterns == 0 then
-            vim.notify("Must need at least one pattern to toggle highlight", vim.log.levels.ERROR)
+            vim.notify("Candela: no patterns to toggle highlight", vim.log.levels.ERROR)
             return
         end
 
         local curr_line = vim.api.nvim_win_get_cursor(0)[1]
-        CandelaPatternList.toggle_highlight(curr_line)
+        local curr_pattern = CandelaPatternList.get_pattern(curr_line)
+        local is_highlighted = CandelaPatternList.toggle_highlight(curr_line)
+        if is_highlighted then
+            CandelaHighlighter.highlight_matches(CandelaUi.base_buf, curr_pattern, CandelaEngine.ripgrep_lines)
+        else
+            CandelaHighlighter.remove_highlight(CandelaUi.base_buf, curr_pattern.regex)
+        end
         CandelaUi.update_lines()
     elseif operation == "toggle_lightbox" then
         if #CandelaPatternList.patterns == 0 then
-            vim.notify("Must need at least one pattern to toggle lightbox", vim.log.levels.ERROR)
+            vim.notify("Candela: no patterns to toggle lightbox", vim.log.levels.ERROR)
             return
         end
 
         local curr_line = vim.api.nvim_win_get_cursor(0)[1]
-        CandelaPatternList.toggle_lightbox(curr_line)
+        local curr_pattern = CandelaPatternList.get_pattern(curr_line)
+        local is_lightboxed = CandelaPatternList.toggle_lightbox(curr_line)
         CandelaUi.update_lines()
     else
         vim.notify(string.format("Candela: invalid operation \"%s\"", operation))
