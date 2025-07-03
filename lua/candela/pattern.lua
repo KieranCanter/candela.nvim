@@ -5,14 +5,15 @@
 ---@field color string
 ---@field highlight boolean
 ---@field lightbox boolean
----@field count boolean
+---@field count number
 
 local CandelaPattern = {}
 
----@param regex string:
----@param color string:
----@param highlight boolean:
----@param lightbox boolean:
+---@param regex string
+---@param color string
+---@param highlight boolean
+---@param lightbox boolean
+---@param count number
 ---@return CandelaPattern
 function CandelaPattern.new(regex, color, highlight, lightbox, count)
     local instance = {

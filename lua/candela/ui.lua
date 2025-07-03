@@ -28,10 +28,10 @@ function CandelaUi.setup(opts)
     local win_height = vim.o.lines
 
     local float_width = math.floor(win_width * 0.50) -- total window width before borders
-    local pattern_color_width = 9 -- 7 space hex code, 1 space margin on each side
+    local pattern_color_width = 8 -- 7 space hex code, 1 space margin
     local pattern_ops_width = 5 -- 1 space letter/symbol, 2 space margin on each side
-    -- fill rest of width with regex window, minus 2 for border (1 space on each side)
-    local pattern_regex_width = float_width - pattern_color_width - (pattern_ops_width * 2) - 2
+    local pattern_count_width = 4 -- 1 digit, resize to fit larger digits once more patterns are made
+    local pattern_regex_width = float_width - pattern_color_width - (pattern_ops_width * 3) - 2 -- fill rest of space
 
     local pattern_height = opts.height -- starting height
     local prompt_height = 1 -- 1 space height for prompt
@@ -62,10 +62,22 @@ function CandelaUi.setup(opts)
         height = patterns.config.height - 2,
         style = "minimal",
         focusable = false,
-        title = " Color ",
+        title = "Color",
         title_pos = "center",
         border = "solid",
         col = 0,
+        row = 0,
+        zindex = 10,
+    })
+    local count = CandelaWindow.new({
+        relative = "win",
+        width = pattern_count_width,
+        height = patterns.config.height - 2,
+        style = "minimal",
+        focusable = false,
+        title = "",
+        border = "solid",
+        col = pattern_color_width,
         row = 0,
         zindex = 10,
     })
@@ -74,10 +86,10 @@ function CandelaUi.setup(opts)
         width = pattern_regex_width,
         height = patterns.config.height - 2,
         style = "minimal",
-        title = " Regex ",
+        title = " Regex",
         title_pos = "left",
         border = "solid",
-        col = pattern_color_width + 2,
+        col = pattern_color_width + pattern_ops_width,
         row = 0,
         zindex = 10,
     })
@@ -87,10 +99,10 @@ function CandelaUi.setup(opts)
         height = patterns.config.height - 2,
         style = "minimal",
         focusable = false,
-        title = " H ",
+        title = "H",
         title_pos = "center",
         border = "solid",
-        col = pattern_color_width + pattern_regex_width + 4,
+        col = pattern_color_width + pattern_regex_width  + pattern_ops_width + 4,
         row = 0,
         zindex = 10,
     })
@@ -100,10 +112,10 @@ function CandelaUi.setup(opts)
         height = patterns.config.height - 2,
         style = "minimal",
         focusable = false,
-        title = " L ",
+        title = "L",
         title_pos = "center",
         border = "solid",
-        col = pattern_color_width + pattern_ops_width + pattern_regex_width + 6,
+        col = pattern_color_width + (pattern_ops_width * 2) + pattern_regex_width + 6,
         row = 0,
         zindex = 10,
     })
@@ -121,12 +133,14 @@ function CandelaUi.setup(opts)
 
     CandelaUi.windows.patterns = patterns
     CandelaUi.windows.color = color
+    CandelaUi.windows.count = count
     CandelaUi.windows.regex = regex
     CandelaUi.windows.highlight = highlight
     CandelaUi.windows.lightbox = lightbox
     CandelaUi.windows.prompt = prompt
 
     -- TODO: handle resizing of window when vim is resized with autocmd
+    -- TODO: handle resizing of count window when count exceeds width
 
     for name, window in pairs(CandelaUi.windows) do
         window:ensure_buffer()
@@ -176,6 +190,8 @@ function CandelaUi.show_patterns()
             end
         end
     end
+
+    vim.wo[CandelaUi.windows.count.win].winhighlight = "Normal:LineNr"
 end
 
 -- HACK: could probably make this better/clean up prompt window/buffer handling consolidate to one for patterns + prompt?
@@ -221,10 +237,11 @@ function CandelaUi.show_prompt(operation)
         vim.fn.prompt_setcallback(CandelaUi.windows.prompt.buf, function(regex)
             local new_pattern = CandelaPatternList.add(regex)
             if new_pattern ~= nil then
+                new_pattern.count =
+                    CandelaHighlighter.highlight_matches(CandelaUi.base_buf, new_pattern, CandelaEngine.ripgrep_lines)
                 CandelaUi.update_lines()
                 CandelaUi.resize_height()
                 CandelaUi.hide_prompt()
-                CandelaHighlighter.highlight_matches(CandelaUi.base_buf, new_pattern, CandelaEngine.ripgrep_lines)
             end
         end)
         CandelaUi.windows.prompt:open_window(true)
@@ -323,16 +340,21 @@ function CandelaUi.show_prompt(operation)
     end
 end
 
----@param name string: Field name
----@param field string|boolean: CandelaPattern[field]
+---@param field string: Field name
+---@param field_val string|boolean|number
 ---@return string: String to input into buffer lines
-local function _format_field(name, field)
-    if type(field) == "boolean" then
-        return field and "  ✓  " or "  ✘  "
-    elseif name == "regex" then
-        return ("/" .. field .. "/") or ""
+local function _format_field(field, field_val)
+    if type(field_val) == "boolean" then
+        return field_val and "  ✓  " or "  ✘  "
+    elseif field == "regex" then
+        return string.format(" /%s/", field_val) or ""
+    elseif type(field_val) == "number" then
+        local win_width = vim.api.nvim_win_get_width(CandelaUi.windows.count.win)
+        local line = tostring(field_val)
+        local right_aligned = string.rep(" ", win_width - #line) .. line
+        return right_aligned
     else
-        return field or ""
+        return field_val or ""
     end
 end
 
@@ -340,6 +362,7 @@ end
 function CandelaUi.update_lines()
     local all_lines = {
         color = {},
+        count = {},
         regex = {},
         highlight = {},
         lightbox = {},
