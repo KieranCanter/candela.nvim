@@ -15,7 +15,7 @@ function CandelaEngine.ripgrep_lines(regex, filepath)
     local lineno = tonumber(line:match("^(%d+):"))
     local linestr = line:match(":(.*)")
     if lineno then
-      table.insert(matches, { lineno, string.len(linestr) })
+      matches[lineno] = linestr
     end
   end
 
