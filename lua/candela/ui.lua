@@ -49,7 +49,7 @@ function CandelaUi.setup(opts)
         height = float_height,
         style = "minimal",
         focusable = false,
-        title = " Patterns ",
+        title = " Candela ",
         title_pos = "center",
         border = "rounded",
         col = horz_center,
@@ -299,10 +299,12 @@ function CandelaUi.show_prompt(operation)
 
         local curr_line = vim.api.nvim_win_get_cursor(0)[1]
         local curr_pattern = CandelaPatternList.get_pattern(curr_line)
-        CandelaPatternList.remove(curr_line)
-        CandelaHighlighter.remove_highlight(CandelaUi.base_buf, curr_pattern.regex)
-        CandelaUi.update_lines()
-        CandelaUi.resize_height() -- TODO: Shrink height if size decreases
+        local is_removed = CandelaPatternList.remove(curr_line)
+        if is_removed then
+            CandelaHighlighter.remove_highlight(CandelaUi.base_buf, curr_pattern.regex)
+            CandelaUi.update_lines()
+            CandelaUi.resize_height() -- TODO: Shrink height if size decreases
+        end
     elseif operation == "clear" then
         if #CandelaPatternList.patterns == 0 then
             vim.notify("Candela: no patterns to clear", vim.log.levels.ERROR)
@@ -312,10 +314,12 @@ function CandelaUi.show_prompt(operation)
         local patterns = CandelaPatternList.patterns
         CandelaPatternList.clear()
         for _, pattern in ipairs(patterns) do
-            CandelaHighlighter.remove_highlight(CandelaUi.base_buf, pattern.regex)
+            local is_removed = CandelaHighlighter.remove_highlight(CandelaUi.base_buf, pattern.regex)
+            if is_removed then
+                CandelaUi.update_lines()
+                CandelaUi.resize_height() -- TODO: Shrink height if size decreases
+            end
         end
-        CandelaUi.update_lines()
-        CandelaUi.resize_height() -- TODO: Shrink height if size decreases
     elseif operation == "change_color" then
         if #CandelaPatternList.patterns == 0 then
             vim.notify("Candela: no patterns to change color", vim.log.levels.ERROR)

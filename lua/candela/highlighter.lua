@@ -4,7 +4,7 @@ CandelaHighlighter = {}
 
 -- TODO: create default color palette
 
----@param pattern CandelaPattern
+---@param color string
 ---@param ns integer
 ---@param hl_group string
 function CandelaHighlighter.register_highlight(color, ns, hl_group)
@@ -22,12 +22,19 @@ function CandelaHighlighter.register_highlight(color, ns, hl_group)
     })
 end
 
+---@param regex string
+---@return string
+local function hash_regex(regex)
+    local hash = vim.fn.sha256(regex):sub(1, 8)
+    return "CandelaHl_" .. hash
+end
+
 ---@param pattern CandelaPattern
 ---@param engine fun(regex: string, filepath: string): number[]
 ---@return number
 function CandelaHighlighter.highlight_matches(bufnr, pattern, engine)
     local ns = vim.api.nvim_create_namespace("CandelaNs_" .. pattern.regex)
-    local hl_group = "CandelaHl_" .. pattern.regex
+    local hl_group = hash_regex(pattern.regex)
     CandelaHighlighter.register_highlight(pattern.color, ns, hl_group)
 
     local filepath = vim.api.nvim_buf_get_name(bufnr)

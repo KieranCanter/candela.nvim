@@ -8,23 +8,41 @@ local CandelaPatternList = {}
 CandelaPatternList.patterns = {}
 
 CandelaPatternList.palette = {
-    light = {
-        "#ff5555", -- soft red
-        "#f1fa8c", -- yellow
-        "#50fa7b", -- green
-        "#8be9fd", -- cyan
-        "#bd93f9", -- purple
-        "#ff79c6", -- pink
-        "#ffb86c", -- orange
-    },
     dark = {
-        "#ff2c2c", -- red
-        "#b58900", -- yellow
-        "#2aa198", -- cyan-green
-        "#268bd2", -- blue
-        "#6c71c4", -- violet
-        "#cb4b16", -- orange
-        "#d33682", -- magenta
+        "#003f5c", -- deep blue
+        "#2f4b7c", -- indigo
+        "#665191", -- muted purple
+        "#a05195", -- plum
+        "#d45087", -- rose
+        "#f95d6a", -- coral red
+        "#ff7c43", -- burnt orange
+        "#ffa600", -- gold
+        "#b59f3b", -- olive yellow
+        "#5f7e0e", -- moss green
+        "#2f9e44", -- forest green
+        "#228c99", -- teal
+        "#1c7ed6", -- azure
+        "#4263eb", -- strong blue
+        "#5c5f66", -- soft gray
+        "#7c4dff", -- electric purple,
+    },
+    light = {
+        "#3c8fcf", -- muted blue
+        "#61afef", -- sky blue
+        "#88c0d0", -- nord light blue
+        "#81a1c1", -- nord steel
+        "#56b6c2", -- teal
+        "#98c379", -- green
+        "#c3e88d", -- pastel green
+        "#e5c07b", -- soft yellow
+        "#fab387", -- peach
+        "#f78c6c", -- orange
+        "#e06c75", -- red
+        "#ff6ac1", -- pink
+        "#c678dd", -- purple
+        "#bb9af7", -- violet
+        "#7dcfff", -- light aqua
+        "#9aedfe", -- icy cyan,
     },
 }
 local next_color_index = 1
@@ -97,9 +115,11 @@ function CandelaPatternList.edit(index, new_regex)
 end
 
 ---@param index number: index of pattern to remove
+---@return boolean
 function CandelaPatternList.remove(index)
     if index < 1 or index > #CandelaPatternList.patterns then
         vim.notify(string.format("Candela: no pattern at index %d", index), vim.log.levels.ERROR)
+        return false
     end
 
     local regex = CandelaPatternList.patterns[index].regex
@@ -110,8 +130,10 @@ function CandelaPatternList.remove(index)
         vim.notify(string.format("Candela: removed pattern %d: /%s/", index, regex), vim.log.levels.INFO)
     else
         vim.notify("Candela: remove canceled", vim.log.levels.INFO)
-        return
+        return false
     end
+
+    return true
 end
 
 ---@param index number: index of pattern to change color of
