@@ -22,11 +22,13 @@
 --    * vim.api.nvim_buf_get_name(0) = vim.fn.expand('%:p') (path name)
 --
 --  * future improvements
---    * TODO: attach number of matches to pattern class as field and include in ui (new window?)
 --    * automatically rerun highlighting on buffer change
 --    * highlight the color's bg in ui the hex code's appropriate color
 --    * implement a good method of color picking?
 --]]
+--
+-- TODO: remove all functions that aren't needed across files from appropriate table e.g.
+--       CandelaPatternList.get_next_color() => local get_next_color()
 
 local CandelaUi = require("candela.ui")
 local CandelaPatternList = require("candela.pattern_list")

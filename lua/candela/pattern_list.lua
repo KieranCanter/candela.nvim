@@ -7,9 +7,45 @@ local CandelaPattern = require("candela.pattern")
 local CandelaPatternList = {}
 CandelaPatternList.patterns = {}
 
+CandelaPatternList.palette = {
+    light = {
+        "#ff5555", -- soft red
+        "#f1fa8c", -- yellow
+        "#50fa7b", -- green
+        "#8be9fd", -- cyan
+        "#bd93f9", -- purple
+        "#ff79c6", -- pink
+        "#ffb86c", -- orange
+    },
+    dark = {
+        "#ff2c2c", -- red
+        "#b58900", -- yellow
+        "#2aa198", -- cyan-green
+        "#268bd2", -- blue
+        "#6c71c4", -- violet
+        "#cb4b16", -- orange
+        "#d33682", -- magenta
+    },
+}
+local next_color_index = 1
+
 ---@return CandelaPattern
 function CandelaPatternList.get_pattern(index)
     return CandelaPatternList.patterns[index]
+end
+
+---@return table<string>
+function CandelaPatternList.get_palette()
+    local mode = vim.o.background
+    return CandelaPatternList.palette[mode] or CandelaPatternList.palette.dark
+end
+
+---@return string
+function CandelaPatternList.get_next_color()
+    local palette = CandelaPatternList.get_palette()
+    local next_color = palette[next_color_index]
+    next_color_index = (next_color_index % #palette) + 1
+    return next_color
 end
 
 ---@param regex string
@@ -24,7 +60,7 @@ function CandelaPatternList.add(regex)
         return
     end
 
-    local color = "#690000" -- TODO: implement function to generate color from pool of colors
+    local color = CandelaPatternList.get_next_color()
     local highlight = true
     local lightbox = true
     local count = 0

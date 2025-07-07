@@ -6,6 +6,7 @@
 -- * syntax highlighting
 -- * fold vs remove unlightboxed lines
 -- * ignore-case/smart-case default to user's neovim setting, allow override
+-- * palette customization
 --]]
 
 ---@class CandelaConfig
