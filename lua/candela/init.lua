@@ -22,6 +22,11 @@
 --    * vim.api.nvim_buf_get_name(0) = vim.fn.expand('%:p') (path name)
 --
 --  * future improvements
+--    * TODO: implement "find" command: pressing 'f' on a pattern in the UI sends the regex to vim and lets the user
+--            cycle through matches with a keymap (<C-n>?)
+--            - use vim.api.nvim.cmd("cgetexpr system(<ripgrep command>)") with :cn/:cp
+--            - test with `:cgetexpr system("rg --line-number --color=never --vimgrep 'line' " . expand('%:p'))`
+--            - use 'f' for current pattern and 'F' for all patterns
 --    * automatically rerun highlighting on buffer change
 --    * highlight the color's bg in ui the hex code's appropriate color
 --    * implement a good method of color picking?
@@ -40,7 +45,7 @@ local CandelaConfig = require("candela.config")
 ---@field patterns CandelaPattern[]|nil
 
 local Candela = {}
-Candela.ui = { windows = {} }
+Candela.ui = { windows = {}, base_buf = 0 }
 Candela.patterns = {}
 
 function Candela.setup(opts)

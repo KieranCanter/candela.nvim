@@ -7,6 +7,8 @@
 -- * fold vs remove unlightboxed lines
 -- * ignore-case/smart-case default to user's neovim setting, allow override
 -- * palette customization
+-- * file types to include (default to .txt, .log...?)
+-- * auto refresh when switching files or not
 --]]
 
 ---@class CandelaConfig
