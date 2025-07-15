@@ -163,6 +163,16 @@ function CandelaUi.setup(opts)
             CandelaUi.hide_patterns()
         end,
     })
+    vim.api.nvim_create_autocmd("CursorMoved", {
+        group = candela_augroup,
+        buffer = CandelaUi.windows.regex.buf,
+        callback = function()
+            if vim.api.nvim_win_get_cursor(0)[2] ~= 0 then
+                local row = vim.api.nvim_win_get_cursor(0)[1]
+                vim.api.nvim_win_set_cursor(0, {row, 0})
+            end
+        end,
+    })
 end
 
 -- Open patterns window
