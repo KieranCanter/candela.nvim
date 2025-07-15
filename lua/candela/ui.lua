@@ -5,6 +5,7 @@ local CandelaWindow = require("candela.window")
 local CandelaEngine = require("candela.engine")
 local CandelaHighlighter = require("candela.highlighter")
 local CandelaConfig = require("candela.config")
+local CandelaFinder = require("candela.finder")
 
 local candela_augroup = vim.api.nvim_create_augroup("Candela", { clear = true })
 
@@ -377,6 +378,16 @@ function CandelaUi.show_prompt(operation)
         local curr_pattern = CandelaPatternList.get_pattern(curr_line)
         local is_lightboxed = CandelaPatternList.toggle_lightbox(curr_line)
         CandelaUi.update_lines()
+    elseif operation == "match" then
+        if #CandelaPatternList.patterns == 0 then
+            vim.notify("Candela: no patterns to match", vim.log.levels.ERROR)
+            return
+        end
+
+        local curr_line = vim.api.nvim_win_get_cursor(0)[1]
+        local curr_pattern = CandelaPatternList.get_pattern(curr_line)
+        CandelaUi.toggle()
+        CandelaFinder.vim_match(curr_pattern.regex)
     else
         vim.notify(string.format("Candela: invalid operation \"%s\"", operation))
     end

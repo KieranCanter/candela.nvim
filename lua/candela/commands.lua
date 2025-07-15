@@ -60,6 +60,12 @@ function CandelaCommands.dispatch(args)
             return
         end
         CandelaUi.show_prompt("toggle_lightbox")
+    elseif subcommand == "match" then
+        if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
+            vim.notify("Candela: must be in patterns window to match regex", vim.log.levels.ERROR)
+            return
+        end
+        CandelaUi.show_prompt("match")
     else
         vim.notify("Candela: unsupported command \"" .. subcommand .. "\"", vim.log.levels.ERROR)
     end

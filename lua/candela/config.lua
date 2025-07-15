@@ -168,6 +168,17 @@ function CandelaConfig.set_patterns_keymaps(buffer)
     vim.api.nvim_buf_set_keymap(
         buffer,
         "n",
+        "<CR>",
+        [[:Candela match<CR>]],
+        {
+            noremap = true,
+            silent = true,
+            desc = "Candela match pattern in buffer"
+        }
+    )
+    vim.api.nvim_buf_set_keymap(
+        buffer,
+        "n",
         "?",
         [[:Candela help<CR>]],
         {
