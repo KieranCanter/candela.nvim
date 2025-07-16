@@ -443,7 +443,8 @@ function CandelaUi.show_prompt(operation)
             vim.notify("Candela: no patterns to find all", vim.log.levels.ERROR)
             return
         end
-        CandelaUi.toggle()
+        CandelaUi.hide_prompt()
+        CandelaUi.hide_patterns()
         CandelaFinder.find_all(CandelaUi.base_buf, CandelaPatternList.patterns, CandelaEngine.get_matches)
     else
         vim.notify(string.format("Candela: invalid operation \"%s\"", operation))
