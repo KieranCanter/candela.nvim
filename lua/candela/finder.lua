@@ -1,6 +1,6 @@
 local Finder = {}
 
----@param regex string
+--@param regex string
 function Finder.vim_match(regex)
     vim.fn.setreg("/", "\\v\\C" .. regex)
     vim.cmd("normal! n")
@@ -12,6 +12,7 @@ local function update_loclist(matches, kind)
     local loclist = {}
     for _, entry in ipairs(matches) do
         loclist[#loclist + 1] = {
+            bufnr = require("candela.ui").base_buf,
             lnum = entry.lineno,
             text = entry.line,
         }
