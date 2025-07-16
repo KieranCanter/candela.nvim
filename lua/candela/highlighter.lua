@@ -30,7 +30,7 @@ local function hash_regex(regex)
 end
 
 ---@param pattern CandelaPattern
----@param engine fun(regex: string, filepath: string): number[]
+---@param engine fun(cmd: string[]): table[]
 ---@return number
 function CandelaHighlighter.highlight_matches(bufnr, pattern, engine)
     local ns = vim.api.nvim_create_namespace("CandelaNs_" .. pattern.regex)
@@ -43,9 +43,11 @@ function CandelaHighlighter.highlight_matches(bufnr, pattern, engine)
         return 0
     end
 
-    local matches = engine(pattern.regex, filepath)
+    local rg_cmd = { "rg", "--line-number", "--color=never", pattern.regex, filepath }
+    local matches = engine(rg_cmd)
     local count = 0
-    for row, line in pairs(matches) do
+    for _, entry in ipairs(matches) do
+        local row, line = entry.lineno, entry.line
         vim.api.nvim_buf_set_extmark(bufnr, ns, row - 1, 0, {
             end_col = string.len(line),
             hl_group = hl_group,

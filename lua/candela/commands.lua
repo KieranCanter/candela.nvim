@@ -14,6 +14,8 @@ CandelaCommands.commands = {
     "toggle_lightbox",
     "refresh",
     "match",
+    "find",
+    "find_all",
     "help",
 }
 -- TODO: add above commands as variables to CandelaCommands holding functions to each command
@@ -21,7 +23,6 @@ CandelaCommands.commands = {
 ---@param args table<string, any>
 function CandelaCommands.dispatch(args)
     local subcommand = args[1]
-    local tail = { unpack(args, 2) }
 
     if not subcommand or subcommand == "" then
         CandelaUi.toggle()
@@ -80,6 +81,14 @@ function CandelaCommands.dispatch(args)
             return
         end
         CandelaUi.show_prompt("match")
+    elseif subcommand == "find" then
+        if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
+            vim.notify("Candela: must be in patterns window to find instances of regex", vim.log.levels.ERROR)
+            return
+        end
+        CandelaUi.show_prompt("find")
+    elseif subcommand == "find_all" then
+        CandelaUi.show_prompt("find_all")
     elseif subcommand == "help" then
         if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
             vim.notify("Candela: must be in patterns window to see menu commands", vim.log.levels.ERROR)

@@ -428,6 +428,22 @@ function CandelaUi.show_prompt(operation)
         local curr_pattern = CandelaPatternList.get_pattern(curr_line)
         CandelaUi.toggle()
         CandelaFinder.vim_match(curr_pattern.regex)
+    elseif operation == "find" then
+        if #CandelaPatternList.patterns == 0 then
+            vim.notify("Candela: no patterns to find", vim.log.levels.ERROR)
+            return
+        end
+        local curr_line = vim.api.nvim_win_get_cursor(0)[1]
+        local curr_pattern = CandelaPatternList.get_pattern(curr_line)
+        CandelaUi.toggle()
+        CandelaFinder.find(CandelaUi.base_buf, curr_pattern.regex, CandelaEngine.ripgrep_lines)
+    elseif operation == "find_all" then
+        if #CandelaPatternList.patterns == 0 then
+            vim.notify("Candela: no patterns to find all", vim.log.levels.ERROR)
+            return
+        end
+        CandelaUi.toggle()
+        CandelaFinder.find_all(CandelaUi.base_buf, CandelaPatternList.patterns, CandelaEngine.ripgrep_lines)
     else
         vim.notify(string.format("Candela: invalid operation \"%s\"", operation))
     end
