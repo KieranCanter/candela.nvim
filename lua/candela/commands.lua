@@ -87,9 +87,11 @@ function CandelaCommands.dispatch(args)
             return
         end
         CandelaUi.show_prompt("find")
+        vim.api.nvim_cmd({ cmd = "lnext" }, {})
         vim.api.nvim_cmd({ cmd = "lopen" }, {})
     elseif subcommand == "find_all" then
         CandelaUi.show_prompt("find_all")
+        vim.api.nvim_cmd({ cmd = "lnext" }, {})
         vim.api.nvim_cmd({ cmd = "lopen" }, {})
     elseif subcommand == "help" then
         if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
