@@ -1,6 +1,8 @@
 -- module to control the highlighting of matches
 
-CandelaHighlighter = {}
+local CandelaEngine = require("candela.engine")
+
+local CandelaHighlighter = {}
 
 -- TODO: create default color palette
 
@@ -29,10 +31,10 @@ local function hash_regex(regex)
     return "CandelaHl_" .. hash
 end
 
+---@param bufnr number
 ---@param pattern CandelaPattern
----@param engine fun(cmd: string[]): table[]
 ---@return number
-function CandelaHighlighter.highlight_matches(bufnr, pattern, engine)
+function CandelaHighlighter.highlight_matches(bufnr, pattern)
     local ns = vim.api.nvim_create_namespace("CandelaNs_" .. pattern.regex)
     local hl_group = hash_regex(pattern.regex)
     CandelaHighlighter.register_highlight(pattern.color, ns, hl_group)
@@ -43,8 +45,9 @@ function CandelaHighlighter.highlight_matches(bufnr, pattern, engine)
         return 0
     end
 
+    -- TODO: get command from config based on best default between rg, ag, and grep or user config
     local rg_cmd = { "rg", "--line-number", "--color=never", pattern.regex, filepath }
-    local matches = engine(rg_cmd)
+    local matches = CandelaEngine.get_matches(rg_cmd)
     local count = 0
     for _, entry in ipairs(matches) do
         local row, line = entry.lineno, entry.line

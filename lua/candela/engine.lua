@@ -2,11 +2,23 @@
 
 local CandelaEngine = {}
 
----@param cmd string[]: rg command to feed the engine
----@return table[]: list of maps
-function CandelaEngine.ripgrep_lines(cmd)
-    -- TODO: testing ripgrep
-    local output = vim.fn.systemlist(cmd)
+---@class CandelaMatch
+---@field lineno integer
+---@field line string
+
+---@param cmd string[]: command to feed the engine
+---@return string[]: list of matched lines
+function CandelaEngine.run_search(cmd)
+    local matches = vim.fn.systemlist(cmd)
+    return matches
+end
+
+---@param cmd string[]: command to feed the engine
+---@return CandelaMatch[]: array of maps
+function CandelaEngine.get_matches(cmd)
+    local output = CandelaEngine.run_search(cmd)
+
+    ---@type CandelaMatch[]
     local matches = {}
 
     for _, line in ipairs(output) do
@@ -17,5 +29,6 @@ function CandelaEngine.ripgrep_lines(cmd)
 
     return matches
 end
+
 
 return CandelaEngine

@@ -205,7 +205,7 @@ function CandelaUi.refresh_all()
     if CandelaUi.base_buf and vim.api.nvim_buf_is_valid(CandelaUi.base_buf) then
         for _, pattern in ipairs(CandelaPatternList.patterns) do
             pattern.count =
-                CandelaHighlighter.highlight_matches(CandelaUi.base_buf, pattern, CandelaEngine.ripgrep_lines)
+                CandelaHighlighter.highlight_matches(CandelaUi.base_buf, pattern)
             CandelaUi.show_patterns()
             CandelaUi.update_lines()
             CandelaUi.resize_height()
@@ -289,7 +289,7 @@ function CandelaUi.show_prompt(operation)
             local new_pattern = CandelaPatternList.add(regex)
             if new_pattern ~= nil then
                 new_pattern.count =
-                    CandelaHighlighter.highlight_matches(CandelaUi.base_buf, new_pattern, CandelaEngine.ripgrep_lines)
+                    CandelaHighlighter.highlight_matches(CandelaUi.base_buf, new_pattern)
                 CandelaUi.update_lines()
                 CandelaUi.resize_height()
                 CandelaUi.hide_prompt()
@@ -313,7 +313,7 @@ function CandelaUi.show_prompt(operation)
             CandelaHighlighter.remove_highlight(CandelaUi.base_buf, curr_pattern.regex)
             local new_pattern = CandelaPatternList.edit(curr_line, regex)
             new_pattern.count =
-                CandelaHighlighter.highlight_matches(CandelaUi.base_buf, new_pattern, CandelaEngine.ripgrep_lines)
+                CandelaHighlighter.highlight_matches(CandelaUi.base_buf, new_pattern)
             CandelaUi.update_lines()
             CandelaUi.hide_prompt()
         end)
@@ -335,7 +335,7 @@ function CandelaUi.show_prompt(operation)
         vim.fn.prompt_setcallback(CandelaUi.windows.prompt.buf, function(regex)
             local new_pattern = CandelaPatternList.add(regex)
             new_pattern.count =
-                CandelaHighlighter.highlight_matches(CandelaUi.base_buf, new_pattern, CandelaEngine.ripgrep_lines)
+                CandelaHighlighter.highlight_matches(CandelaUi.base_buf, new_pattern)
             CandelaUi.update_lines()
             CandelaUi.resize_height()
             CandelaUi.hide_prompt()
@@ -371,6 +371,7 @@ function CandelaUi.show_prompt(operation)
                 CandelaUi.resize_height() -- TODO: Shrink height if size decreases
             end
         end
+    -- FIX: COLOR NOT CHANGING PROPERLY; YOU HAVE TO HIDE AND RESHOW TO CHANGE COLOR
     elseif operation == "change_color" then
         if #CandelaPatternList.patterns == 0 then
             vim.notify("Candela: no patterns to change color", vim.log.levels.ERROR)
@@ -403,7 +404,7 @@ function CandelaUi.show_prompt(operation)
         local curr_pattern = CandelaPatternList.get_pattern(curr_line)
         local is_highlighted = CandelaPatternList.toggle_highlight(curr_line)
         if is_highlighted then
-            CandelaHighlighter.highlight_matches(CandelaUi.base_buf, curr_pattern, CandelaEngine.ripgrep_lines)
+            CandelaHighlighter.highlight_matches(CandelaUi.base_buf, curr_pattern)
         else
             CandelaHighlighter.remove_highlight(CandelaUi.base_buf, curr_pattern.regex)
         end
@@ -436,14 +437,14 @@ function CandelaUi.show_prompt(operation)
         local curr_line = vim.api.nvim_win_get_cursor(0)[1]
         local curr_pattern = CandelaPatternList.get_pattern(curr_line)
         CandelaUi.toggle()
-        CandelaFinder.find(CandelaUi.base_buf, curr_pattern.regex, CandelaEngine.ripgrep_lines)
+        CandelaFinder.find(CandelaUi.base_buf, curr_pattern.regex, CandelaEngine.get_matches)
     elseif operation == "find_all" then
         if #CandelaPatternList.patterns == 0 then
             vim.notify("Candela: no patterns to find all", vim.log.levels.ERROR)
             return
         end
         CandelaUi.toggle()
-        CandelaFinder.find_all(CandelaUi.base_buf, CandelaPatternList.patterns, CandelaEngine.ripgrep_lines)
+        CandelaFinder.find_all(CandelaUi.base_buf, CandelaPatternList.patterns, CandelaEngine.get_matches)
     else
         vim.notify(string.format("Candela: invalid operation \"%s\"", operation))
     end
