@@ -53,8 +53,8 @@ function CandelaConfig.set_keymaps()
             desc = "Add Candela pattern"
         }
     )
-    vim.api.nvim_set_keymap("n", "<M-k>", [[:lprev<CR>]], {})
-    vim.api.nvim_set_keymap("n", "<M-j>", [[:lnext<CR>]], {})
+    vim.api.nvim_set_keymap("n", "<M-k>", "[l", {})
+    vim.api.nvim_set_keymap("n", "<M-j>", "]l", {})
 end
 
 function CandelaConfig.set_patterns_keymaps(buffer)
