@@ -9,6 +9,7 @@
 -- * palette customization
 -- * file types to include (default to .txt, .log...?)
 -- * auto refresh when switching files or not
+-- * search engine (default in order ripgrep > silver searcher > grep)
 --]]
 
 ---@class CandelaConfig
@@ -113,18 +114,18 @@ function CandelaConfig.set_patterns_keymaps(buffer)
     vim.api.nvim_buf_set_keymap(
         buffer,
         "n",
-        "r",
-        [[:Candela remove<CR>]],
+        "d",
+        [[:Candela delete<CR>]],
         {
             noremap = true,
             silent = true,
-            desc = "Remove Candela pattern"
+            desc = "Delete Candela pattern"
         }
     )
     vim.api.nvim_buf_set_keymap(
         buffer,
         "n",
-        "dd",
+        "D",
         [[:Candela clear<CR>]],
         {
             noremap = true,
@@ -163,6 +164,17 @@ function CandelaConfig.set_patterns_keymaps(buffer)
             noremap = true,
             silent = true,
             desc = "Toggle Candela pattern lightbox"
+        }
+    )
+    vim.api.nvim_buf_set_keymap(
+        buffer,
+        "n",
+        "r",
+        [[:Candela refresh<CR>]],
+        {
+            noremap = true,
+            silent = true,
+            desc = "Refresh patterns for current buffer"
         }
     )
     vim.api.nvim_buf_set_keymap(

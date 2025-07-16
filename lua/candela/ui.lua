@@ -152,7 +152,7 @@ function CandelaUi.setup(opts)
         end
     end
 
-    CandelaConfig.set_keymaps()
+    CandelaConfig.set_keymaps() -- NOTE: For dev purposes only
     CandelaConfig.set_patterns_keymaps(CandelaUi.windows.regex.buf)
     CandelaConfig.set_prompt_keymaps(CandelaUi.windows.prompt.buf)
 
@@ -164,6 +164,7 @@ function CandelaUi.setup(opts)
             CandelaUi.hide_patterns()
         end,
     })
+
     vim.api.nvim_create_autocmd("CursorMoved", {
         group = candela_augroup,
         buffer = CandelaUi.windows.regex.buf,
@@ -174,6 +175,45 @@ function CandelaUi.setup(opts)
             end
         end,
     })
+
+    -- TODO: Hide auto_refresh behind a config option
+    --[[
+    if CandelaConfig.options.auto_refresh then
+        vim.api.nvim_create_autocmd("BufEnter", {
+            group = candela_augroup,
+            callback = function(args)
+                local bufnr = args.buf
+
+                -- Filter out special buffers
+                local bt = vim.api.nvim_get_option_value("buftype", { buf = bufnr })
+                local name = vim.api.nvim_buf_get_name(bufnr)
+                local buflisted = vim.api.nvim_get_option_value("buflisted", { buf = bufnr })
+
+                if bt ~= "" or name == "" or not buflisted then
+                    return
+                end
+
+                CandelaUi.base_buf = bufnr
+                CandelaUi.refresh_all()
+            end,
+        })
+    end --]]
+
+end
+
+function CandelaUi.refresh_all()
+    if CandelaUi.base_buf and vim.api.nvim_buf_is_valid(CandelaUi.base_buf) then
+        for _, pattern in ipairs(CandelaPatternList.patterns) do
+            pattern.count =
+                CandelaHighlighter.highlight_matches(CandelaUi.base_buf, pattern, CandelaEngine.ripgrep_lines)
+            CandelaUi.show_patterns()
+            CandelaUi.update_lines()
+            CandelaUi.resize_height()
+            CandelaUi.toggle()
+        end
+    else
+        vim.notify("Candela: no valid base buffer found", vim.log.levels.WARN)
+    end
 end
 
 -- Open patterns window
@@ -302,15 +342,15 @@ function CandelaUi.show_prompt(operation)
         end)
 
         CandelaUi.windows.prompt:open_window(true)
-    elseif operation == "remove" then
+    elseif operation == "delete" then
         if #CandelaPatternList.patterns == 0 then
-            vim.notify("Candela: no patterns to remove", vim.log.levels.ERROR)
+            vim.notify("Candela: no patterns to delete", vim.log.levels.ERROR)
             return
         end
 
         local curr_line = vim.api.nvim_win_get_cursor(0)[1]
         local curr_pattern = CandelaPatternList.get_pattern(curr_line)
-        local is_removed = CandelaPatternList.remove(curr_line)
+        local is_removed = CandelaPatternList.delete(curr_line)
         if is_removed then
             CandelaHighlighter.remove_highlight(CandelaUi.base_buf, curr_pattern.regex)
             CandelaUi.update_lines()
@@ -323,10 +363,10 @@ function CandelaUi.show_prompt(operation)
         end
 
         local patterns = CandelaPatternList.patterns
-        CandelaPatternList.clear()
-        for _, pattern in ipairs(patterns) do
-            local is_removed = CandelaHighlighter.remove_highlight(CandelaUi.base_buf, pattern.regex)
-            if is_removed then
+        local is_removed = CandelaPatternList.clear()
+        if is_removed then
+            for _, pattern in ipairs(patterns) do
+                CandelaHighlighter.remove_highlight(CandelaUi.base_buf, pattern.regex)
                 CandelaUi.update_lines()
                 CandelaUi.resize_height() -- TODO: Shrink height if size decreases
             end
@@ -474,6 +514,7 @@ end
 function CandelaUi.toggle()
     if CandelaUi.windows.prompt:is_open() then
         CandelaUi.hide_prompt()
+        CandelaUi.hide_patterns()
     elseif CandelaUi.windows.regex:is_open() then
         CandelaUi.hide_patterns()
     else

@@ -55,7 +55,7 @@ function Candela.setup(opts)
         nargs = "?",
         desc = "Regex highlighter",
         complete = function()
-           return { "add", "edit", "copy", "remove", "clear", "change_color", "toggle_highlight", "toggle_lightbox" }
+            return CandelaCommands.commands
         end,
     })
 
