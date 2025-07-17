@@ -371,7 +371,6 @@ function CandelaUi.show_prompt(operation)
                 CandelaUi.resize_height() -- TODO: Shrink height if size decreases
             end
         end
-    -- FIX: COLOR NOT CHANGING PROPERLY; YOU HAVE TO HIDE AND RESHOW TO CHANGE COLOR
     elseif operation == "change_color" then
         if #CandelaPatternList.patterns == 0 then
             vim.notify("Candela: no patterns to change color", vim.log.levels.ERROR)
@@ -387,7 +386,7 @@ function CandelaUi.show_prompt(operation)
 
         vim.fn.prompt_setcallback(CandelaUi.windows.prompt.buf, function(color)
             local new_pattern = CandelaPatternList.change_color(curr_line, color)
-            CandelaHighlighter.change_highlight_color(CandelaUi.base_buf, curr_pattern.regex, new_pattern.color)
+            CandelaHighlighter.change_highlight_color(curr_pattern.regex, new_pattern.color)
             CandelaUi.update_lines()
             CandelaUi.resize_height()
             CandelaUi.hide_prompt()

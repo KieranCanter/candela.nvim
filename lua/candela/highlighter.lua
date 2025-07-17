@@ -27,16 +27,15 @@ end
 ---@param regex string
 ---@return string
 local function hash_regex(regex)
-    local hash = vim.fn.sha256(regex):sub(1, 8)
-    return "CandelaHl_" .. hash
+    return vim.fn.sha256(regex):sub(1, 8)
 end
 
 ---@param bufnr number
 ---@param pattern CandelaPattern
 ---@return number
 function CandelaHighlighter.highlight_matches(bufnr, pattern)
-    local ns = vim.api.nvim_create_namespace("CandelaNs_" .. pattern.regex)
-    local hl_group = hash_regex(pattern.regex)
+    local ns = vim.api.nvim_create_namespace("CandelaNs_" .. hash_regex(pattern.regex))
+    local hl_group = "CandelaHl_" .. hash_regex(pattern.regex)
     CandelaHighlighter.register_highlight(pattern.color, ns, hl_group)
 
     local filepath = vim.api.nvim_buf_get_name(bufnr)
@@ -73,9 +72,9 @@ function CandelaHighlighter.clear_highlights(bufnr)
     vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
 end
 
-function CandelaHighlighter.change_highlight_color(bufnr, regex, new_color)
-    local ns = vim.api.nvim_get_namespaces()["CandelaNs_" .. regex]
-    local hl_group = "CandelaHl_" .. regex
+function CandelaHighlighter.change_highlight_color(regex, new_color)
+    local ns = vim.api.nvim_create_namespace("CandelaNs_" .. hash_regex(regex))
+    local hl_group = "CandelaHl_" .. hash_regex(regex)
     CandelaHighlighter.register_highlight(new_color, ns, hl_group)
 end
 
