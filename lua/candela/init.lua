@@ -49,7 +49,11 @@ function Candela.setup(opts)
         nargs = "?",
         desc = "Regex highlighter",
         complete = function()
-            return CandelaCommands.commands
+            local commands = {}
+            for comm, _ in pairs(CandelaCommands.commands) do
+                table.insert(commands, comm)
+            end
+            return commands
         end,
     })
 
