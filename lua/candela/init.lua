@@ -1,18 +1,6 @@
 --[[
 --  Candela regex highlighter
 --
---  * List of patterns
---    * Add pattern
---    * Remove pattern
---    * Show patterns
---    * Clear patterns
---  * Pattern
---    * Change color
---    * Toggle highlighting
---    * Toggle pattern showing up in lightbox
---  * Syntax highlighting option true or false
---  * Lightbox
---    * separate buffer/window for only "lightbox" true patterns
 --
 --  * Neovim API equivalents
 --    * vim.api.nvim_<get|set>_option_value() = vim.bo, vim.b, vim.wo, vim.w, vim.t, vim.o, vim.go
@@ -22,7 +10,9 @@
 --    * vim.api.nvim_buf_get_name(0) = vim.fn.expand('%:p') (path name)
 --
 --  * future improvements
+--    * import/export pattern list
 --    * highlight the color's bg in ui the hex code's appropriate color
+--    * make more obvious the toggling of highlight/lightbox (maybe highlight symbol background when active?)
 --    * implement a good method of color picking?
 --]]
 --
