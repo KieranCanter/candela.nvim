@@ -124,6 +124,7 @@ function CandelaPatternList.edit_pattern(index, new_regex)
 end
 
 ---@param index number: index of pattern to delete
+---@return boolean
 function CandelaPatternList.delete_pattern(index)
     if index < 1 or index > #CandelaPatternList.patterns then
         vim.notify(string.format("Candela: no pattern at index %d", index), vim.log.levels.ERROR)
@@ -133,16 +134,19 @@ function CandelaPatternList.delete_pattern(index)
     local regex = CandelaPatternList.patterns[index].regex
     table.remove(CandelaPatternList.patterns, index)
     vim.notify(string.format("Candela: deleted pattern %d: /%s/", index, regex), vim.log.levels.INFO)
+    return true
 end
 
+---@return boolean
 function CandelaPatternList.clear_patterns()
     if #CandelaPatternList.patterns == 0 then
         vim.notify("Candela: cannot clear an empty patterns list", vim.log.levels.INFO)
-        return
+        return false
     end
 
     CandelaPatternList.patterns = {}
     vim.notify("Candela: cleared all patterns", vim.log.levels.INFO)
+    return true
 end
 
 ---@param index number: index of pattern to change color of

@@ -379,10 +379,11 @@ function M.edit()
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
     local curr_pattern = CandelaPatternList.get_pattern(curr_line)
 
-    M.show_prompt(Commands.EDIT, curr_line, curr_pattern)
-    if M.windows.prompt:is_open() then
+    vim.schedule(function ()
         vim.api.nvim_paste(curr_pattern.regex, false, -1)
-    end
+    end)
+
+    M.show_prompt(Commands.EDIT, curr_line, curr_pattern)
 end
 
 function M.copy()
@@ -418,17 +419,17 @@ function M.delete(ask)
         return
     end
 
+    local curr_line = vim.api.nvim_win_get_cursor(0)[1]
+    local curr_pattern = CandelaPatternList.get_pattern(curr_line)
     if ask then
         local choice =
-            vim.fn.confirm(string.format("Do you want to delete pattern %d: /%s/?", index, regex), "&Yes\n&No", 2)
+        vim.fn.confirm(string.format("Do you want to delete pattern %d: /%s/?", curr_line, curr_pattern.regex), "&Yes\n&No", 2)
         if choice ~= 1 then
             vim.notify("Candela: delete canceled", vim.log.levels.INFO)
             return
         end
     end
 
-    local curr_line = vim.api.nvim_win_get_cursor(0)[1]
-    local curr_pattern = CandelaPatternList.get_pattern(curr_line)
     local is_removed = CandelaPatternList.delete_pattern(curr_line)
     if is_removed then
         CandelaHighlighter.remove_highlight(M.base_buf, curr_pattern.regex)
