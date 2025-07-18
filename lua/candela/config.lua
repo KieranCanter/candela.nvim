@@ -10,6 +10,7 @@
 -- * file types to include (default to .txt, .log...?)
 -- * auto refresh when switching files or not
 -- * search engine (default in order ripgrep > silver searcher > grep)
+-- * whether users want confirmation message on delete/clear to show or not
 --]]
 
 ---@class CandelaConfig

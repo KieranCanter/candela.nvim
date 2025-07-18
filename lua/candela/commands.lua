@@ -18,11 +18,15 @@ CandelaCommands.commands.copy = function()
 end
 
 CandelaCommands.commands.delete = function()
-    CandelaUi.delete()
+    CandelaUi.delete(true)
 end
 
 CandelaCommands.commands.clear = function()
-    CandelaUi.clear()
+    CandelaUi.clear(true)
+end
+
+CandelaCommands.commands.refresh = function()
+    CandelaUi.refresh()
 end
 
 CandelaCommands.commands.change_color = function()
