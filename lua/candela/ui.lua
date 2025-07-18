@@ -207,9 +207,16 @@ end
 
 local function refresh_all()
     for _, pattern in ipairs(CandelaPatternList.patterns) do
-        CandelaHighlighter.remove_highlight(M.base_buf, pattern.regex)
-        pattern.count =
-            CandelaHighlighter.highlight_matches(M.curr_buf, pattern)
+        if not CandelaHighlighter.remove_highlight(M.base_buf, pattern.regex) then
+            return
+        end
+
+        local count = CandelaHighlighter.highlight_matches(M.curr_buf, pattern)
+        if count == -1 then
+            return
+        end
+
+        pattern.count = count
         M.show_patterns()
         M.update_lines()
         M.resize_height()
@@ -300,8 +307,12 @@ function M.show_prompt(command, curr_line, curr_pattern)
                 M.hide_prompt()
             end
 
-            new_pattern.count =
-                CandelaHighlighter.highlight_matches(M.base_buf, new_pattern)
+            local count = CandelaHighlighter.highlight_matches(M.base_buf, new_pattern)
+            if count == -1 then
+                return
+            end
+
+            new_pattern.count = count
             M.update_lines()
             M.resize_height()
             M.hide_prompt()
@@ -315,9 +326,16 @@ function M.show_prompt(command, curr_line, curr_pattern)
                 M.hide_prompt()
             end
 
-            CandelaHighlighter.remove_highlight(M.base_buf, old_regex)
-            new_pattern.count =
-                CandelaHighlighter.highlight_matches(M.base_buf, new_pattern)
+            if not CandelaHighlighter.remove_highlight(M.base_buf, old_regex) then
+                return
+            end
+
+            local count = CandelaHighlighter.highlight_matches(M.base_buf, new_pattern)
+            if count == -1 then
+                return
+            end
+
+            new_pattern.count = count
             M.update_lines()
             M.hide_prompt()
         end)
@@ -329,8 +347,12 @@ function M.show_prompt(command, curr_line, curr_pattern)
                 M.hide_prompt()
             end
 
-            new_pattern.count =
-                CandelaHighlighter.highlight_matches(M.base_buf, new_pattern)
+            local count = CandelaHighlighter.highlight_matches(M.base_buf, new_pattern)
+            if count == -1 then
+                return
+            end
+
+            new_pattern.count = count
             M.update_lines()
             M.resize_height()
             M.hide_prompt()
@@ -342,7 +364,10 @@ function M.show_prompt(command, curr_line, curr_pattern)
                 return
             end
 
-            CandelaHighlighter.change_highlight_color(curr_pattern.regex, new_pattern.color)
+            if not CandelaHighlighter.change_highlight_color(curr_pattern.regex, new_pattern.color) then
+                return
+            end
+
             M.update_lines()
             M.resize_height()
             M.hide_prompt()
@@ -430,12 +455,16 @@ function M.delete(ask)
         end
     end
 
-    local is_removed = CandelaPatternList.delete_pattern(curr_line)
-    if is_removed then
-        CandelaHighlighter.remove_highlight(M.base_buf, curr_pattern.regex)
-        M.update_lines()
-        M.resize_height() -- TODO: Shrink height if size decreases
+    if not CandelaPatternList.delete_pattern(curr_line) then
+        return
     end
+
+    if not CandelaHighlighter.remove_highlight(M.base_buf, curr_pattern.regex) then
+        return
+    end
+
+    M.update_lines()
+    M.resize_height() -- TODO: Shrink height if size decreases
 end
 
 ---@param ask boolean: show the confirmation message or not
@@ -456,9 +485,10 @@ function M.clear(ask)
     local patterns = CandelaPatternList.patterns
     CandelaPatternList.clear_patterns()
     for _, pattern in ipairs(patterns) do
-        CandelaHighlighter.remove_highlight(M.base_buf, pattern.regex)
-        M.update_lines()
-        -- M.reset_height() -- TODO: Implement reset_height()
+        if CandelaHighlighter.remove_highlight(M.base_buf, pattern.regex) then
+            M.update_lines()
+            -- M.reset_height() -- TODO: Implement reset_height()
+        end
     end
 end
 
@@ -489,17 +519,6 @@ function M.change_color()
         vim.api.nvim_paste(curr_pattern.color, false, -1)
     end)
 
-    vim.fn.prompt_setcallback(M.windows.prompt.buf, function(color) -- NOTE:
-        local new_pattern = CandelaPatternList.change_pattern_color(curr_line, color)
-        if new_pattern == nil then
-            return
-        end
-        CandelaHighlighter.change_highlight_color(curr_pattern.regex, new_pattern.color)
-        M.update_lines()
-        M.resize_height()
-        M.hide_prompt()
-    end)
-
     M.show_prompt(Commands.CHANGE_COLOR, curr_line, curr_pattern)
 end
 
@@ -518,9 +537,15 @@ function M.toggle_highlight()
     local curr_pattern = CandelaPatternList.get_pattern(curr_line)
     local is_highlighted = CandelaPatternList.toggle_pattern_highlight(curr_line)
     if is_highlighted then
-        CandelaHighlighter.highlight_matches(M.base_buf, curr_pattern)
+        local count = CandelaHighlighter.highlight_matches(M.base_buf, curr_pattern)
+        if count == -1 then
+            return
+        end
+        curr_pattern.count = count
     else
-        CandelaHighlighter.remove_highlight(M.base_buf, curr_pattern.regex)
+        if not CandelaHighlighter.remove_highlight(M.base_buf, curr_pattern.regex) then
+            return
+        end
     end
     M.update_lines()
 end
@@ -538,12 +563,17 @@ function M.toggle_lightbox()
 
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
     local curr_pattern = CandelaPatternList.get_pattern(curr_line)
-    local is_lightboxed = CandelaPatternList.toggle_pattern_lightbox(curr_line)
-    -- TODO: temporary implementation to test command, implement lightbox
-    if is_lightboxed then
-        CandelaHighlighter.highlight_matches(M.base_buf, curr_pattern)
+    local is_highlighted = CandelaPatternList.toggle_pattern_highlight(curr_line)
+    if is_highlighted then
+        local count = CandelaHighlighter.highlight_matches(M.base_buf, curr_pattern)
+        if count == -1 then
+            return
+        end
+        curr_pattern.count = count
     else
-        CandelaHighlighter.remove_highlight(M.base_buf, curr_pattern.regex)
+        if not CandelaHighlighter.remove_highlight(M.base_buf, curr_pattern.regex) then
+            return
+        end
     end
     M.update_lines()
 end

@@ -2,14 +2,14 @@
 
 local CandelaEngine = require("candela.engine")
 
-local CandelaHighlighter = {}
+local M = {}
 
 -- TODO: create default color palette
 
 ---@param color string
 ---@param ns integer
 ---@param hl_group string
-function CandelaHighlighter.register_highlight(color, ns, hl_group)
+local function register_highlight(color, ns, hl_group)
     vim.api.nvim_set_hl_ns(ns)
     -- TODO: figure out foreground color situation
     local fg = "#101010"
@@ -33,15 +33,15 @@ end
 ---@param bufnr number
 ---@param pattern CandelaPattern
 ---@return number
-function CandelaHighlighter.highlight_matches(bufnr, pattern)
+function M.highlight_matches(bufnr, pattern)
     local ns = vim.api.nvim_create_namespace("CandelaNs_" .. hash_regex(pattern.regex))
     local hl_group = "CandelaHl_" .. hash_regex(pattern.regex)
-    CandelaHighlighter.register_highlight(pattern.color, ns, hl_group)
+    M.register_highlight(pattern.color, ns, hl_group)
 
     local filepath = vim.api.nvim_buf_get_name(bufnr)
     if filepath == "" then
         vim.notify("Candela: cannot search file with no file name", vim.log.levels.ERROR)
-        return 0
+        return -1
     end
 
     -- TODO: get command from config based on best default between rg, ag, and grep or user config
@@ -62,15 +62,29 @@ function CandelaHighlighter.highlight_matches(bufnr, pattern)
     return count
 end
 
-function CandelaHighlighter.remove_highlight(bufnr, regex)
+---@return boolean
+function M.remove_highlight(bufnr, regex)
     local ns = vim.api.nvim_get_namespaces()["CandelaNs_" .. hash_regex(regex)]
+    if ns == nil then
+        vim.notify(string.format("Candela: namespace does not exist: CandelaNs_%s", hash_regex(regex)), vim.log.levels.ERROR)
+        return false
+    end
+
     vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
+    return true
 end
 
-function CandelaHighlighter.change_highlight_color(regex, new_color)
-    local ns = vim.api.nvim_create_namespace("CandelaNs_" .. hash_regex(regex))
+---@return boolean
+function M.change_highlight_color(regex, new_color)
+    local ns = vim.api.nvim_get_namespaces()["CandelaNs_" .. hash_regex(regex)]
+    if ns == nil then
+        vim.notify(string.format("Candela: namespace does not exist: CandelaNs_%s", hash_regex(regex)), vim.log.levels.ERROR)
+        return false
+    end
+
     local hl_group = "CandelaHl_" .. hash_regex(regex)
-    CandelaHighlighter.register_highlight(new_color, ns, hl_group)
+    register_highlight(new_color, ns, hl_group)
+    return true
 end
 
-return CandelaHighlighter
+return M
