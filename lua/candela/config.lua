@@ -15,23 +15,25 @@
 ---@class CandelaConfig
 ---@field defaults table<string, any>
 ---@field options table<string, any>
-local CandelaConfig = {}
+local M = {}
 
-CandelaConfig.defaults = {
+M.version = "1.0"
+
+M.defaults = {
     -- Use log syntax highlighting
     height = 7,
     syntax_highlighting = true,
 }
 
-CandelaConfig.options = {}
+M.options = {}
 
 ---@return CandelaConfig
-function CandelaConfig.setup(opts)
-    CandelaConfig.options = vim.tbl_deep_extend("force", vim.deepcopy(CandelaConfig.defaults), opts or {})
-    return CandelaConfig.options
+function M.setup(opts)
+    M.options = vim.tbl_deep_extend("force", vim.deepcopy(M.defaults), opts or {})
+    return M.options
 end
 
-function CandelaConfig.set_keymaps()
+function M.set_keymaps()
     -- NOTE: Only for dev purposes, leave for user to create
     vim.api.nvim_set_keymap(
         "n",
@@ -57,7 +59,7 @@ function CandelaConfig.set_keymaps()
     vim.api.nvim_set_keymap("n", "<M-j>", "]l", {})
 end
 
-function CandelaConfig.set_patterns_keymaps(buffer)
+function M.set_patterns_keymaps(buffer)
     vim.api.nvim_buf_set_keymap(
         buffer,
         "n",
@@ -225,7 +227,7 @@ function CandelaConfig.set_patterns_keymaps(buffer)
     )
 end
 
-function CandelaConfig.set_prompt_keymaps(buffer)
+function M.set_prompt_keymaps(buffer)
     vim.api.nvim_buf_set_keymap(
         buffer,
         "n",
@@ -250,4 +252,4 @@ function CandelaConfig.set_prompt_keymaps(buffer)
     )
 end
 
-return CandelaConfig
+return M

@@ -63,12 +63,7 @@ function CandelaHighlighter.highlight_matches(bufnr, pattern)
 end
 
 function CandelaHighlighter.remove_highlight(bufnr, regex)
-    local ns = vim.api.nvim_get_namespaces()["CandelaNs_" .. regex]
-    vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
-end
-
-function CandelaHighlighter.clear_highlights(bufnr)
-    local ns = vim.api.nvim_get_namespaces()["CandelaNs_" .. regex]
+    local ns = vim.api.nvim_get_namespaces()["CandelaNs_" .. hash_regex(regex)]
     vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
 end
 

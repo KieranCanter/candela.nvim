@@ -29,10 +29,10 @@
 -- TODO: remove all functions that aren't needed across files from appropriate table e.g.
 --       CandelaPatternList.get_next_color() => local get_next_color()
 
+local CandelaConfig = require("candela.config")
+local CandelaCommands = require("candela.commands")
 local CandelaUi = require("candela.ui")
 local CandelaPatternList = require("candela.pattern_list")
-local CandelaCommands = require("candela.commands")
-local CandelaConfig = require("candela.config")
 
 ---@class Candela
 ---@field ui CandelaUi

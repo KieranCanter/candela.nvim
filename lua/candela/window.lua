@@ -4,6 +4,11 @@
 ---@field buf number|nil
 ---@field win number|nil
 ---@field config vim.api.keyset.win_config
+---@field attach_to fun(self: CandelaWindow, parent_window: CandelaWindow)
+---@field ensure_buffer fun(self: CandelaWindow)
+---@field is_open fun(self: CandelaWindow): boolean
+---@field open_window fun(self: CandelaWindow, enter: boolean)
+---@field close_window fun(self: CandelaWindow)
 
 local CandelaWindow = {}
 
@@ -18,18 +23,6 @@ function CandelaWindow.new(opts)
 
     setmetatable(instance, { __index = CandelaWindow })
     return instance
-end
-
----@param self CandelaWindow
----@param key string
----@param val string|number
-function CandelaWindow:change_config(key, val)
-    if not self or not self.config then
-        vim.notify(string.format("Invalid window (win=%s, buf=%s) passed to change_config", self.win, self.buf)
-            , vim.log.levels.ERROR)
-        return
-    end
-    self.config[key] = val
 end
 
 ---@param self CandelaWindow
@@ -54,6 +47,13 @@ function CandelaWindow:ensure_buffer()
     end
 end
 
+-- Check if the window is open
+---@param self CandelaWindow
+---@return boolean
+function CandelaWindow:is_open()
+    return self.win ~= nil and vim.api.nvim_win_is_valid(self.win)
+end
+
 -- Open windows based on config
 ---@param self CandelaWindow
 ---@param enter boolean=false
@@ -65,13 +65,6 @@ function CandelaWindow:open_window(enter)
     self:ensure_buffer()
     enter = enter or false
     self.win = vim.api.nvim_open_win(self.buf, enter, self.config)
-end
-
--- Check if the window is open
----@param self CandelaWindow
----@return boolean
-function CandelaWindow:is_open()
-    return self.win ~= nil and vim.api.nvim_win_is_valid(self.win)
 end
 
 -- Close window
