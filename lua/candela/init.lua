@@ -10,10 +10,10 @@
 --    * vim.api.nvim_buf_get_name(0) = vim.fn.expand('%:p') (path name)
 --
 --  * future improvements
+--    * lightbox duh
 --    * import/export pattern list
---    * highlight the color's bg in ui the hex code's appropriate color
---    * make more obvious the toggling of highlight/lightbox (maybe highlight symbol background when active?)
 --    * implement a good method of color picking?
+--    * handle automatic foreground color changing if the colors are too similar in luminosity
 --]]
 --
 -- TODO: remove all functions that aren't needed across files from appropriate table e.g.
