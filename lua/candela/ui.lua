@@ -673,6 +673,7 @@ function M.update_lines()
         vim.api.nvim_set_option_value("modifiable", false, { buf = M.windows[field].buf })
     end
 
+    -- FIX: bug with one highlight being left after clear or deleting last pattern
     CandelaHighlighter.highlight_ui(M.windows, CandelaPatternList.patterns)
 end
 

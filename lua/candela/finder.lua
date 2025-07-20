@@ -1,7 +1,7 @@
-local Finder = {}
+local M = {}
 
 --@param regex string
-function Finder.vim_match(regex)
+function M.vim_match(regex)
     vim.fn.setreg("/", "\\v\\C" .. regex)
     vim.cmd("normal! n")
 end
@@ -37,7 +37,7 @@ end
 ---@param bufnr number
 ---@param regex string
 ---@param engine fun(cmd: string[]): table[]
-function Finder.find(bufnr, regex, engine)
+function M.find(bufnr, regex, engine)
     local filepath = vim.api.nvim_buf_get_name(bufnr)
     if filepath == "" then
         vim.notify("Candela: cannot search file with no file name", vim.log.levels.ERROR)
@@ -53,7 +53,7 @@ end
 ---@param bufnr number
 ---@param patterns CandelaPattern[]
 ---@param engine fun(cmd: string[]): table[]
-function Finder.find_all(bufnr, patterns, engine)
+function M.find_all(bufnr, patterns, engine)
     if #patterns < 1 then
         vim.notify("Candela: cannot run find_all on pattern list of length 0", vim.log.levels.ERROR)
         return
@@ -76,4 +76,4 @@ function Finder.find_all(bufnr, patterns, engine)
     update_loclist(matches, "all")
 end
 
-return Finder
+return M

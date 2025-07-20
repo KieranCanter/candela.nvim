@@ -7,7 +7,7 @@
 ---@field lightbox boolean
 ---@field count number
 
-local CandelaPattern = {}
+local M = {}
 
 ---@param regex string
 ---@param color string
@@ -15,7 +15,7 @@ local CandelaPattern = {}
 ---@param lightbox boolean
 ---@param count number
 ---@return CandelaPattern
-function CandelaPattern.new(regex, color, highlight, lightbox, count)
+function M.new(regex, color, highlight, lightbox, count)
     local instance = {
         regex = regex,
         color = color,
@@ -24,13 +24,13 @@ function CandelaPattern.new(regex, color, highlight, lightbox, count)
         count = count,
     }
 
-    setmetatable(instance, { __index = CandelaPattern })
+    setmetatable(instance, { __index = M })
     return instance
 end
 
 ---@param self CandelaPattern
 ---@param regex string
-function CandelaPattern:edit_regex(regex)
+function M:edit_regex(regex)
     self.regex = regex
 end
 
@@ -47,7 +47,7 @@ end
 
 ---@param self CandelaPattern
 ---@param new_color string
-function CandelaPattern:change_color(new_color)
+function M:change_color(new_color)
     if _is_valid_color(new_color) then
         self.color = new_color
     else
@@ -59,13 +59,13 @@ function CandelaPattern:change_color(new_color)
 end
 
 ---@param self CandelaPattern
-function CandelaPattern:toggle_highlight()
+function M:toggle_highlight()
     self.highlight = not self.highlight
 end
 
 ---@param self CandelaPattern
-function CandelaPattern:toggle_lightbox()
+function M:toggle_lightbox()
     self.lightbox = not self.lightbox
 end
 
-return CandelaPattern
+return M

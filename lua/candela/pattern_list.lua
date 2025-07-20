@@ -4,10 +4,10 @@ local CandelaPattern = require("candela.pattern")
 
 ---@class CandelaPatternList: CandelaPattern[]
 
-local CandelaPatternList = {}
-CandelaPatternList.patterns = {}
+local M = {}
+M.patterns = {}
 
-CandelaPatternList.palette = {
+M.palette = {
     dark = {
         "#003f5c", -- deep blue
         "#2f4b7c", -- indigo
@@ -48,19 +48,19 @@ CandelaPatternList.palette = {
 local next_color_index = 1
 
 ---@return CandelaPattern
-function CandelaPatternList.get_pattern(index)
-    return CandelaPatternList.patterns[index]
+function M.get_pattern(index)
+    return M.patterns[index]
 end
 
 ---@return table<string>
-function CandelaPatternList.get_palette()
+function M.get_palette()
     local mode = vim.o.background
-    return CandelaPatternList.palette[mode] or CandelaPatternList.palette.dark
+    return M.palette[mode] or M.palette.dark
 end
 
 ---@return string
-function CandelaPatternList.get_next_color()
-    local palette = CandelaPatternList.get_palette()
+function M.get_next_color()
+    local palette = M.get_palette()
     local next_color = palette[next_color_index]
     next_color_index = (next_color_index % #palette) + 1
     return next_color
@@ -68,7 +68,7 @@ end
 
 ---@param regex string
 ---@return CandelaPattern|nil
-function CandelaPatternList.add_pattern(regex)
+function M.add_pattern(regex)
     if regex == "" then
         vim.notify("Candela: Regex cannot be empty", vim.log.levels.ERROR)
         return
@@ -78,19 +78,19 @@ function CandelaPatternList.add_pattern(regex)
         return
     end
 
-    local color = CandelaPatternList.get_next_color()
+    local color = M.get_next_color()
     local highlight = true
     local lightbox = true
     local count = 0
 
     local new_pattern = CandelaPattern.new(regex, color, highlight, lightbox, count)
-    for _, pattern in ipairs(CandelaPatternList.patterns) do
+    for _, pattern in ipairs(M.patterns) do
         if pattern.regex == new_pattern.regex then
             vim.notify(string.format("Regex /%s/ already exists.", pattern.regex), vim.log.levels.ERROR)
             return
         end
     end
-    table.insert(CandelaPatternList.patterns, new_pattern)
+    table.insert(M.patterns, new_pattern)
 
     return new_pattern
 end
@@ -98,7 +98,7 @@ end
 ---@param index number: index of pattern to edit
 ---@param new_regex string: new regex to change pattern to
 ---@return CandelaPattern|nil
-function CandelaPatternList.edit_pattern(index, new_regex)
+function M.edit_pattern(index, new_regex)
     if new_regex == "" then
         vim.notify("Candela: Regex cannot be empty", vim.log.levels.ERROR)
         return
@@ -108,11 +108,11 @@ function CandelaPatternList.edit_pattern(index, new_regex)
         return
     end
 
-    local pattern = CandelaPatternList.patterns[index]
+    local pattern = M.patterns[index]
     if pattern.regex == new_regex then
         return
     end
-    for _, pat in ipairs(CandelaPatternList.patterns) do
+    for _, pat in ipairs(M.patterns) do
         if pat.regex == new_regex then
             vim.notify(string.format("Regex /%s/ already exists.", pat.regex), vim.log.levels.ERROR)
             return
@@ -125,35 +125,35 @@ end
 
 ---@param index number: index of pattern to delete
 ---@return boolean
-function CandelaPatternList.delete_pattern(index)
-    if index < 1 or index > #CandelaPatternList.patterns then
+function M.delete_pattern(index)
+    if index < 1 or index > #M.patterns then
         vim.notify(string.format("Candela: no pattern at index %d", index), vim.log.levels.ERROR)
         return false
     end
 
-    local regex = CandelaPatternList.patterns[index].regex
-    table.remove(CandelaPatternList.patterns, index)
+    local regex = M.patterns[index].regex
+    table.remove(M.patterns, index)
     vim.notify(string.format("Candela: deleted pattern %d: /%s/", index, regex), vim.log.levels.INFO)
     return true
 end
 
 ---@return boolean
-function CandelaPatternList.clear_patterns()
-    if #CandelaPatternList.patterns == 0 then
+function M.clear_patterns()
+    if #M.patterns == 0 then
         vim.notify("Candela: cannot clear an empty patterns list", vim.log.levels.INFO)
         return false
     end
 
-    CandelaPatternList.patterns = {}
+    M.patterns = {}
     vim.notify("Candela: cleared all patterns", vim.log.levels.INFO)
     return true
 end
 
 ---@param index number: index of pattern to change color of
 ---@return CandelaPattern|nil
-function CandelaPatternList.change_pattern_color(index, new_color)
-    local pattern = CandelaPatternList.patterns[index]
-    if index < 1 or index > #CandelaPatternList.patterns then
+function M.change_pattern_color(index, new_color)
+    local pattern = M.patterns[index]
+    if index < 1 or index > #M.patterns then
         vim.notify(string.format("Candela: no pattern at index %d", index), vim.log.levels.ERROR)
         return
     end
@@ -163,9 +163,9 @@ end
 
 ---@param index number: index of pattern to toggle highlight on
 ---@return boolean
-function CandelaPatternList.toggle_pattern_highlight(index)
-    local pattern = CandelaPatternList.patterns[index]
-    if index < 1 or index > #CandelaPatternList.patterns then
+function M.toggle_pattern_highlight(index)
+    local pattern = M.patterns[index]
+    if index < 1 or index > #M.patterns then
         vim.notify(string.format("Candela: no pattern at index %d", index), vim.log.levels.ERROR)
     end
     pattern:toggle_highlight()
@@ -174,13 +174,13 @@ end
 
 ---@param index number: index of pattern to toggle lightbox on
 ---@return boolean
-function CandelaPatternList.toggle_pattern_lightbox(index)
-    local pattern = CandelaPatternList.patterns[index]
-    if index < 1 or index > #CandelaPatternList.patterns then
+function M.toggle_pattern_lightbox(index)
+    local pattern = M.patterns[index]
+    if index < 1 or index > #M.patterns then
         vim.notify(string.format("Candela: no pattern at index %d", index), vim.log.levels.ERROR)
     end
     pattern:toggle_lightbox()
     return pattern.lightbox
 end
 
-return CandelaPatternList
+return M
