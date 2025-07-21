@@ -11,6 +11,7 @@
 --
 --  * future improvements
 --    * lightbox duh
+--    * add verify_opts function to each that takes opts
 --    * lazy load more
 --    * import/export pattern list
 --    * handle automatic foreground color changing if the colors are too similar in luminosity
@@ -23,6 +24,8 @@ local CandelaConfig = require("candela.config")
 local CandelaCommands = require("candela.commands")
 local CandelaUi = require("candela.ui")
 local CandelaPatternList = require("candela.pattern_list")
+local CandelaHighlighter = require("candela.highlighter")
+local CandelaLightbox = require("candela.lightbox")
 
 ---@class Candela
 ---@field ui CandelaUi
@@ -49,6 +52,8 @@ function Candela.setup(opts)
     Candela.commands = CandelaCommands.setup(Candela.config)
     Candela.ui = CandelaUi.setup(Candela.config)
     Candela.patterns = CandelaPatternList.setup(Candela.config)
+    Candela.highlight = CandelaHighlighter.setup(Candela.config)
+    Candela.lightbox = CandelaLightbox.setup(Candela.config)
 end
 
 return Candela

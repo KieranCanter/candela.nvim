@@ -14,7 +14,7 @@ M.defaults = {
         -- initial height (number of patterns) of the patterns window
         height = 7, -- integer
         -- position of prompt window in relation to patterns window
-        prompt = "overlap", -- "overlap" | "border"
+        prompt_layout = "overlap", -- "overlap" | "border"
     },
     engine = {
         -- regex search engine to use; defaults to first found tool out of the list in order
@@ -33,8 +33,8 @@ M.defaults = {
     -- case-sensitive option for searching
     case = "sensitive", -- "sensitive" | "ignore" | "smart" | "system"
     lightbox = {
-        -- lightbox display mode
-        display = "tab", -- "tab" | "split-right" | "split-left" | "split-up" | "split-down"
+        -- lightbox view mode
+        view = "split-right", -- "tab" | "split-left" | "split-right" | "split-above" | "split-below"
         -- place unmatched lines in folds or completely remove them
         non_matched = "fold", -- "fold" | "remove"
     },
@@ -49,24 +49,6 @@ M.defaults = {
         -- list of colors to use for dark/light mode
         colors = {
             dark = {
-                "#3c8fcf", -- muted blue
-                "#61afef", -- sky blue
-                "#88c0d0", -- nord light blue
-                "#81a1c1", -- nord steel
-                "#56b6c2", -- teal
-                "#98c379", -- green
-                "#c3e88d", -- pastel green
-                "#e5c07b", -- soft yellow
-                "#fab387", -- peach
-                "#f78c6c", -- orange
-                "#e06c75", -- red
-                "#ff6ac1", -- pink
-                "#c678dd", -- purple
-                "#bb9af7", -- violet
-                "#7dcfff", -- light aqua
-                "#9aedfe", -- icy cyan,
-            },
-            light = {
                 "#003f5c", -- deep blue
                 "#2f4b7c", -- indigo
                 "#665191", -- muted purple
@@ -83,6 +65,24 @@ M.defaults = {
                 "#4263eb", -- strong blue
                 "#5c5f66", -- soft gray
                 "#7c4dff", -- electric purple,
+            },
+            light = {
+                "#3c8fcf", -- muted blue
+                "#61afef", -- sky blue
+                "#88c0d0", -- nord light blue
+                "#81a1c1", -- nord steel
+                "#56b6c2", -- teal
+                "#98c379", -- green
+                "#c3e88d", -- pastel green
+                "#e5c07b", -- soft yellow
+                "#fab387", -- peach
+                "#f78c6c", -- orange
+                "#e06c75", -- red
+                "#ff6ac1", -- pink
+                "#c678dd", -- purple
+                "#bb9af7", -- violet
+                "#7dcfff", -- light aqua
+                "#9aedfe", -- icy cyan,
             },
         },
     },
@@ -131,13 +131,13 @@ local function get_default_args(opts)
     if opts.case ~= "sensitive" and opts.case ~= "ignore" and opts.case ~= "smart" and opts.case ~= "system" then
         vim.notify(
             string.format(
-                "`%s` is not a valid option value for `case`, using `sensitive` as default."
-                    .. ' Valid values: "sensitive", "ignore", "smart", or "system".',
+                '"%s" is not a valid option value for `case`, using "sensitive" as default.'
+                    .. ' Valid values: "sensitive", "ignore", "smart", "system".',
                 opts.case
             ),
             vim.log.levels.WARN
         )
-        opts.case = "sensitive"
+        opts.case = M.defaults.case
     end
 
     if command == "rg" then
@@ -216,43 +216,43 @@ function M.set_keymaps()
     vim.api.nvim_set_keymap("n", "<leader>cds", "", {
         noremap = true,
         silent = true,
-        desc = "Toggle Candela patterns window",
+        desc = "Candela: toggle patterns window",
         callback = function() CandelaUi.toggle() end
     })
     vim.api.nvim_set_keymap("n", "<leader>cda", "", {
         noremap = true,
         silent = true,
-        desc = "Add Candela pattern",
+        desc = "Candela: add pattern",
         callback = function() CandelaCommands.commands.add() end
     })
     vim.api.nvim_set_keymap("n", "<leader>cdr", "", {
         noremap = true,
         silent = true,
-        desc = "Add Candela pattern",
+        desc = "Candela: refresh patterns",
         callback = function() CandelaCommands.commands.refresh() end
     })
     vim.api.nvim_set_keymap("n", "<leader>cdD", "", {
         noremap = true,
         silent = true,
-        desc = "Add Candela pattern",
+        desc = "Candela: clear patterns",
         callback = function() CandelaCommands.commands.clear() end
     })
     vim.api.nvim_set_keymap("n", "<leader>cdM", "", {
         noremap = true,
         silent = true,
-        desc = "Add Candela pattern",
+        desc = "Candela: match all",
         callback = function() CandelaCommands.commands.match_all() end
     })
     vim.api.nvim_set_keymap("n", "<leader>cdF", "", {
         noremap = true,
         silent = true,
-        desc = "Add Candela pattern",
+        desc = "Candela: find all",
         callback = function() CandelaCommands.commands.find_all() end
     })
     vim.api.nvim_set_keymap("n", "<leader>cdL", "", {
         noremap = true,
         silent = true,
-        desc = "Add Candela pattern",
+        desc = "Candela: lightbox",
         callback = function() CandelaCommands.commands.lightbox() end
     })
     vim.api.nvim_set_keymap("n", "<M-k>", "[l", {})
@@ -363,7 +363,7 @@ function M.set_patterns_keymaps(buffer)
     vim.api.nvim_buf_set_keymap(buffer, "n", "?", "", {
         noremap = true,
         silent = true,
-        desc = "Display Candela keymaps",
+        desc = "Candela: display keymaps",
         callback = function() CandelaCommands.commands.help() end
     })
 end
@@ -373,13 +373,13 @@ function M.set_prompt_keymaps(buffer)
     vim.api.nvim_buf_set_keymap(buffer, "n", "q", "", {
         noremap = true,
         silent = true,
-        desc = "Close Prompt",
+        desc = "Candela: close Prompt",
         callback = function() CandelaUi.hide_prompt() end
     })
     vim.api.nvim_buf_set_keymap(buffer, "n", "<ESC>", "", {
         noremap = true,
         silent = true,
-        desc = "Close Prompt",
+        desc = "Candela: close Prompt",
         callback = function() CandelaUi.hide_prompt() end
     })
 end

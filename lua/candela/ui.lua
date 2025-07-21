@@ -119,17 +119,22 @@ function M.setup(opts)
     local prompt_height = 1 -- 1 space height for prompt
     local float_height = pattern_height + 2 -- + prompt_height + 2
 
+    local defaults = require("candela.config").defaults
     local prompt_layout = 0
-    if opts.window.prompt == "overlap" then
+    if opts.window.prompt_layout == "overlap" then
         prompt_layout = 2
-    elseif opts.window.prompt == "border" then
+    elseif opts.window.prompt_layout == "border" then
         prompt_layout = 3
     else
-        vim.notify(string.format(
-                "`%s` is not a valid option value for `window.prompt`, using `overlap` as default." ..
-                " Valid values: \"overlap\" or \"border\".",
-                opts.window.prompt
-        ), vim.log.levels.WARN)
+        vim.notify(
+            string.format(
+                '"%s" is not a valid option value for `window.prompt_layout`, using "%s" as default.'
+                    .. ' Valid values: "overlap", "border".',
+                opts.window.prompt_layout,
+                defaults.prompt_layout
+            ),
+            vim.log.levels.WARN
+        )
         prompt_layout = 2
     end
 
@@ -241,7 +246,7 @@ function M.setup(opts)
     for name, window in pairs(M.windows) do
         window:ensure_buffer()
         vim.api.nvim_set_option_value("swapfile", false, { buf = window.buf })
-        vim.api.nvim_set_option_value("filetype", "candela", { buf = window.buf })
+        vim.api.nvim_set_option_value("filetype", string.format("%s.candela", name), { buf = window.buf })
         if name ~= "prompt" then
             vim.api.nvim_set_option_value("modifiable", false, { buf = window.buf })
         end
@@ -411,7 +416,7 @@ local function show_prompt(command, curr_line, curr_pattern)
 
             local cmd = CandelaConfig.options.engine.command
             local args = CandelaConfig.options.engine.args
-            local count = CandelaHighlighter.highlight_matches(M.base_buf, new_pattern,  cmd, args)
+            local count = CandelaHighlighter.highlight_matches(M.base_buf, new_pattern, cmd, args)
             if count == -1 then
                 return
             end

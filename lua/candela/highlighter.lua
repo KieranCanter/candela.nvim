@@ -4,7 +4,11 @@ local CandelaEngine = require("candela.engine")
 
 local M = {}
 
--- TODO: create default color palette
+function M.setup()
+    M.match_cache = {}
+
+    return M
+end
 
 ---@param colors table
 ---@param ns integer
@@ -39,21 +43,18 @@ function M.highlight_ui(windows, patterns)
     local toggle_end = 5 -- end at middle of length 5 window
 
     for i, pattern in ipairs(patterns) do
-        vim.api.nvim_buf_set_extmark(windows.color.buf, ns, i-1, 0, {
+        vim.api.nvim_buf_set_extmark(windows.color.buf, ns, i - 1, 0, {
             end_col = color_end,
             line_hl_group = "CandelaHl_" .. hash_regex(pattern.regex),
-            priority = 100,
         })
         if pattern.highlight == true then
-            vim.api.nvim_buf_set_extmark(windows.highlight.buf, ns, i-1, 0, {
+            vim.api.nvim_buf_set_extmark(windows.highlight.buf, ns, i - 1, 0, {
                 line_hl_group = "CandelaHl_" .. hash_regex(pattern.regex),
-                priority = 100,
             })
         end
         if pattern.lightbox == true then
-            vim.api.nvim_buf_set_extmark(windows.lightbox.buf, ns, i-1, 0, {
+            vim.api.nvim_buf_set_extmark(windows.lightbox.buf, ns, i - 1, 0, {
                 line_hl_group = "CandelaHl_" .. hash_regex(pattern.regex),
-                priority = 100,
             })
         end
     end
@@ -82,6 +83,7 @@ function M.highlight_matches(bufnr, pattern, cmd, args)
     table.insert(command, filepath)
 
     local matches = CandelaEngine.get_matches(command)
+    M.match_cache[pattern.regex] = {}
     local col = 0
     local count = 0
     for _, entry in ipairs(matches) do
@@ -90,12 +92,14 @@ function M.highlight_matches(bufnr, pattern, cmd, args)
             vim.api.nvim_buf_set_extmark(bufnr, ns, row - 1, col, {
                 end_col = string.len(line),
                 hl_group = hl_group,
-                hl_eol = true,
                 priority = 100,
             })
+            table.insert(M.match_cache[pattern.regex], row)
             count = count + 1
         end
     end
+
+    table.sort(M.match_cache)
 
     return count
 end
@@ -112,6 +116,7 @@ function M.remove_match_highlights(bufnr, regex)
     end
 
     vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
+    M.match_cache[regex] = nil
     return true
 end
 
@@ -129,6 +134,70 @@ function M.change_highlight_color(regex, new_color)
     local hl_group = "CandelaHl_" .. hash_regex(regex)
     register_highlight({ bg = new_color }, ns, hl_group)
     return true
+end
+
+---@param buf integer
+function M.higlight_cache(buf)
+    local patterns = require("candela.pattern_list").patterns
+    for _, pattern in ipairs(patterns) do
+        local ns = vim.api.nvim_get_namespaces()["CandelaNs_" .. hash_regex(pattern.regex)]
+        local hl_group = "CandelaHl_" .. hash_regex(pattern.regex)
+        if ns == nil then
+            vim.notify(
+                string.format("Candela: namespace does not exist: CandelaNs_%s", hash_regex(pattern.regex)),
+                vim.log.levels.ERROR
+            )
+            return
+        end
+
+        for _, lineno in ipairs(M.match_cache[pattern.regex]) do
+            vim.api.nvim_buf_set_extmark(buf, ns, lineno - 1, 0, {
+                end_col = string.len(vim.api.nvim_buf_get_lines(buf, lineno - 1, -1, false)[1]),
+                hl_group = hl_group,
+                priority = 100,
+            })
+        end
+    end
+end
+
+---@return integer[]
+function M.get_match_ranges()
+    local ranges = {}
+
+    for regex, lines in pairs(M.match_cache) do
+        local start, prev = lines[1], lines[1]
+        ranges[regex] = {}
+        for i = 2, #lines do
+            local curr = lines[i]
+            if curr ~= prev + 1 then
+                table.insert(ranges[regex], { start, prev })
+                start = curr
+            end
+            prev = curr
+        end
+
+        table.insert(ranges[regex], { start, prev })
+    end
+
+    return ranges
+end
+
+function M.get_flattened_match_cache()
+    local flattened = {}
+    local seen = {}
+
+    for _, lines in pairs(M.match_cache) do
+        for _, lineno in ipairs(lines) do
+            if not seen[lineno] then
+                table.insert(flattened, lineno)
+                seen[lineno] = true
+            end
+        end
+    end
+
+    table.sort(flattened)
+
+    return flattened
 end
 
 return M
