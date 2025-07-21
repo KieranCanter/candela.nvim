@@ -29,8 +29,6 @@ local CandelaPatternList = require("candela.pattern_list")
 ---@field patterns CandelaPattern[]|nil
 
 local Candela = {}
-Candela.ui = { windows = {}, base_buf = 0 }
-Candela.patterns = {}
 
 function Candela.setup(opts)
     vim.api.nvim_create_user_command("Candela", function(args)
@@ -47,8 +45,9 @@ function Candela.setup(opts)
         end,
     })
 
-    opts = CandelaConfig.setup(opts)
-    Candela.ui = CandelaUi.new(opts)
+    Candela.config = CandelaConfig.setup(opts)
+    Candela.commands = CandelaCommands.setup(Candela.config)
+    Candela.ui = CandelaUi.setup(Candela.config)
     Candela.patterns = CandelaPatternList.patterns
 end
 
