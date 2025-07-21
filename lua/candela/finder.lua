@@ -1,8 +1,22 @@
 local M = {}
 
---@param regex string
-function M.vim_match(regex)
+---@param regex string
+function M.match(regex)
     vim.fn.setreg("/", "\\v\\C" .. regex)
+    vim.cmd("normal! n")
+end
+
+--@param patterns CandelaPattern[]
+function M.match_all(patterns)
+    local multi_regex = ""
+    for i, pattern in ipairs(patterns) do
+        if i == 1 then
+            multi_regex = string.format("%s", pattern.regex)
+        else
+            multi_regex = string.format("%s|(%s)", multi_regex, pattern.regex)
+        end
+    end
+    vim.fn.setreg("/", "\\v\\C" .. multi_regex)
     vim.cmd("normal! n")
 end
 
