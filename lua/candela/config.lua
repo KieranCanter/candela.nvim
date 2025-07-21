@@ -49,24 +49,6 @@ M.defaults = {
         -- list of colors to use for dark/light mode
         colors = {
             dark = {
-                "#003f5c", -- deep blue
-                "#2f4b7c", -- indigo
-                "#665191", -- muted purple
-                "#a05195", -- plum
-                "#d45087", -- rose
-                "#f95d6a", -- coral red
-                "#ff7c43", -- burnt orange
-                "#ffa600", -- gold
-                "#b59f3b", -- olive yellow
-                "#5f7e0e", -- moss green
-                "#2f9e44", -- forest green
-                "#228c99", -- teal
-                "#1c7ed6", -- azure
-                "#4263eb", -- strong blue
-                "#5c5f66", -- soft gray
-                "#7c4dff", -- electric purple,
-            },
-            light = {
                 "#3c8fcf", -- muted blue
                 "#61afef", -- sky blue
                 "#88c0d0", -- nord light blue
@@ -83,6 +65,24 @@ M.defaults = {
                 "#bb9af7", -- violet
                 "#7dcfff", -- light aqua
                 "#9aedfe", -- icy cyan,
+            },
+            light = {
+                "#003f5c", -- deep blue
+                "#2f4b7c", -- indigo
+                "#665191", -- muted purple
+                "#a05195", -- plum
+                "#d45087", -- rose
+                "#f95d6a", -- coral red
+                "#ff7c43", -- burnt orange
+                "#ffa600", -- gold
+                "#b59f3b", -- olive yellow
+                "#5f7e0e", -- moss green
+                "#2f9e44", -- forest green
+                "#228c99", -- teal
+                "#1c7ed6", -- azure
+                "#4263eb", -- strong blue
+                "#5c5f66", -- soft gray
+                "#7c4dff", -- electric purple,
             },
         },
     },
@@ -210,119 +210,177 @@ end
 -- TODO: move mappings to mappings.lua file and change to callbacks instead of rhs strings
 function M.set_keymaps()
     -- NOTE: Only for dev purposes, leave for user to create
-    vim.api.nvim_set_keymap("n", "<leader>cds", [[:Candela<CR>]], {
+    local CandelaUi = require("candela.ui")
+    local CandelaCommands = require("candela.commands")
+
+    vim.api.nvim_set_keymap("n", "<leader>cds", "", {
         noremap = true,
         silent = true,
         desc = "Toggle Candela patterns window",
+        callback = function() CandelaUi.toggle() end
     })
-    vim.api.nvim_set_keymap("n", "<leader>cda", [[:Candela add<CR>]], {
+    vim.api.nvim_set_keymap("n", "<leader>cda", "", {
         noremap = true,
         silent = true,
         desc = "Add Candela pattern",
+        callback = function() CandelaCommands.commands.add() end
+    })
+    vim.api.nvim_set_keymap("n", "<leader>cdr", "", {
+        noremap = true,
+        silent = true,
+        desc = "Add Candela pattern",
+        callback = function() CandelaCommands.commands.refresh() end
+    })
+    vim.api.nvim_set_keymap("n", "<leader>cdD", "", {
+        noremap = true,
+        silent = true,
+        desc = "Add Candela pattern",
+        callback = function() CandelaCommands.commands.clear() end
+    })
+    vim.api.nvim_set_keymap("n", "<leader>cdM", "", {
+        noremap = true,
+        silent = true,
+        desc = "Add Candela pattern",
+        callback = function() CandelaCommands.commands.match_all() end
+    })
+    vim.api.nvim_set_keymap("n", "<leader>cdF", "", {
+        noremap = true,
+        silent = true,
+        desc = "Add Candela pattern",
+        callback = function() CandelaCommands.commands.find_all() end
+    })
+    vim.api.nvim_set_keymap("n", "<leader>cdL", "", {
+        noremap = true,
+        silent = true,
+        desc = "Add Candela pattern",
+        callback = function() CandelaCommands.commands.lightbox() end
     })
     vim.api.nvim_set_keymap("n", "<M-k>", "[l", {})
     vim.api.nvim_set_keymap("n", "<M-j>", "]l", {})
+    vim.api.nvim_set_keymap("n", "<M-h>", "[q", {})
+    vim.api.nvim_set_keymap("n", "<M-l>", "]q", {})
 end
 
 function M.set_patterns_keymaps(buffer)
-    vim.api.nvim_buf_set_keymap(buffer, "n", "q", [[:Candela<CR>]], {
+    local CandelaUi = require("candela.ui")
+    local CandelaCommands = require("candela.commands")
+    vim.api.nvim_buf_set_keymap(buffer, "n", "q", "", {
         noremap = true,
         silent = true,
         desc = "Close Candela",
+        callback = function() CandelaUi.hide_patterns() end
     })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "<ESC>", [[:Candela<CR>]], {
+    vim.api.nvim_buf_set_keymap(buffer, "n", "<ESC>", "", {
         noremap = true,
         silent = true,
         desc = "Close Candela",
+        callback = function() CandelaUi.hide_patterns() end
     })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "a", [[:Candela add<CR>]], {
+    vim.api.nvim_buf_set_keymap(buffer, "n", "a", "", {
         noremap = true,
         silent = true,
         desc = "Add Candela pattern",
+        callback = function() CandelaCommands.commands.add() end
     })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "e", [[:Candela edit<CR>]], {
+    vim.api.nvim_buf_set_keymap(buffer, "n", "e", "", {
         noremap = true,
         silent = true,
         desc = "Edit Candela pattern",
+        callback = function() CandelaCommands.commands.edit() end
     })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "c", [[:Candela copy<CR>]], {
+    vim.api.nvim_buf_set_keymap(buffer, "n", "c", "", {
         noremap = true,
         silent = true,
         desc = "Copy Candela pattern",
+        callback = function() CandelaCommands.commands.copy() end
     })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "d", [[:Candela delete<CR>]], {
+    vim.api.nvim_buf_set_keymap(buffer, "n", "d", "", {
         noremap = true,
         silent = true,
         desc = "Delete Candela pattern",
+        callback = function() CandelaCommands.commands.delete() end
     })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "D", [[:Candela clear<CR>]], {
+    vim.api.nvim_buf_set_keymap(buffer, "n", "D", "", {
         noremap = true,
         silent = true,
         desc = "Clear all Candela patterns",
+        callback = function() CandelaCommands.commands.clear() end
     })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "C", [[:Candela change_color<CR>]], {
+    vim.api.nvim_buf_set_keymap(buffer, "n", "C", "", {
         noremap = true,
         silent = true,
         desc = "Change Candela pattern color",
+        callback = function() CandelaCommands.commands.change_color() end
     })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "h", [[:Candela toggle_highlight<CR>]], {
+    vim.api.nvim_buf_set_keymap(buffer, "n", "h", "", {
         noremap = true,
         silent = true,
         desc = "Toggle Candela pattern highlight",
+        callback = function() CandelaCommands.commands.toggle_highlight() end
     })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "l", [[:Candela toggle_lightbox<CR>]], {
+    vim.api.nvim_buf_set_keymap(buffer, "n", "l", "", {
         noremap = true,
         silent = true,
         desc = "Toggle Candela pattern lightbox",
+        callback = function() CandelaCommands.commands.toggle_lightbox() end
     })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "r", [[:Candela refresh<CR>]], {
+    vim.api.nvim_buf_set_keymap(buffer, "n", "r", "", {
         noremap = true,
         silent = true,
         desc = "Refresh patterns for current buffer",
+        callback = function() CandelaCommands.commands.refresh() end
     })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "m", [[:Candela match<CR>]], {
+    vim.api.nvim_buf_set_keymap(buffer, "n", "m", "", {
         noremap = true,
         silent = true,
         desc = "Candela match pattern in buffer",
+        callback = function() CandelaCommands.commands.match() end
     })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "M", [[:Candela match_all<CR>]], {
+    vim.api.nvim_buf_set_keymap(buffer, "n", "M", "", {
         noremap = true,
         silent = true,
         desc = "Candela match pattern in buffer",
+        callback = function() CandelaCommands.commands.match_all() end
     })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "f", [[:Candela find<CR>]], {
+    vim.api.nvim_buf_set_keymap(buffer, "n", "f", "", {
         noremap = true,
         silent = true,
         desc = "Candela find pattern in buffer",
+        callback = function() CandelaCommands.commands.find() end
     })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "F", [[:Candela find_all<CR>]], {
+    vim.api.nvim_buf_set_keymap(buffer, "n", "F", "", {
         noremap = true,
         silent = true,
         desc = "Candela find all patterns in buffer",
+        callback = function() CandelaCommands.commands.find_all() end
     })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "?", [[:Candela help<CR>]], {
+    vim.api.nvim_buf_set_keymap(buffer, "n", "L", "", {
+        noremap = true,
+        silent = true,
+        desc = "Candela find all patterns in buffer",
+        callback = function() CandelaCommands.commands.lightbox() end
+    })
+    vim.api.nvim_buf_set_keymap(buffer, "n", "?", "", {
         noremap = true,
         silent = true,
         desc = "Display Candela keymaps",
+        callback = function() CandelaCommands.commands.help() end
     })
 end
 
 function M.set_prompt_keymaps(buffer)
+    local CandelaUi = require("candela.ui")
     vim.api.nvim_buf_set_keymap(buffer, "n", "q", "", {
         noremap = true,
         silent = true,
         desc = "Close Prompt",
-        callback = function()
-            require("candela.ui").hide_prompt()
-        end,
+        callback = function() CandelaUi.hide_prompt() end
     })
     vim.api.nvim_buf_set_keymap(buffer, "n", "<ESC>", "", {
         noremap = true,
         silent = true,
         desc = "Close Prompt",
-        callback = function()
-            require("candela.ui").hide_prompt()
-        end,
+        callback = function() CandelaUi.hide_prompt() end
     })
 end
 

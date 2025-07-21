@@ -1,5 +1,6 @@
 -- Module for defining user commands
 local CandelaUi = require("candela.ui")
+local CandelaLightbox = require("candela.lightbox")
 
 local M = {}
 
@@ -50,6 +51,9 @@ function M.setup(opts)
             CandelaUi.find_all()
             vim.api.nvim_cmd({ cmd = "lnext" }, {})
             vim.api.nvim_cmd({ cmd = "lopen" }, {})
+        end,
+        lightbox = function()
+            CandelaLightbox.display(opts.lightbox.display, opts.lightbox.non_matched)
         end,
         help = function()
             if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then

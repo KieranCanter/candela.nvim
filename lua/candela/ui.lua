@@ -57,7 +57,6 @@ local function update_lines()
         vim.api.nvim_set_option_value("modifiable", false, { buf = M.windows[field].buf })
     end
 
-    print(M.windows.color.buf)
     CandelaHighlighter.highlight_ui(M.windows, CandelaPatternList.patterns)
 end
 
