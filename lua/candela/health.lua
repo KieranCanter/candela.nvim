@@ -2,42 +2,36 @@ CandelaConfig = require("candela.config")
 
 local M = {}
 
-function M.has_search_engine()
-    local pattern = "%d+%.%d+%.*%d*"
-    local rg_version = vim.fn.system("rg --version"):match(pattern)
-    local ag_version = vim.fn.system("ag --version"):match(pattern)
-    local grep_version = vim.fn.system("grep --version"):match(pattern)
+local function engine_health()
+    local available = CandelaConfig.options.engine.available
+    local selected = CandelaConfig.options.engine.selected
+    local found = "Found"
+    local version = ""
 
-    if rg_version ~= nil then
-        vim.health.ok("`ripgrep " .. rg_version .. "` found")
-    else
-        vim.health.warn("`ripgrep` not found")
+    if #available == 0 or selected == nil then
+        vim.health.error("No regex search engine found... how do you not at least have grep?")
     end
 
-    if ag_version ~= nil then
-        vim.health.ok("`silver searcher " .. ag_version .. "` found")
-    else
-        vim.health.warn("`silver searcher` not found")
+    for i, engine in pairs(available) do
+        if next(engine) == selected then
+            version = engine[next(engine)]
+        end
+
+        if i == 1 then
+            found = string.format("%s `%s`", found, next(engine))
+        else
+            found = string.format("%s, `%s`", found, next(engine))
+        end
     end
 
-    if rg_version == nil and ag_version == nil then
-        vim.health.warn("Consider installing `ripgrep` or `silver searcher` for faster searches")
-    end
-
-    if grep_version ~= nil and (rg_version ~= nil or ag_version ~= nil) then
-        vim.health.ok("`GNU grep " .. grep_version .. "` found")
-    elseif grep_version ~= nil then
-        vim.health.ok("`GNU grep " .. grep_version .. "` found, but consider installing `ripgrep`" ..
-            "or `silver searcher` for faster searches")
-    else
-        vim.health.error("No search engine found... how do you not even have grep?")
-    end
+    vim.health.ok(found)
+    vim.health.ok(string.format("Selected `%s %s` for regex matching", selected, version))
 end
 
 function M.check()
     vim.health.start("candela.nvim")
     vim.health.info("{candela.nvim} version `" .. CandelaConfig.version .. "`")
-    M.has_search_engine()
+    engine_health()
 end
 
 return M

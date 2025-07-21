@@ -9,7 +9,7 @@
 -- * palette customization
 -- * file types to include (default to .txt, .log...?)
 -- * auto refresh when switching files or not
--- * search engine (default in order ripgrep > silver searcher > grep)
+-- * search engine ripgrep, hypergrep, ag, ugrep, ack, gnu grep
 -- * whether users want confirmation message on delete/clear to show or not
 --]]
 
@@ -20,20 +20,85 @@ local M = {}
 
 M.version = "1.0.0"
 
+---@return table<table>
+local function get_engine_versions()
+    local pattern = "%d+%.%d+%.*%d*"
+    local engines = {
+        "rg",
+        "hgrep",
+        "ag",
+        "ugrep",
+        "ack",
+        "grep",
+    }
+    local available = {}
+
+    for _, engine in ipairs(engines) do
+        local version = vim.fn.system(engine .. " --version"):match(pattern)
+        if version ~= nil then
+            table.insert(available, { [engine] = version })
+        end
+    end
+    return available
+end
+
+---@return string|nil
+local function get_default_engine()
+    for _, engine in ipairs(M.defaults.engine.available) do
+        if engine[next(engine)] ~= nil then
+            return next(engine)
+        end
+    end
+
+    vim.notify("No regex search tool found... how do you not at least have grep?", vim.log.levels.ERROR)
+    return nil
+end
+
+---@return string[]
+local function get_default_args()
+    local selected = M.defaults.engine.selected
+
+    if selected == "rg" then
+        return {"--line-number", "--color=never"}
+    elseif selected == "hgrep" then
+        return {}
+    elseif selected == "ag" then
+        return {}
+    elseif selected == "ugrep" then
+        return {}
+    elseif selected == "ack" then
+        return {}
+    elseif selected == "grep" then
+        return {}
+    else
+        vim.notify("No default args for search tool found", vim.log.levels.ERROR)
+        return {}
+    end
+end
+
 M.defaults = {
     -- Use log syntax highlighting
     height = 7,
     syntax_highlighting = true,
+    engine = {
+        ["available"] = {},
+        ["selected"] = {},
+        ["args"] = {},
+    }
 }
 
 M.options = {}
 
 ---@return CandelaConfig
 function M.setup(opts)
+    M.defaults.engine.available = get_engine_versions()
+    M.defaults.engine.selected = get_default_engine()
+    M.defaults.engine.args = get_default_args()
     M.options = vim.tbl_deep_extend("force", vim.deepcopy(M.defaults), opts or {})
     return M.options
 end
 
+-- TODO: move mappings to mappings.lua file
 function M.set_keymaps()
     -- NOTE: Only for dev purposes, leave for user to create
     vim.api.nvim_set_keymap(
