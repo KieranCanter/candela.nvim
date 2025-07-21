@@ -62,7 +62,7 @@ end
 ---@param bufnr number
 ---@param pattern CandelaPattern
 ---@return number
-function M.highlight_matches(bufnr, pattern)
+function M.highlight_matches(bufnr, pattern, cmd, args)
     local ns = vim.api.nvim_create_namespace("CandelaNs_" .. hash_regex(pattern.regex))
     local hl_group = "CandelaHl_" .. hash_regex(pattern.regex)
     register_highlight({ bg = pattern.color }, ns, hl_group)
@@ -73,9 +73,15 @@ function M.highlight_matches(bufnr, pattern)
         return -1
     end
 
-    -- TODO: get command from config based on best default between rg, ag, and grep or user config
-    local rg_cmd = { "rg", "--line-number", "--color=never", pattern.regex, filepath }
-    local matches = CandelaEngine.get_matches(rg_cmd)
+    -- construct shell command from regex search engine
+    local command = { cmd }
+    for _, arg in ipairs(args) do
+        table.insert(command, arg)
+    end
+    table.insert(command, pattern.regex)
+    table.insert(command, filepath)
+
+    local matches = CandelaEngine.get_matches(command)
     local col = 0
     local count = 0
     for _, entry in ipairs(matches) do
