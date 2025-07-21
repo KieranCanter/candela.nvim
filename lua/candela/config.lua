@@ -18,11 +18,22 @@
 ---@field options table<string, any>
 local M = {}
 
-M.version = "1.0.0"
+M.defaults = {
+    -- Use log syntax highlighting
+    height = 7,
+    syntax_highlighting = true,
+    engine = {
+        ["available"] = {},
+        ["selected"] = {},
+        ["args"] = {},
+    }
+}
+M.options = {}
+M.version = {}
 
 ---@return table<table>
 local function get_engine_versions()
-    local pattern = "%d+%.%d+%.*%d*"
+    local pattern = "%a+.*%d+%.%d+%.+%d+"
     local engines = {
         "rg",
         "hgrep",
@@ -76,21 +87,12 @@ local function get_default_args()
     end
 end
 
-M.defaults = {
-    -- Use log syntax highlighting
-    height = 7,
-    syntax_highlighting = true,
-    engine = {
-        ["available"] = {},
-        ["selected"] = {},
-        ["args"] = {},
-    }
-}
-
-M.options = {}
-
 ---@return CandelaConfig
 function M.setup(opts)
+    M.version["major"] = 1
+    M.version["minor"] = 0
+    M.version["patch"] = 0
+
     M.defaults.engine.available = get_engine_versions()
     M.defaults.engine.selected = get_default_engine()
     M.defaults.engine.args = get_default_args()

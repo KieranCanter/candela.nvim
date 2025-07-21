@@ -2,6 +2,15 @@ CandelaConfig = require("candela.config")
 
 local M = {}
 
+local function get_version()
+    return string.format(
+        "%d.%d.%d",
+        CandelaConfig.version.major,
+        CandelaConfig.version.minor,
+        CandelaConfig.version.patch
+    )
+end
+
 local function engine_health()
     local available = CandelaConfig.options.engine.available
     local selected = CandelaConfig.options.engine.selected
@@ -25,12 +34,12 @@ local function engine_health()
     end
 
     vim.health.ok(found)
-    vim.health.ok(string.format("Selected `%s %s` for regex matching", selected, version))
+    vim.health.ok(string.format("Selected `%s` for regex matching", version))
 end
 
 function M.check()
     vim.health.start("candela.nvim")
-    vim.health.info("{candela.nvim} version `" .. CandelaConfig.version .. "`")
+    vim.health.info(string.format("{candela.nvim} version `%s`", get_version()))
     engine_health()
 end
 
