@@ -1,11 +1,5 @@
 -- Module for defining user configuration
 
---[[
--- Config ideas:
--- * palette customization
--- * file types to include (default to .txt, .log...?)
---]]
-
 ---@class CandelaConfig
 ---@field defaults table<string, any>
 ---@field options table<string, any>
@@ -32,6 +26,11 @@ M.defaults = {
         display = "tab", -- "tab" | "split-right" | "split-left" | "split-up" | "split-down": lightbox display mode
         non_matched = "fold", -- "fold" | "remove": place unmatched lines in folds or completely remove them
     },
+    palette = { }, -- TODO: implement
+    file_types = {
+        ".log",
+        ".txt"
+    }
 }
 
 ---@return table<table>

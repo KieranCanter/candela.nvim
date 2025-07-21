@@ -10,6 +10,7 @@
 --    * vim.api.nvim_buf_get_name(0) = vim.fn.expand('%:p') (path name)
 --
 --  * future improvements
+--    * lazy load more
 --    * lightbox duh
 --    * import/export pattern list
 --    * implement a good method of color picking?
