@@ -26,6 +26,12 @@ end
 
 function M.highlight_ui(windows, patterns)
     local ns = vim.api.nvim_create_namespace("CandelaUi")
+    if #patterns == 0 then
+        vim.api.nvim_buf_clear_namespace(windows.color.buf, ns, 0, -1)
+        vim.api.nvim_buf_clear_namespace(windows.highlight.buf, ns, 0, -1)
+        vim.api.nvim_buf_clear_namespace(windows.lightbox.buf, ns, 0, -1)
+        return
+    end
 
     local color_start = 0 -- start at beginning of color
     local color_end = 7 -- end index of hex code #123456
