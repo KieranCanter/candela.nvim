@@ -19,10 +19,9 @@ M.defaults = {
         height = 7, -- integer: initial height (number of patterns) of the patterns window
         prompt = "overlap", -- "overlap" | "border": position of prompt window in relation to patterns window
     },
-    engine = { -- automatically generated, will be overridden if manually set
-        ["available"] = {},
-        ["selected"] = {},
-        ["args"] = {},
+    engine = {
+        command = {}, -- "rg" | "hgrep" | "ag" | "ugrep" | "ack" | "grep": regex search engine
+        args = {}, -- args to pass to search engine; refer to your tool's manual
     },
     syntax_highlighting = true, -- true | false: Candela-styled logs -- TODO: implement
     auto_refresh = false, -- true | false: automatically refresh pattern matching/highlighting on buffer change
@@ -36,7 +35,7 @@ M.defaults = {
 }
 
 ---@return table<table>
-local function get_engine_versions()
+function M.get_engine_versions()
     local pattern = "%a+.*%d+%.%d+%.+%d+"
     local engines = { -- TODO: implement other engines
         "rg",
@@ -57,10 +56,10 @@ local function get_engine_versions()
     return available
 end
 
----@param opts table
+---@param available table
 ---@return string|nil
-local function get_default_engine(opts)
-    for _, engine in ipairs(opts.engine.available) do
+local function get_default_engine(available)
+    for _, engine in ipairs(available) do
         if engine[next(engine)] ~= nil then
             return next(engine)
         end
@@ -74,7 +73,7 @@ end
 ---@return string[]
 local function get_default_args(opts)
     local args = {}
-    local selected = opts.engine.selected
+    local command = opts.engine.command
 
     if opts.case ~= "sensitive" and opts.case ~= "ignore" and opts.case ~= "smart" and opts.case ~= "system" then
         vim.notify(
@@ -88,7 +87,7 @@ local function get_default_args(opts)
         opts.case = "sensitive"
     end
 
-    if selected == "rg" then
+    if command == "rg" then
         args = { "--line-number", "--color=never" }
         if opts.case == "ignore" or (opts.case == "system" and vim.api.nvim_get_option_value("ignorecase", {})) then
             table.insert(args, "--ignore-case")
@@ -97,15 +96,15 @@ local function get_default_args(opts)
         else
             table.insert(args, "--case-sensitive")
         end
-    elseif selected == "hgrep" then
+    elseif command == "hgrep" then
         args = {}
-    elseif selected == "ag" then
+    elseif command == "ag" then
         args = {}
-    elseif selected == "ugrep" then
+    elseif command == "ugrep" then
         args = {}
-    elseif selected == "ack" then
+    elseif command == "ack" then
         args = {}
-    elseif selected == "grep" then
+    elseif command == "grep" then
         args = { "--line-number", "--color=never" }
         if opts.case == "ignore" or (opts.case == "system" and vim.api.nvim_get_option_value("ignorecase", {})) then
             table.insert(args, "--ignore-case")
@@ -133,8 +132,8 @@ function M.setup(opts)
     M.version["patch"] = 0
 
     M.options = vim.tbl_deep_extend("force", vim.deepcopy(M.defaults), opts or {})
-    M.options.engine.available = get_engine_versions()
-    M.options.engine.selected = get_default_engine(M.options)
+    local available = M.get_engine_versions()
+    M.options.engine.command = get_default_engine(available)
     M.options.engine.args = get_default_args(M.options)
     return M.options
 end

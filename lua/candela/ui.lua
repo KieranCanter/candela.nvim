@@ -90,7 +90,7 @@ local function refresh_all()
             return
         end
 
-        local cmd = CandelaConfig.options.engine.selected
+        local cmd = CandelaConfig.options.engine.command
         local args = CandelaConfig.options.engine.args
         local count = CandelaHighlighter.highlight_matches(M.curr_buf, pattern, cmd, args)
         if count == -1 then
@@ -386,7 +386,7 @@ local function show_prompt(command, curr_line, curr_pattern)
                 return M.hide_prompt()
             end
 
-            local cmd = CandelaConfig.options.engine.selected
+            local cmd = CandelaConfig.options.engine.command
             local args = CandelaConfig.options.engine.args
             local count = CandelaHighlighter.highlight_matches(M.base_buf, new_pattern, cmd, args)
             if count == -1 then
@@ -410,7 +410,7 @@ local function show_prompt(command, curr_line, curr_pattern)
                 return
             end
 
-            local cmd = CandelaConfig.options.engine.selected
+            local cmd = CandelaConfig.options.engine.command
             local args = CandelaConfig.options.engine.args
             local count = CandelaHighlighter.highlight_matches(M.base_buf, new_pattern,  cmd, args)
             if count == -1 then
@@ -428,7 +428,7 @@ local function show_prompt(command, curr_line, curr_pattern)
                 return M.hide_prompt()
             end
 
-            local cmd = CandelaConfig.options.engine.selected
+            local cmd = CandelaConfig.options.engine.command
             local args = CandelaConfig.options.engine.args
             local count = CandelaHighlighter.highlight_matches(M.base_buf, new_pattern, cmd, args)
             if count == -1 then
@@ -621,7 +621,7 @@ function M.toggle_highlight()
     local curr_pattern = CandelaPatternList.get_pattern(curr_line)
     local is_highlighted = CandelaPatternList.toggle_pattern_highlight(curr_line)
     if is_highlighted then
-        local cmd = CandelaConfig.options.engine.selected
+        local cmd = CandelaConfig.options.engine.command
         local args = CandelaConfig.options.engine.args
         local count = CandelaHighlighter.highlight_matches(M.base_buf, curr_pattern, cmd, args)
         if count == -1 then
@@ -652,7 +652,7 @@ function M.toggle_lightbox()
     CandelaPatternList.toggle_pattern_lightbox(curr_line)
     -- NOTE: TEMPORARY FOR TESTING
     if CandelaPatternList.toggle_pattern_highlight(curr_line) then
-        local cmd = CandelaConfig.options.engine.selected
+        local cmd = CandelaConfig.options.engine.command
         local args = CandelaConfig.options.engine.args
         local count = CandelaHighlighter.highlight_matches(M.base_buf, curr_pattern, cmd, args)
         if count == -1 then

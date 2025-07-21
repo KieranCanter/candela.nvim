@@ -12,17 +12,17 @@ local function get_version()
 end
 
 local function engine_health()
-    local available = CandelaConfig.options.engine.available
-    local selected = CandelaConfig.options.engine.selected
+    local available = CandelaConfig.get_engine_versions()
+    local command = CandelaConfig.options.engine.command
     local found = "Found"
     local version = ""
 
-    if #available == 0 or selected == nil then
+    if #available == 0 or command == nil then
         vim.health.error("No regex search engine found... how do you not at least have grep?")
     end
 
     for i, engine in pairs(available) do
-        if next(engine) == selected then
+        if next(engine) == command then
             version = engine[next(engine)]
         end
 
