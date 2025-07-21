@@ -86,13 +86,15 @@ function M.highlight_matches(bufnr, pattern, cmd, args)
     local count = 0
     for _, entry in ipairs(matches) do
         local row, line = entry.lineno, entry.line
-        vim.api.nvim_buf_set_extmark(bufnr, ns, row - 1, col, {
-            end_col = string.len(line),
-            hl_group = hl_group,
-            hl_eol = true,
-            priority = 100,
-        })
-        count = count + 1
+        if row ~= nil and type(row) == "number" and line ~= nil and type(line) == "string" then
+            vim.api.nvim_buf_set_extmark(bufnr, ns, row - 1, col, {
+                end_col = string.len(line),
+                hl_group = hl_group,
+                hl_eol = true,
+                priority = 100,
+            })
+            count = count + 1
+        end
     end
 
     return count

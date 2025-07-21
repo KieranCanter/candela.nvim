@@ -9,24 +9,36 @@ M.version = {}
 M.defaults = {
     -- Use log syntax highlighting
     window = {
-        width = math.floor(vim.o.columns * 0.25), -- integer: width of the patterns window
-        height = 7, -- integer: initial height (number of patterns) of the patterns window
-        prompt = "overlap", -- "overlap" | "border": position of prompt window in relation to patterns window
+        -- width of the patterns window
+        width = math.floor(vim.o.columns * 0.25), -- integer
+        -- initial height (number of patterns) of the patterns window
+        height = 7, -- integer
+        -- position of prompt window in relation to patterns window
+        prompt = "overlap", -- "overlap" | "border"
     },
     engine = {
-        command = {}, -- "rg" | "hgrep" | "ag" | "ugrep" | "ack" | "grep": regex search engine
-        args = {}, -- args to pass to search engine; refer to your tool's manual
+        -- regex search engine to use; defaults to first found tool out of the list in order
+        command = {}, -- "rg" | "ag" | "ugrep" | "ack" | "grep"
+        -- args to pass to search engine; refer to your tool's manual
+        args = {},
     },
-    syntax_highlighting = true, -- true | false: Candela-styled logs -- TODO: implement
-    auto_refresh = false, -- true | false: automatically refresh pattern matching/highlighting on buffer change
-    delete_confirmation = true, -- true | false: require user confirmation upon deleting a pattern
-    clear_confirmation = true, -- true | false: require user confirmation upon clearing all patterns
-    case = "sensitive", -- "sensitive" | "ignore" | "smart" | "system": case-sensitive option for searching
+    -- Candela-styled logs
+    syntax_highlighting = true, -- true | false -- TODO: implement
+    -- automatically refresh pattern matching/highlighting on buffer change
+    auto_refresh = false, -- true | false
+    -- require user confirmation upon deleting a pattern
+    delete_confirmation = true, -- true | false
+    -- require user confirmation upon clearing all patterns
+    clear_confirmation = true, -- true | false
+    -- case-sensitive option for searching
+    case = "sensitive", -- "sensitive" | "ignore" | "smart" | "system"
     lightbox = {
-        display = "tab", -- "tab" | "split-right" | "split-left" | "split-up" | "split-down": lightbox display mode
-        non_matched = "fold", -- "fold" | "remove": place unmatched lines in folds or completely remove them
+        -- lightbox display mode
+        display = "tab", -- "tab" | "split-right" | "split-left" | "split-up" | "split-down"
+        -- place unmatched lines in folds or completely remove them
+        non_matched = "fold", -- "fold" | "remove"
     },
-    palette = { }, -- TODO: implement
+    -- file types to load Candela for
     file_types = {
         ".log",
         ".txt",
@@ -78,28 +90,27 @@ M.defaults = {
 
 ---@return table<table>
 function M.get_engine_versions()
-    local pattern = "%a+.*%d+%.%d+%.+%d+"
+    local pattern = "%d+%.%d+%.*%d*"
     local engines = { -- TODO: implement other engines
-        "rg",
-        "hgrep",
-        "ag",
-        "ugrep",
-        "ack",
-        "grep",
+        { rg = "ripgrep" },
+        { ag = "ag" },
+        { ugrep = "ugrep" },
+        { ack = "ack" },
+        { grep = "grep" },
     }
     local available = {}
 
     for _, engine in ipairs(engines) do
-        local version = vim.fn.system(engine .. " --version"):match(pattern)
+        local version = vim.fn.system(next(engine) .. " --version"):match(pattern)
         if version ~= nil then
-            table.insert(available, { [engine] = version })
+            table.insert(available, { [next(engine)] = { engine[next(engine)], version } })
         end
     end
     return available
 end
 
 ---@param available table
----@return string|nil
+---@return table|nil
 local function get_default_engine(available)
     for _, engine in ipairs(available) do
         if engine[next(engine)] ~= nil then
@@ -138,14 +149,31 @@ local function get_default_args(opts)
         else
             table.insert(args, "--case-sensitive")
         end
-    elseif command == "hgrep" then
-        args = {}
     elseif command == "ag" then
-        args = {}
+        args = {"--numbers", "--nocolor"}
+        if opts.case == "ignore" or (opts.case == "system" and vim.api.nvim_get_option_value("ignorecase", {})) then
+            table.insert(args, "--ignore-case")
+        elseif opts.case == "smart" or (opts.case == "system" and vim.api.nvim_get_option_value("smartcase", {})) then
+            table.insert(args, "--smart-case")
+        else
+            table.insert(args, "--case-sensitive")
+        end
     elseif command == "ugrep" then
-        args = {}
+        args = {"--line-number", "--color=never"}
+        if opts.case == "ignore" or (opts.case == "system" and vim.api.nvim_get_option_value("ignorecase", {})) then
+            table.insert(args, "--ignore-case")
+        elseif opts.case == "smart" or (opts.case == "system" and vim.api.nvim_get_option_value("smartcase", {})) then
+            table.insert(args, "--smart-case")
+        end
     elseif command == "ack" then
-        args = {}
+        args = {"--with-filename", "--nocolor"}
+        if opts.case == "ignore" or (opts.case == "system" and vim.api.nvim_get_option_value("ignorecase", {})) then
+            table.insert(args, "--ignore-case")
+        elseif opts.case == "smart" or (opts.case == "system" and vim.api.nvim_get_option_value("smartcase", {})) then
+            table.insert(args, "--smart-case")
+        else
+            table.insert(args, "--no-ignore-case")
+        end
     elseif command == "grep" then
         args = { "--line-number", "--color=never" }
         if opts.case == "ignore" or (opts.case == "system" and vim.api.nvim_get_option_value("ignorecase", {})) then
@@ -156,8 +184,6 @@ local function get_default_args(opts)
                     .. "`case` in your user config to turn smart-case off. Proceeding with the case-sensitive flag.",
                 vim.log.levels.WARN
             )
-        else
-            table.insert(args, "--no-ignore-case")
         end
     else
         vim.notify("No default args for search tool found", vim.log.levels.ERROR)
@@ -176,6 +202,7 @@ function M.setup(opts)
     M.options = vim.tbl_deep_extend("force", vim.deepcopy(M.defaults), opts or {})
     local available = M.get_engine_versions()
     M.options.engine.command = get_default_engine(available)
+    M.options.engine.command = "grep"
     M.options.engine.args = get_default_args(M.options)
     return M.options
 end
@@ -287,7 +314,7 @@ function M.set_prompt_keymaps(buffer)
         desc = "Close Prompt",
         callback = function()
             require("candela.ui").hide_prompt()
-        end
+        end,
     })
     vim.api.nvim_buf_set_keymap(buffer, "n", "<ESC>", "", {
         noremap = true,
@@ -295,7 +322,7 @@ function M.set_prompt_keymaps(buffer)
         desc = "Close Prompt",
         callback = function()
             require("candela.ui").hide_prompt()
-        end
+        end,
     })
 end
 

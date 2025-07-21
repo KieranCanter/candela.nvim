@@ -15,6 +15,7 @@ local function engine_health()
     local available = CandelaConfig.get_engine_versions()
     local command = CandelaConfig.options.engine.command
     local found = "Found"
+    local selected = ""
     local version = ""
 
     if #available == 0 or command == nil then
@@ -22,8 +23,10 @@ local function engine_health()
     end
 
     for i, engine in pairs(available) do
+        local cmd = engine[next(engine)]
         if next(engine) == command then
-            version = engine[next(engine)]
+            selected = cmd[1]
+            version = cmd[2]
         end
 
         if i == 1 then
@@ -34,7 +37,7 @@ local function engine_health()
     end
 
     vim.health.ok(found)
-    vim.health.ok(string.format("Selected `%s` for regex matching", version))
+    vim.health.ok(string.format("Selected `%s %s` for regex matching", selected, version))
 end
 
 function M.check()

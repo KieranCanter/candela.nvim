@@ -22,8 +22,8 @@ function M.get_matches(cmd)
     local matches = {}
 
     for _, line in ipairs(output) do
-        local lineno = tonumber(line:match("^(%d+):"))
-        local linestr = line:match(":(.*)")
+        local lineno = tonumber(line:match("(%d+):"))
+        local linestr = line:match("%d+:(.*)")
         table.insert(matches, { lineno = lineno, line = linestr })
     end
 

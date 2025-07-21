@@ -49,7 +49,7 @@ function Candela.setup(opts)
     Candela.config = CandelaConfig.setup(opts)
     Candela.commands = CandelaCommands.setup(Candela.config)
     Candela.ui = CandelaUi.setup(Candela.config)
-    Candela.patterns = CandelaPatternList.patterns
+    Candela.patterns = CandelaPatternList.setup(Candela.config)
 end
 
 return Candela
