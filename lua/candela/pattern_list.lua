@@ -7,6 +7,7 @@ local CandelaPattern = require("candela.pattern")
 local M = {}
 M.patterns = {}
 
+local next_color_index = 1
 M.palette = {
     dark = {
         "#003f5c", -- deep blue
@@ -45,7 +46,10 @@ M.palette = {
         "#9aedfe", -- icy cyan,
     },
 }
-local next_color_index = 1
+
+function M.setup(opts)
+    M.palette = opts.palette.colors
+end
 
 ---@return CandelaPattern
 function M.get_pattern(index)
