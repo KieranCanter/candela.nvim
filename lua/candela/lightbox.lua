@@ -1,6 +1,5 @@
 local CandelaWindow = require("candela.window")
 local CandelaHighlighter = require("candela.highlighter")
-local CandelaConfig = require("candela.config")
 
 local M = {}
 
@@ -38,6 +37,19 @@ local function verify_opts(opts)
         )
         opts.lightbox.non_matched = defaults.lightbox.non_matched
     end
+
+    if type(opts.lightbox.trim_space) ~= "boolean" then
+        vim.notify(
+            string.format(
+                '"%s" is not a valid option value for `lightbox.trim_space`, using "%s" as default.'
+                    .. ' Valid values: true, false.',
+                opts.lightbox.trim_space,
+                defaults.lightbox.trim_space
+            ),
+            vim.log.levels.WARN
+        )
+        opts.lightbox.trim_space = defaults.lightbox.trim_space
+    end
 end
 
 local function init_tab()
@@ -58,10 +70,12 @@ end
 
 function M.setup(opts)
     verify_opts(opts)
-    M.view = opts.lightbox.view
-    M.non_matched = opts.lightbox.non_matched
+    M.opts = {}
+    M.opts.view = opts.lightbox.view
+    M.opts.non_matched = opts.lightbox.non_matched
+    M.opts.trim_space = opts.lightbox.trim_space
 
-    local view_mode = M.view:match("split%-(%a+)")
+    local view_mode = M.opts.view:match("split%-(%a+)")
     if view_mode == nil then
         init_tab()
     else
@@ -71,38 +85,43 @@ function M.setup(opts)
     return M
 end
 
-function M.update(ranges)
-    --vim.api.nvim_buf_set_lines(M.window.buf, 0, -1, false, lines)
-    --CandelaHighlighter.higlight_cache(M.window.buf)
-    --local gaps = CandelaHighlighter.get_match_gaps(M.window.buf)
-    --local new_lines = remove_gaps(lines, gaps)
-    --vim.api.nvim_buf_set_lines(M.window.buf, 0, -1, false, new_lines)
+local function write_lightbox_with_fold(base_buf)
+    vim.notify("write_lightbox_with_fold() not implemented yet", vim.log.levels.WARN)
 end
 
-function M.display(view, non_matched)
+local function write_lightbox_with_remove(base_buf)
+    local old_lines = vim.api.nvim_buf_get_lines(base_buf, 0, -1, false)
+    local match_cache = CandelaHighlighter.get_flattened_match_cache()
+
+    for i, match in ipairs(match_cache) do
+        local curr = ""
+        if M.opts.trim_space == true then
+            curr = string.match(old_lines[match.lineno], "%s*(%a.*%a)%s*")
+        else
+            curr = old_lines[match.lineno]
+        end
+        vim.api.nvim_buf_set_lines(M.window.buf, i-1, i, false, { curr })
+        vim.api.nvim_buf_set_extmark(M.window.buf, match.ns, i-1, 0, {
+            end_col = string.len(curr),
+            line_hl_group = match.hl_group,
+            priority = 100,
+        })
+    end
+end
+
+function M.display()
     local base_buf = require("candela.ui").base_buf
     if base_buf == nil then
         return
     end
-    local old_lines = vim.api.nvim_buf_get_lines(base_buf, 0, -1, false)
-    local linenums = CandelaHighlighter.get_flattened_match_cache()
 
-    local new_lines = {}
-    for _, lineno in ipairs(linenums) do
-        table.insert(new_lines, old_lines[lineno])
+    if M.opts.non_matched == "fold" then
+        write_lightbox_with_fold()
+    else
+        write_lightbox_with_remove(base_buf)
     end
 
-    vim.api.nvim_buf_set_lines(M.window.buf, 0, -1, false, new_lines)
-
-    local cmd = CandelaConfig.options.engine.command
-    local args = CandelaConfig.options.engine.args
-
-    --M.update(ranges)
     M.window:open_window(true)
-    -- FIX: THIS IS A MESS CAN'T GREP SCRATCH BUFFER CUZ NO FILE NAME FIGURE IT THE FUCK OUT
-    for _, pattern in ipairs(require("candela.pattern_list").patterns) do
-        CandelaHighlighter.highlight_matches(M.window.buf, pattern, cmd, args)
-    end
 end
 
 function M.toggle(view, non_matched)

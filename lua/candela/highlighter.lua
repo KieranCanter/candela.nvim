@@ -182,20 +182,23 @@ function M.get_match_ranges()
     return ranges
 end
 
+---@return table[lineno, ns, hl_group]
 function M.get_flattened_match_cache()
     local flattened = {}
     local seen = {}
 
-    for _, lines in pairs(M.match_cache) do
+    for regex, lines in pairs(M.match_cache) do
+        local ns = vim.api.nvim_get_namespaces()["CandelaNs_" .. hash_regex(regex)]
+        local hl_group = "CandelaHl_" .. hash_regex(regex)
         for _, lineno in ipairs(lines) do
             if not seen[lineno] then
-                table.insert(flattened, lineno)
+                table.insert(flattened, { lineno = lineno, ns = ns, hl_group = hl_group })
                 seen[lineno] = true
             end
         end
     end
 
-    table.sort(flattened)
+    table.sort(flattened, function(a, b) return a.lineno < b.lineno end)
 
     return flattened
 end

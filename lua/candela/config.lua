@@ -7,6 +7,8 @@ local M = {}
 M.version = {}
 
 M.defaults = {
+    -- Candela-styled logs
+    syntax_highlighting = true, -- true | false -- TODO: implement
     -- Use log syntax highlighting
     window = {
         -- width of the patterns window
@@ -22,30 +24,36 @@ M.defaults = {
         -- args to pass to search engine; refer to your tool's manual
         args = {},
     },
-    -- Candela-styled logs
-    syntax_highlighting = true, -- true | false -- TODO: implement
-    -- automatically refresh pattern matching/highlighting on buffer change
-    auto_refresh = false, -- true | false
-    -- require user confirmation upon deleting a pattern
-    delete_confirmation = true, -- true | false
-    -- require user confirmation upon clearing all patterns
-    clear_confirmation = true, -- true | false
-    -- case-sensitive option for searching
-    case = "sensitive", -- "sensitive" | "ignore" | "smart" | "system"
+    matching = {
+        -- automatically refresh pattern matching/highlighting on buffer change
+        auto_refresh = false, -- true | false
+        -- require user confirmation upon deleting a pattern
+        delete_confirmation = true, -- true | false
+        -- require user confirmation upon clearing all patterns
+        clear_confirmation = true, -- true | false
+        -- case-sensitive option for searching
+        case = "sensitive", -- "sensitive" | "ignore" | "smart" | "system"
+        -- highlight entire line (end of line) or end of text
+        hl_eol = true, -- true | false -- TODO: implement
+    },
     lightbox = {
         -- lightbox view mode
         view = "split-right", -- "tab" | "split-left" | "split-right" | "split-above" | "split-below"
         -- place unmatched lines in folds or completely remove them
-        non_matched = "fold", -- "fold" | "remove"
+        non_matched = "remove", -- "fold" | "remove"
+        -- trim beginning/ending whitespace from lightbox-highlighted lines
+        trim_space = false, -- false | true
+        -- highlight entire line (end of line) or end of text
+        hl_eol = true, -- true | false -- TODO: implement
     },
     -- file types to load Candela for
-    file_types = {
+    file_types = { -- TODO: implement
         ".log",
         ".txt",
     },
     palette = {
         -- replace default color palette or add to it
-        use = "replace", -- "replace" | "prepend" | "append"
+        use = "replace", -- "replace" | "prepend" | "append" -- TODO: implement
         -- list of colors to use for dark/light mode
         colors = {
             dark = {
@@ -128,57 +136,92 @@ local function get_default_args(opts)
     local args = {}
     local command = opts.engine.command
 
-    if opts.case ~= "sensitive" and opts.case ~= "ignore" and opts.case ~= "smart" and opts.case ~= "system" then
+    if
+        opts.matching.case ~= "sensitive"
+        and opts.matching.case ~= "ignore"
+        and opts.matching.case ~= "smart"
+        and opts.matching.case ~= "system"
+    then
         vim.notify(
             string.format(
                 '"%s" is not a valid option value for `case`, using "sensitive" as default.'
                     .. ' Valid values: "sensitive", "ignore", "smart", "system".',
-                opts.case
+                opts.matching.case
             ),
             vim.log.levels.WARN
         )
-        opts.case = M.defaults.case
+        opts.matching.case = M.defaults.case
     end
 
     if command == "rg" then
         args = { "--line-number", "--color=never" }
-        if opts.case == "ignore" or (opts.case == "system" and vim.api.nvim_get_option_value("ignorecase", {})) then
+        if
+            opts.matching.case == "ignore"
+            or (opts.matching.case == "system" and vim.api.nvim_get_option_value("ignorecase", {}))
+        then
             table.insert(args, "--ignore-case")
-        elseif opts.case == "smart" or (opts.case == "system" and vim.api.nvim_get_option_value("smartcase", {})) then
+        elseif
+            opts.matching.case == "smart"
+            or (opts.matching.case == "system" and vim.api.nvim_get_option_value("smartcase", {}))
+        then
             table.insert(args, "--smart-case")
         else
             table.insert(args, "--case-sensitive")
         end
     elseif command == "ag" then
-        args = {"--numbers", "--nocolor"}
-        if opts.case == "ignore" or (opts.case == "system" and vim.api.nvim_get_option_value("ignorecase", {})) then
+        args = { "--numbers", "--nocolor" }
+        if
+            opts.matching.case == "ignore"
+            or (opts.matching.case == "system" and vim.api.nvim_get_option_value("ignorecase", {}))
+        then
             table.insert(args, "--ignore-case")
-        elseif opts.case == "smart" or (opts.case == "system" and vim.api.nvim_get_option_value("smartcase", {})) then
+        elseif
+            opts.matching.case == "smart"
+            or (opts.matching.case == "system" and vim.api.nvim_get_option_value("smartcase", {}))
+        then
             table.insert(args, "--smart-case")
         else
             table.insert(args, "--case-sensitive")
         end
     elseif command == "ugrep" then
-        args = {"--line-number", "--color=never"}
-        if opts.case == "ignore" or (opts.case == "system" and vim.api.nvim_get_option_value("ignorecase", {})) then
+        args = { "--line-number", "--color=never" }
+        if
+            opts.matching.case == "ignore"
+            or (opts.matching.case == "system" and vim.api.nvim_get_option_value("ignorecase", {}))
+        then
             table.insert(args, "--ignore-case")
-        elseif opts.case == "smart" or (opts.case == "system" and vim.api.nvim_get_option_value("smartcase", {})) then
+        elseif
+            opts.matching.case == "smart"
+            or (opts.matching.case == "system" and vim.api.nvim_get_option_value("smartcase", {}))
+        then
             table.insert(args, "--smart-case")
         end
     elseif command == "ack" then
-        args = {"--with-filename", "--nocolor"}
-        if opts.case == "ignore" or (opts.case == "system" and vim.api.nvim_get_option_value("ignorecase", {})) then
+        args = { "--with-filename", "--nocolor" }
+        if
+            opts.matching.case == "ignore"
+            or (opts.matching.case == "system" and vim.api.nvim_get_option_value("ignorecase", {}))
+        then
             table.insert(args, "--ignore-case")
-        elseif opts.case == "smart" or (opts.case == "system" and vim.api.nvim_get_option_value("smartcase", {})) then
+        elseif
+            opts.matching.case == "smart"
+            or (opts.matching.case == "system" and vim.api.nvim_get_option_value("smartcase", {}))
+        then
             table.insert(args, "--smart-case")
         else
             table.insert(args, "--no-ignore-case")
         end
     elseif command == "grep" then
         args = { "--line-number", "--color=never" }
-        if opts.case == "ignore" or (opts.case == "system" and vim.api.nvim_get_option_value("ignorecase", {})) then
+        if
+            opts.matching.case == "ignore"
+            or (opts.matching.case == "system" and vim.api.nvim_get_option_value("ignorecase", {}))
+        then
             table.insert(args, "--ignore-case")
-        elseif opts.case == "smart" or (opts.case == "system" and vim.api.nvim_get_option_value("smartcase", {})) then
+        elseif
+            opts.matching.case == "smart"
+            or (opts.matching.case == "system" and vim.api.nvim_get_option_value("smartcase", {}))
+        then
             vim.notify(
                 "grep does not support smart-case. Consider installing a faster regex search engine or modifying"
                     .. "`case` in your user config to turn smart-case off. Proceeding with the case-sensitive flag.",
@@ -217,43 +260,57 @@ function M.set_keymaps()
         noremap = true,
         silent = true,
         desc = "Candela: toggle patterns window",
-        callback = function() CandelaUi.toggle() end
+        callback = function()
+            CandelaUi.toggle()
+        end,
     })
     vim.api.nvim_set_keymap("n", "<leader>cda", "", {
         noremap = true,
         silent = true,
         desc = "Candela: add pattern",
-        callback = function() CandelaCommands.commands.add() end
+        callback = function()
+            CandelaCommands.commands.add()
+        end,
     })
     vim.api.nvim_set_keymap("n", "<leader>cdr", "", {
         noremap = true,
         silent = true,
         desc = "Candela: refresh patterns",
-        callback = function() CandelaCommands.commands.refresh() end
+        callback = function()
+            CandelaCommands.commands.refresh()
+        end,
     })
     vim.api.nvim_set_keymap("n", "<leader>cdD", "", {
         noremap = true,
         silent = true,
         desc = "Candela: clear patterns",
-        callback = function() CandelaCommands.commands.clear() end
+        callback = function()
+            CandelaCommands.commands.clear()
+        end,
     })
     vim.api.nvim_set_keymap("n", "<leader>cdM", "", {
         noremap = true,
         silent = true,
         desc = "Candela: match all",
-        callback = function() CandelaCommands.commands.match_all() end
+        callback = function()
+            CandelaCommands.commands.match_all()
+        end,
     })
     vim.api.nvim_set_keymap("n", "<leader>cdF", "", {
         noremap = true,
         silent = true,
         desc = "Candela: find all",
-        callback = function() CandelaCommands.commands.find_all() end
+        callback = function()
+            CandelaCommands.commands.find_all()
+        end,
     })
     vim.api.nvim_set_keymap("n", "<leader>cdL", "", {
         noremap = true,
         silent = true,
         desc = "Candela: lightbox",
-        callback = function() CandelaCommands.commands.lightbox() end
+        callback = function()
+            CandelaCommands.commands.lightbox()
+        end,
     })
     vim.api.nvim_set_keymap("n", "<M-k>", "[l", {})
     vim.api.nvim_set_keymap("n", "<M-j>", "]l", {})
@@ -268,103 +325,137 @@ function M.set_patterns_keymaps(buffer)
         noremap = true,
         silent = true,
         desc = "Close Candela",
-        callback = function() CandelaUi.hide_patterns() end
+        callback = function()
+            CandelaUi.hide_patterns()
+        end,
     })
     vim.api.nvim_buf_set_keymap(buffer, "n", "<ESC>", "", {
         noremap = true,
         silent = true,
         desc = "Close Candela",
-        callback = function() CandelaUi.hide_patterns() end
+        callback = function()
+            CandelaUi.hide_patterns()
+        end,
     })
     vim.api.nvim_buf_set_keymap(buffer, "n", "a", "", {
         noremap = true,
         silent = true,
         desc = "Add Candela pattern",
-        callback = function() CandelaCommands.commands.add() end
+        callback = function()
+            CandelaCommands.commands.add()
+        end,
     })
     vim.api.nvim_buf_set_keymap(buffer, "n", "e", "", {
         noremap = true,
         silent = true,
         desc = "Edit Candela pattern",
-        callback = function() CandelaCommands.commands.edit() end
+        callback = function()
+            CandelaCommands.commands.edit()
+        end,
     })
     vim.api.nvim_buf_set_keymap(buffer, "n", "c", "", {
         noremap = true,
         silent = true,
         desc = "Copy Candela pattern",
-        callback = function() CandelaCommands.commands.copy() end
+        callback = function()
+            CandelaCommands.commands.copy()
+        end,
     })
     vim.api.nvim_buf_set_keymap(buffer, "n", "d", "", {
         noremap = true,
         silent = true,
         desc = "Delete Candela pattern",
-        callback = function() CandelaCommands.commands.delete() end
+        callback = function()
+            CandelaCommands.commands.delete()
+        end,
     })
     vim.api.nvim_buf_set_keymap(buffer, "n", "D", "", {
         noremap = true,
         silent = true,
         desc = "Clear all Candela patterns",
-        callback = function() CandelaCommands.commands.clear() end
+        callback = function()
+            CandelaCommands.commands.clear()
+        end,
     })
     vim.api.nvim_buf_set_keymap(buffer, "n", "C", "", {
         noremap = true,
         silent = true,
         desc = "Change Candela pattern color",
-        callback = function() CandelaCommands.commands.change_color() end
+        callback = function()
+            CandelaCommands.commands.change_color()
+        end,
     })
     vim.api.nvim_buf_set_keymap(buffer, "n", "h", "", {
         noremap = true,
         silent = true,
         desc = "Toggle Candela pattern highlight",
-        callback = function() CandelaCommands.commands.toggle_highlight() end
+        callback = function()
+            CandelaCommands.commands.toggle_highlight()
+        end,
     })
     vim.api.nvim_buf_set_keymap(buffer, "n", "l", "", {
         noremap = true,
         silent = true,
         desc = "Toggle Candela pattern lightbox",
-        callback = function() CandelaCommands.commands.toggle_lightbox() end
+        callback = function()
+            CandelaCommands.commands.toggle_lightbox()
+        end,
     })
     vim.api.nvim_buf_set_keymap(buffer, "n", "r", "", {
         noremap = true,
         silent = true,
         desc = "Refresh patterns for current buffer",
-        callback = function() CandelaCommands.commands.refresh() end
+        callback = function()
+            CandelaCommands.commands.refresh()
+        end,
     })
     vim.api.nvim_buf_set_keymap(buffer, "n", "m", "", {
         noremap = true,
         silent = true,
         desc = "Candela match pattern in buffer",
-        callback = function() CandelaCommands.commands.match() end
+        callback = function()
+            CandelaCommands.commands.match()
+        end,
     })
     vim.api.nvim_buf_set_keymap(buffer, "n", "M", "", {
         noremap = true,
         silent = true,
         desc = "Candela match pattern in buffer",
-        callback = function() CandelaCommands.commands.match_all() end
+        callback = function()
+            CandelaCommands.commands.match_all()
+        end,
     })
     vim.api.nvim_buf_set_keymap(buffer, "n", "f", "", {
         noremap = true,
         silent = true,
         desc = "Candela find pattern in buffer",
-        callback = function() CandelaCommands.commands.find() end
+        callback = function()
+            CandelaCommands.commands.find()
+        end,
     })
     vim.api.nvim_buf_set_keymap(buffer, "n", "F", "", {
         noremap = true,
         silent = true,
         desc = "Candela find all patterns in buffer",
-        callback = function() CandelaCommands.commands.find_all() end
+        callback = function()
+            CandelaCommands.commands.find_all()
+        end,
     })
     vim.api.nvim_buf_set_keymap(buffer, "n", "L", "", {
         noremap = true,
         silent = true,
         desc = "Candela find all patterns in buffer",
-        callback = function() CandelaCommands.commands.lightbox() end
+        callback = function()
+            CandelaCommands.commands.lightbox()
+        end,
     })
     vim.api.nvim_buf_set_keymap(buffer, "n", "?", "", {
         noremap = true,
         silent = true,
         desc = "Candela: display keymaps",
-        callback = function() CandelaCommands.commands.help() end
+        callback = function()
+            CandelaCommands.commands.help()
+        end,
     })
 end
 
@@ -374,13 +465,17 @@ function M.set_prompt_keymaps(buffer)
         noremap = true,
         silent = true,
         desc = "Candela: close Prompt",
-        callback = function() CandelaUi.hide_prompt() end
+        callback = function()
+            CandelaUi.hide_prompt()
+        end,
     })
     vim.api.nvim_buf_set_keymap(buffer, "n", "<ESC>", "", {
         noremap = true,
         silent = true,
         desc = "Candela: close Prompt",
-        callback = function() CandelaUi.hide_prompt() end
+        callback = function()
+            CandelaUi.hide_prompt()
+        end,
     })
 end
 

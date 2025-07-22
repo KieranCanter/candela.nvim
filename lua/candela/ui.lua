@@ -298,7 +298,7 @@ function M.setup(opts)
 
             M.curr_buf = bufnr
 
-            if opts.auto_refresh then
+            if opts.matching.auto_refresh then
                 refresh_all()
             end
         end,

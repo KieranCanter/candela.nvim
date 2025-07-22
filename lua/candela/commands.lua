@@ -17,11 +17,11 @@ function M.setup(opts)
             CandelaUi.copy()
         end,
         delete = function()
-            local ask = opts.delete_confirmation
+            local ask = opts.matching.delete_confirmation
             CandelaUi.delete(ask)
         end,
         clear = function()
-            local ask = opts.clear_confirmation
+            local ask = opts.matching.clear_confirmation
             CandelaUi.clear(ask)
         end,
         refresh = function()
