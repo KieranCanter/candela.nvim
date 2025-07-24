@@ -1,86 +1,34 @@
 local CandelaWindow = require("candela.window")
 local CandelaHighlighter = require("candela.highlighter")
+local CandelaConfig = require("candela.config")
 
 local M = {}
 
-local function verify_opts(opts)
-    local defaults = require("candela.config").defaults
+local BUFNAME = "lightbox"
 
-    if
-        opts.lightbox.view ~= "tab"
-        and opts.lightbox.view ~= "split-left"
-        and opts.lightbox.view ~= "split-right"
-        and opts.lightbox.view ~= "split-above"
-        and opts.lightbox.view ~= "split-below"
-    then
-        vim.notify(
-            string.format(
-                '"%s" is not a valid option value for `lightbox.view`, using "%s" as default.'
-                    .. ' Valid values: "tab", "split-left", "split-right", "split-above", "split-below".',
-                opts.lightbox.view,
-                defaults.lightbox.view
-            ),
-            vim.log.levels.WARN
-        )
-        opts.lightbox.view = defaults.lightbox.view
-    end
-
-    if opts.lightbox.non_matched ~= "fold" and opts.lightbox.non_matched ~= "remove" then
-        vim.notify(
-            string.format(
-                '"%s" is not a valid option value for `lightbox.non_matched`, using "%s" as default.'
-                    .. ' Valid values: "fold", "remove".',
-                opts.lightbox.non_matched,
-                defaults.lightbox.non_matched
-            ),
-            vim.log.levels.WARN
-        )
-        opts.lightbox.non_matched = defaults.lightbox.non_matched
-    end
-
-    if type(opts.lightbox.trim_space) ~= "boolean" then
-        vim.notify(
-            string.format(
-                '"%s" is not a valid option value for `lightbox.trim_space`, using "%s" as default.'
-                    .. ' Valid values: true, false.',
-                opts.lightbox.trim_space,
-                defaults.lightbox.trim_space
-            ),
-            vim.log.levels.WARN
-        )
-        opts.lightbox.trim_space = defaults.lightbox.trim_space
-    end
+local function set_buf_options()
+    M.window.buf = vim.api.nvim_create_buf(true, false)
+    vim.api.nvim_set_option_value("swapfile", false, { buf = M.window.buf })
+    vim.api.nvim_set_option_value("filetype", "candela", { buf = M.window.buf })
+    vim.api.nvim_set_option_value("buftype", "nofile", { buf = M.window.buf })
 end
 
-local function init_tab()
-    vim.notify("init_tab() not implemented yet", vim.log.levels.WARN)
-end
+function M.setup()
+    local view_mode = CandelaConfig.options.lightbox.view:match("split%-(%a+)")
+    local window = nil
 
----@param view_mode string: "left" | "right" | "above" | "below"
-local function init_split(view_mode)
-    local window = CandelaWindow.new({
-        win = 0,
-        split = view_mode,
-    })
-    window.buf = vim.api.nvim_create_buf(false, true)
-    vim.api.nvim_set_option_value("swapfile", false, { buf = window.buf })
-    vim.api.nvim_set_option_value("filetype", "lightbox.candela", { buf = window.buf })
-    M.window = window
-end
-
-function M.setup(opts)
-    verify_opts(opts)
-    M.opts = {}
-    M.opts.view = opts.lightbox.view
-    M.opts.non_matched = opts.lightbox.non_matched
-    M.opts.trim_space = opts.lightbox.trim_space
-
-    local view_mode = M.opts.view:match("split%-(%a+)")
     if view_mode == nil then
-        init_tab()
+        window = CandelaWindow.new({})
     else
-        init_split(view_mode)
+        window = CandelaWindow.new({
+            win = 0,
+            split = view_mode,
+        })
     end
+    M.window = window
+
+    set_buf_options()
+    vim.api.nvim_buf_set_name(M.window.buf, BUFNAME)
 
     return M
 end
@@ -91,44 +39,79 @@ end
 
 local function write_lightbox_with_remove(base_buf)
     local old_lines = vim.api.nvim_buf_get_lines(base_buf, 0, -1, false)
+
+    -- match_cache: table of form { lineno, pattern, ns, hl_group }
     local match_cache = CandelaHighlighter.get_flattened_match_cache()
 
     for i, match in ipairs(match_cache) do
         local curr = ""
-        if M.opts.trim_space == true then
+        if CandelaConfig.options.lightbox.trim_space then
             curr = string.match(old_lines[match.lineno], "%s*(%a.*%a)%s*")
         else
             curr = old_lines[match.lineno]
         end
-        vim.api.nvim_buf_set_lines(M.window.buf, i-1, i, false, { curr })
-        vim.api.nvim_buf_set_extmark(M.window.buf, match.ns, i-1, 0, {
-            end_col = string.len(curr),
-            line_hl_group = match.hl_group,
-            priority = 100,
-        })
+        vim.api.nvim_buf_set_lines(M.window.buf, i - 1, i, false, { curr })
+        if CandelaConfig.options.lightbox.hl_eol then
+            vim.api.nvim_buf_set_extmark(M.window.buf, match.ns, i - 1, 0, {
+                line_hl_group = match.hl_group,
+                priority = 100,
+            })
+        else
+            vim.api.nvim_buf_set_extmark(M.window.buf, match.ns, i - 1, 0, {
+                end_col = string.len(curr),
+                hl_group = match.hl_group,
+                priority = 100,
+            })
+        end
     end
 end
 
-function M.display()
+function M.write_lightbox()
     local base_buf = require("candela.ui").base_buf
     if base_buf == nil then
         return
     end
 
-    if M.opts.non_matched == "fold" then
+    if CandelaConfig.options.lightbox.hide_method == "fold" then
         write_lightbox_with_fold()
     else
         write_lightbox_with_remove(base_buf)
     end
-
-    M.window:open_window(true)
 end
 
-function M.toggle(view, non_matched)
-    if M.window:is_open() then
-        M.window:close_window()
+function M.display()
+    M.write_lightbox()
+
+    -- open in tab view
+    if CandelaConfig.options.lightbox.view == "tab" then
+        if M.tab ~= nil and vim.api.nvim_tabpage_is_valid(M.tab) then
+            vim.api.nvim_tabpage_set_win(M.tab, M.window.win)
+        else
+            vim.api.nvim_cmd({ cmd = "tabnew" }, {})
+            local temp_buf = vim.api.nvim_get_current_buf()
+            vim.api.nvim_cmd({ cmd = "buffer", args = { string.format("%s", M.window.buf) } }, {})
+            M.window.win = vim.api.nvim_get_current_win()
+            vim.api.nvim_buf_delete(temp_buf, { force = true })
+        end
+        M.window.win = vim.api.nvim_get_current_win()
+        set_buf_options()
+    -- open in split view
     else
-        M.display(view, non_matched)
+        M.window:open_window(true)
+    end
+end
+
+function M.toggle()
+    if M.window == nil then
+        M.setup()
+    end
+
+    if M.window:is_open() and M.window.win == vim.api.nvim_get_current_win() then
+        M.window:close_window()
+    elseif M.window:is_open() then
+        vim.api.nvim_set_current_win(M.window.win)
+    else
+        M.display()
     end
 end
 

@@ -34,17 +34,17 @@ M.defaults = {
         -- case-sensitive option for searching
         case = "sensitive", -- "sensitive" | "ignore" | "smart" | "system"
         -- highlight entire line (end of line) or end of text
-        hl_eol = true, -- true | false -- TODO: implement
+        hl_eol = false, -- true | false
     },
     lightbox = {
         -- lightbox view mode
-        view = "split-right", -- "tab" | "split-left" | "split-right" | "split-above" | "split-below"
-        -- place unmatched lines in folds or completely remove them
-        non_matched = "remove", -- "fold" | "remove"
+        view = "tab", -- "tab" | "split-left" | "split-right" | "split-above" | "split-below"
+        -- place non-matched lines in folds or completely remove them
+        hide_method = "remove", -- "fold" | "remove"
         -- trim beginning/ending whitespace from lightbox-highlighted lines
         trim_space = false, -- false | true
         -- highlight entire line (end of line) or end of text
-        hl_eol = true, -- true | false -- TODO: implement
+        hl_eol = true, -- true | false
     },
     -- file types to load Candela for
     file_types = { -- TODO: implement

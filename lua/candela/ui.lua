@@ -246,7 +246,7 @@ function M.setup(opts)
     for name, window in pairs(M.windows) do
         window:ensure_buffer()
         vim.api.nvim_set_option_value("swapfile", false, { buf = window.buf })
-        vim.api.nvim_set_option_value("filetype", string.format("%s.candela", name), { buf = window.buf })
+        vim.api.nvim_set_option_value("filetype", "candela", { buf = window.buf })
         if name ~= "prompt" then
             vim.api.nvim_set_option_value("modifiable", false, { buf = window.buf })
         end

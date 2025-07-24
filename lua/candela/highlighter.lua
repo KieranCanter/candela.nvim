@@ -1,6 +1,7 @@
 -- module to control the highlighting of matches
 
 local CandelaEngine = require("candela.engine")
+local CandelaConfig = require("candela.config")
 
 local M = {}
 
@@ -37,10 +38,7 @@ function M.highlight_ui(windows, patterns)
         return
     end
 
-    local color_start = 0 -- start at beginning of color
     local color_end = 7 -- end index of hex code #123456
-    local toggle_start = 1 -- start at middle of length 5 window
-    local toggle_end = 5 -- end at middle of length 5 window
 
     for i, pattern in ipairs(patterns) do
         vim.api.nvim_buf_set_extmark(windows.color.buf, ns, i - 1, 0, {
@@ -89,11 +87,14 @@ function M.highlight_matches(bufnr, pattern, cmd, args)
     for _, entry in ipairs(matches) do
         local row, line = entry.lineno, entry.line
         if row ~= nil and type(row) == "number" and line ~= nil and type(line) == "string" then
-            vim.api.nvim_buf_set_extmark(bufnr, ns, row - 1, col, {
-                end_col = string.len(line),
-                hl_group = hl_group,
-                priority = 100,
-            })
+            local extmark_opts = {}
+            if CandelaConfig.options.matching.hl_eol then
+                extmark_opts = {line_hl_group = hl_group, priority = 100}
+            else
+                extmark_opts = {end_col = string.len(line), hl_group = hl_group, priority = 100}
+            end
+
+            vim.api.nvim_buf_set_extmark(bufnr, ns, row - 1, col, extmark_opts)
             table.insert(M.match_cache[pattern.regex], row)
             count = count + 1
         end

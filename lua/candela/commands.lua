@@ -54,7 +54,7 @@ function M.setup(opts)
         end,
         lightbox = function()
             CandelaUi.hide_patterns()
-            CandelaLightbox.toggle(opts.lightbox.display, opts.lightbox.non_matched)
+            CandelaLightbox.toggle()
         end,
         help = function()
             if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
