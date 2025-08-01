@@ -91,7 +91,7 @@ function M.highlight_matches(bufnr, pattern, cmd, args)
             if CandelaConfig.options.matching.hl_eol then
                 extmark_opts = {line_hl_group = hl_group, priority = 100}
             else
-                extmark_opts = {end_col = string.len(line), hl_group = hl_group, priority = 100}
+                extmark_opts = {end_col = string.len(line) - 1, hl_group = hl_group, priority = 100}
             end
 
             vim.api.nvim_buf_set_extmark(bufnr, ns, row - 1, col, extmark_opts)
