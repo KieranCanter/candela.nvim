@@ -112,8 +112,7 @@ function M.setup(opts)
     local pattern_count_width = 4 -- 3 digit, resize to fit larger digits once more patterns are made
     local pattern_regex_width = opts.window.width
     local pattern_ops_width = 5 -- 1 space letter/symbol, 2 space margin on each side
-    local float_width = pattern_regex_width + pattern_color_width + (pattern_ops_width * 3) + 2 -- total window width
-    local total_width = float_width + 6 -- total window width after borders
+    local float_width = pattern_regex_width + pattern_color_width + (pattern_ops_width * 3) + 4 -- total window width
 
     local pattern_height = opts.window.height -- starting height
     local prompt_height = 1 -- 1 space height for prompt
@@ -139,12 +138,12 @@ function M.setup(opts)
     end
 
     -- Account for 2 border spaces worth of padding to center window in center of base window
-    local horz_center = math.floor((vim.o.columns - total_width - 2) / 2)
+    local horz_center = math.floor((vim.o.columns - float_width - 2) / 2)
     local vert_center = math.floor((vim.o.lines - pattern_height - prompt_height - 2) / 2)
 
     local patterns = CandelaWindow.new({
         relative = "editor",
-        width = total_width,
+        width = float_width,
         height = float_height,
         style = "minimal",
         focusable = false,
@@ -201,7 +200,7 @@ function M.setup(opts)
         title = "H",
         title_pos = "center",
         border = "solid",
-        col = pattern_color_width + pattern_regex_width + pattern_ops_width + 4,
+        col = pattern_color_width + pattern_regex_width + pattern_ops_width + 1,
         row = 0,
         zindex = 10,
     })
@@ -214,13 +213,13 @@ function M.setup(opts)
         title = "L",
         title_pos = "center",
         border = "solid",
-        col = pattern_color_width + (pattern_ops_width * 2) + pattern_regex_width + 6,
+        col = pattern_color_width + pattern_regex_width + ((pattern_ops_width + 1) * 2),
         row = 0,
         zindex = 10,
     })
     local prompt = CandelaWindow.new({
         relative = "win",
-        width = total_width,
+        width = float_width,
         height = prompt_height,
         style = "minimal",
         title_pos = "left",

@@ -11,8 +11,8 @@
 --
 --  * future improvements
 --    * lightbox duh
---    * add verify_opts function to each that takes opts
 --    * lazy load more
+--    * design solution for patterns that are too long for line (set nowrap or create a SSOT for line numbers to print?)
 --    * import/export pattern list
 --    * handle automatic foreground color changing if the colors are too similar in luminosity
 --]]
