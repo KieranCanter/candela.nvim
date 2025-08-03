@@ -59,9 +59,12 @@ function M.highlight_ui(windows, patterns)
 end
 
 ---@param bufnr number
+---@param id string
 ---@param pattern CandelaPattern
+---@param cmd string
+---@param args string[]
 ---@return number
-function M.highlight_matches(bufnr, pattern, cmd, args)
+function M.highlight_matches(bufnr, id, pattern, cmd, args)
     local ns = vim.api.nvim_create_namespace("CandelaNs_" .. hash_regex(pattern.regex))
     local hl_group = "CandelaHl_" .. hash_regex(pattern.regex)
     register_highlight({ bg = pattern.color }, ns, hl_group)
@@ -81,7 +84,7 @@ function M.highlight_matches(bufnr, pattern, cmd, args)
     table.insert(command, filepath)
 
     local matches = CandelaEngine.get_matches(command)
-    M.match_cache[pattern.regex] = {}
+    M.match_cache[id] = {}
     local col = 0
     local count = 0
     for _, entry in ipairs(matches) do
@@ -89,20 +92,54 @@ function M.highlight_matches(bufnr, pattern, cmd, args)
         if row ~= nil and type(row) == "number" and line ~= nil and type(line) == "string" then
             local extmark_opts = {}
             if CandelaConfig.options.matching.hl_eol then
-                extmark_opts = {line_hl_group = hl_group, priority = 100}
+                extmark_opts = { line_hl_group = hl_group, priority = 100 }
             else
-                extmark_opts = {end_col = string.len(line), hl_group = hl_group, priority = 100}
+                extmark_opts = { end_col = string.len(line), hl_group = hl_group, priority = 100 }
             end
 
-            vim.api.nvim_buf_set_extmark(bufnr, ns, row - 1, col, extmark_opts)
-            table.insert(M.match_cache[pattern.regex], row)
+            local extmark_id = vim.api.nvim_buf_set_extmark(bufnr, ns, row - 1, col, extmark_opts)
             count = count + 1
+
+            table.insert(M.match_cache[id], { extmark_id = extmark_id, line = row, end_col = string.len(line) })
         end
     end
 
-    table.sort(M.match_cache)
-
     return count
+end
+
+---@return boolean
+function M.toggle_match_highlights(bufnr, id, regex, toggle)
+    local ns = vim.api.nvim_get_namespaces()["CandelaNs_" .. hash_regex(regex)]
+    if ns == nil then
+        vim.notify(
+            string.format("Candela: namespace does not exist: CandelaNs_%s", hash_regex(regex)),
+            vim.log.levels.ERROR
+        )
+        return false
+    end
+
+    local hl_group = ""
+    if toggle then
+        hl_group = "CandelaHl_" .. hash_regex(regex)
+    else
+        hl_group = "Normal"
+    end
+
+
+    for _, match in ipairs(M.match_cache[id]) do
+        local extmark_opts = {}
+        if CandelaConfig.options.matching.hl_eol then
+            extmark_opts = { id = match.extmark_id, line_hl_group = hl_group, priority = 100 }
+        else
+            local line = vim.api.nvim_buf_get_lines(bufnr, match.line - 1, match.line, false)[1]
+            print(line)
+            extmark_opts = { id = match.extmark_id, end_col = string.len(line), hl_group = hl_group, priority = 100 }
+        end
+
+        vim.api.nvim_buf_set_extmark(bufnr, ns, match.line - 1, 0, extmark_opts)
+    end
+
+    return true
 end
 
 ---@return boolean
@@ -199,7 +236,9 @@ function M.get_flattened_match_cache()
         end
     end
 
-    table.sort(flattened, function(a, b) return a.lineno < b.lineno end)
+    table.sort(flattened, function(a, b)
+        return a.lineno < b.lineno
+    end)
 
     return flattened
 end

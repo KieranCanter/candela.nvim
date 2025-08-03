@@ -87,6 +87,11 @@ local function resize_height()
 end
 
 local function refresh_all()
+    if M.base_buf == M.curr_buf then
+        vim.notify("Candela: current buffer is already being matched against, skipping refresh", vim.log.levels.INFO)
+        return
+    end
+
     for _, id in ipairs(CandelaPatternList.order) do
         local pattern = CandelaPatternList.patterns[id]
         if not CandelaHighlighter.remove_match_highlights(M.base_buf, pattern.regex) then
@@ -95,7 +100,7 @@ local function refresh_all()
 
         local cmd = CandelaConfig.options.engine.command
         local args = CandelaConfig.options.engine.args
-        local count = CandelaHighlighter.highlight_matches(M.curr_buf, pattern, cmd, args)
+        local count = CandelaHighlighter.highlight_matches(M.curr_buf, id, pattern, cmd, args)
         if count == -1 then
             return
         end
@@ -336,7 +341,8 @@ function M.show_patterns()
         end
     end
 
-    vim.wo[M.windows.count.win].winhighlight = "Normal:Comment"
+    vim.api.nvim_set_option_value("wrap", false, { win = M.windows.regex.win })
+    vim.api.nvim_set_option_value("winhighlight", "Normal:Comment", { win = M.windows.count.win })
 end
 
 ---@param command string: type of command to conduct
@@ -388,14 +394,14 @@ local function show_prompt(command, curr_line, curr_pattern)
 
     if command == Commands.ADD then
         vim.fn.prompt_setcallback(M.windows.prompt.buf, function(regex)
-            local new_pattern = CandelaPatternList.add_pattern(regex)
-            if new_pattern == nil then
+            local new_id, new_pattern = CandelaPatternList.add_pattern(regex)
+            if new_id == nil or new_pattern == nil then
                 return M.hide_prompt()
             end
 
             local cmd = CandelaConfig.options.engine.command
             local args = CandelaConfig.options.engine.args
-            local count = CandelaHighlighter.highlight_matches(M.base_buf, new_pattern, cmd, args)
+            local count = CandelaHighlighter.highlight_matches(M.base_buf, new_id, new_pattern, cmd, args)
             if count == -1 then
                 return
             end
@@ -408,8 +414,8 @@ local function show_prompt(command, curr_line, curr_pattern)
     elseif command == Commands.EDIT then
         vim.fn.prompt_setcallback(M.windows.prompt.buf, function(regex)
             local old_regex = curr_pattern.regex
-            local new_pattern = CandelaPatternList.edit_pattern(curr_line, regex)
-            if new_pattern == nil then
+            local new_id, new_pattern = CandelaPatternList.edit_pattern(curr_line, regex)
+            if new_id == nil or new_pattern == nil then
                 return M.hide_prompt()
             end
 
@@ -419,7 +425,7 @@ local function show_prompt(command, curr_line, curr_pattern)
 
             local cmd = CandelaConfig.options.engine.command
             local args = CandelaConfig.options.engine.args
-            local count = CandelaHighlighter.highlight_matches(M.base_buf, new_pattern, cmd, args)
+            local count = CandelaHighlighter.highlight_matches(M.base_buf, new_id, new_pattern, cmd, args)
             if count == -1 then
                 return
             end
@@ -430,14 +436,14 @@ local function show_prompt(command, curr_line, curr_pattern)
         end)
     elseif command == Commands.COPY then
         vim.fn.prompt_setcallback(M.windows.prompt.buf, function(regex)
-            local new_pattern = CandelaPatternList.add_pattern(regex)
-            if new_pattern == nil then
+            local new_id, new_pattern = CandelaPatternList.add_pattern(regex)
+            if new_id == nil or new_pattern == nil then
                 return M.hide_prompt()
             end
 
             local cmd = CandelaConfig.options.engine.command
             local args = CandelaConfig.options.engine.args
-            local count = CandelaHighlighter.highlight_matches(M.base_buf, new_pattern, cmd, args)
+            local count = CandelaHighlighter.highlight_matches(M.base_buf, new_id, new_pattern, cmd, args)
             if count == -1 then
                 return
             end
@@ -627,22 +633,13 @@ function M.toggle_highlight()
     end
 
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
+    local curr_id = CandelaPatternList.order[curr_line]
     local curr_pattern = CandelaPatternList.get_pattern(curr_line)
     local is_highlighted = CandelaPatternList.toggle_pattern_highlight(curr_line)
-    if is_highlighted then
-        local cmd = CandelaConfig.options.engine.command
-        local args = CandelaConfig.options.engine.args
-        local count = CandelaHighlighter.highlight_matches(M.base_buf, curr_pattern, cmd, args)
-        if count == -1 then
-            return
-        end
-        curr_pattern.count = count
-    else
-        if not CandelaHighlighter.remove_match_highlights(M.base_buf, curr_pattern.regex) then
-            return
-        end
+    if not CandelaHighlighter.toggle_match_highlights(M.base_buf, curr_id, curr_pattern.regex, is_highlighted) then
+        return
     end
-    update_lines()
+    update_lines() -- HACK: expensive for just changing toggle in ui
 end
 
 function M.toggle_lightbox()
@@ -657,21 +654,12 @@ function M.toggle_lightbox()
     end
 
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
+    local curr_id = CandelaPatternList.order[curr_line]
     local curr_pattern = CandelaPatternList.get_pattern(curr_line)
-    CandelaPatternList.toggle_pattern_lightbox(curr_line)
+    local is_lightboxed = CandelaPatternList.toggle_pattern_lightbox(curr_line)
     -- NOTE: TEMPORARY FOR TESTING
-    if CandelaPatternList.toggle_pattern_highlight(curr_line) then
-        local cmd = CandelaConfig.options.engine.command
-        local args = CandelaConfig.options.engine.args
-        local count = CandelaHighlighter.highlight_matches(M.base_buf, curr_pattern, cmd, args)
-        if count == -1 then
-            return
-        end
-        curr_pattern.count = count
-    else
-        if not CandelaHighlighter.remove_match_highlights(M.base_buf, curr_pattern.regex) then
-            return
-        end
+    if not CandelaHighlighter.toggle_match_highlights(M.base_buf, curr_id, curr_pattern.regex, is_lightboxed) then
+        return
     end
     -- NOTE: END TEMPORARY FOR TESTING
     update_lines()

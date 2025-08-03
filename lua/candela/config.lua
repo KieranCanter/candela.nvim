@@ -118,7 +118,7 @@ function M.get_engine_versions()
 end
 
 ---@param available table
----@return table|nil
+---@return table?
 local function get_default_engine(available)
     for _, engine in ipairs(available) do
         if engine[next(engine)] ~= nil then
@@ -126,7 +126,8 @@ local function get_default_engine(available)
         end
     end
 
-    vim.notify("No regex search tool found... how do you not at least have grep?", vim.log.levels.ERROR)
+    vim.notify("[Candela] No regex search tool found... how do you not at least have grep?", vim.log.levels.ERROR)
+    vim.notify("Candela will not be loaded", vim.log.levels.ERROR)
     return nil
 end
 
@@ -236,7 +237,7 @@ local function get_default_args(opts)
     return args
 end
 
----@return CandelaConfig
+---@return CandelaConfig?
 function M.setup(opts)
     M.version["major"] = 1
     M.version["minor"] = 0
@@ -245,7 +246,7 @@ function M.setup(opts)
     M.options = vim.tbl_deep_extend("force", vim.deepcopy(M.defaults), opts or {})
     local available = M.get_engine_versions()
     M.options.engine.command = get_default_engine(available)
-    M.options.engine.command = "grep"
+    if M.options.engine.command == nil then return nil end
     M.options.engine.args = get_default_args(M.options)
     return M.options
 end

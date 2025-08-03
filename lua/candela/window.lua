@@ -1,8 +1,8 @@
 -- Module for initializing and manipulating Candela buffers/windows
 
 ---@class CandelaWindow
----@field buf number|nil
----@field win number|nil
+---@field buf number?
+---@field win number?
 ---@field config vim.api.keyset.win_config
 ---@field attach_to fun(self: CandelaWindow, parent_window: CandelaWindow)
 ---@field ensure_buffer fun(self: CandelaWindow)
@@ -56,7 +56,7 @@ end
 
 -- Open windows based on config
 ---@param self CandelaWindow
----@param enter boolean=false
+---@param enter boolean?=false
 function M:open_window(enter)
     if self:is_open() then
         return

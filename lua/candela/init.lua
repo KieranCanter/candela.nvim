@@ -29,7 +29,7 @@ local CandelaLightbox = require("candela.lightbox")
 
 ---@class Candela
 ---@field ui CandelaUi
----@field patterns CandelaPattern[]|nil
+---@field patterns CandelaPattern[]
 
 local Candela = {}
 
@@ -49,6 +49,10 @@ function Candela.setup(opts)
     })
 
     Candela.config = CandelaConfig.setup(opts)
+    if Candela.config == nil then
+        package.loaded.candela = nil
+        return
+    end
     Candela.commands = CandelaCommands.setup(Candela.config)
     Candela.ui = CandelaUi.setup(Candela.config)
     Candela.patterns = CandelaPatternList.setup(Candela.config)
