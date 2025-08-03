@@ -1,22 +1,21 @@
 local M = {}
 
+-- TODO: use config case sensitivity for matching
 ---@param regex string
 function M.match(regex)
     vim.fn.setreg("/", "\\v\\C" .. regex)
     vim.cmd("normal! n")
 end
 
+-- TODO: use config case sensitivity for matching
 --@param patterns CandelaPattern[]
 function M.match_all(patterns)
-    local multi_regex = ""
-    for i, pattern in ipairs(patterns) do
-        if i == 1 then
-            multi_regex = string.format("%s", pattern.regex)
-        else
-            multi_regex = string.format("%s|(%s)", multi_regex, pattern.regex)
-        end
+    local parts = {}
+    for _, pattern in pairs(patterns) do
+        table.insert(parts, "(" .. pattern.regex .. ")")
     end
-    vim.fn.setreg("/", "\\v\\C" .. multi_regex)
+    local search_str = table.concat(parts, "|")
+    vim.fn.setreg("/", "\\v\\C" .. search_str)
     vim.cmd("normal! n")
 end
 
@@ -48,6 +47,7 @@ local function update_loclist(matches, kind)
     vim.fn.setloclist(0, {}, ' ', what)
 end
 
+-- TODO: use config case sensitivity for matching
 ---@param bufnr number
 ---@param regex string
 ---@param engine fun(cmd: string[]): table[]
@@ -64,6 +64,7 @@ function M.find(bufnr, regex, engine)
     update_loclist(matches, "single")
 end
 
+-- TODO: use config case sensitivity for matching
 ---@param bufnr number
 ---@param patterns CandelaPattern[]
 ---@param engine fun(cmd: string[]): table[]
@@ -79,12 +80,13 @@ function M.find_all(bufnr, patterns, engine)
         return 0
     end
 
-    local reg = string.format("(%s)", patterns[1].regex)
-    for i = 2, #patterns do
-        reg = reg .. string.format("|(%s)", patterns[i].regex)
+    local parts = {}
+    for _, pattern in pairs(patterns) do
+        table.insert(parts, "(" .. pattern.regex .. ")")
     end
+    local search_str = table.concat(parts, "|")
 
-    local rg_cmd = { "rg", "--line-number", "--color=never", reg, filepath }
+    local rg_cmd = { "rg", "--line-number", "--color=never", search_str, filepath }
     local matches = engine(rg_cmd)
 
     update_loclist(matches, "all")

@@ -45,7 +45,10 @@ local function update_lines()
         lightbox = {},
     }
 
-    for _, pattern in ipairs(CandelaPatternList.patterns) do
+    local pattern_list = {}
+    for _, id in ipairs(CandelaPatternList.order) do
+        local pattern = CandelaPatternList.patterns[id]
+        table.insert(pattern_list, pattern)
         for field, _ in pairs(all_lines) do
             table.insert(all_lines[field], format_field(field, pattern[field]))
         end
@@ -57,14 +60,14 @@ local function update_lines()
         vim.api.nvim_set_option_value("modifiable", false, { buf = M.windows[field].buf })
     end
 
-    CandelaHighlighter.highlight_ui(M.windows, CandelaPatternList.patterns)
+    CandelaHighlighter.highlight_ui(M.windows, pattern_list)
 end
 
 -- TODO: revise this better
 -- If the number of patterns in list exceeds the height of the current height, increase height of patterns windows
 local function resize_height()
     local curr_height = vim.api.nvim_win_get_height(M.windows.regex.win) -- Num of shown entries
-    if #CandelaPatternList.patterns > curr_height then
+    if #CandelaPatternList.order > curr_height then
         local new_height = math.min(M.windows.patterns.config.height + 1, vim.o.lines - 6)
         local prompt_height = M.windows.prompt.config.height
         local new_vert_center = math.floor((vim.o.lines - new_height - prompt_height - 2) / 2)
@@ -84,7 +87,8 @@ local function resize_height()
 end
 
 local function refresh_all()
-    for _, pattern in ipairs(CandelaPatternList.patterns) do
+    for _, id in ipairs(CandelaPatternList.order) do
+        local pattern = CandelaPatternList.patterns[id]
         if not CandelaHighlighter.remove_match_highlights(M.base_buf, pattern.regex) then
             return
         end
@@ -484,7 +488,7 @@ function M.edit()
         return
     end
 
-    if #CandelaPatternList.patterns == 0 then
+    if #CandelaPatternList.order == 0 then
         vim.notify("Candela: no patterns to edit", vim.log.levels.ERROR)
         return
     end
@@ -506,7 +510,7 @@ function M.copy()
         return
     end
 
-    if #CandelaPatternList.patterns == 0 then
+    if #CandelaPatternList.order == 0 then
         vim.notify("Candela: no patterns to copy", vim.log.levels.ERROR)
         return
     end
@@ -528,7 +532,7 @@ function M.delete(ask)
         return
     end
 
-    if #CandelaPatternList.patterns == 0 then
+    if #CandelaPatternList.order == 0 then
         vim.notify("Candela: no patterns to delete", vim.log.levels.ERROR)
         return
     end
@@ -561,7 +565,7 @@ end
 
 ---@param ask boolean: show the confirmation message or not
 function M.clear(ask)
-    if #CandelaPatternList.patterns == 0 then
+    if #CandelaPatternList.order == 0 then
         vim.notify("Candela: no patterns to clear", vim.log.levels.ERROR)
         return
     end
@@ -574,9 +578,11 @@ function M.clear(ask)
         end
     end
 
+    local order = CandelaPatternList.order
     local patterns = CandelaPatternList.patterns
     CandelaPatternList.clear_patterns()
-    for _, pattern in ipairs(patterns) do
+    for _, id in ipairs(order) do
+        local pattern = patterns[id]
         if CandelaHighlighter.remove_match_highlights(M.base_buf, pattern.regex) then
             update_lines()
             -- M.reset_height() -- TODO: Implement reset_height()
@@ -594,7 +600,7 @@ function M.change_color()
         return
     end
 
-    if #CandelaPatternList.patterns == 0 then
+    if #CandelaPatternList.order == 0 then
         vim.notify("Candela: no patterns to change color", vim.log.levels.ERROR)
         return
     end
@@ -615,7 +621,7 @@ function M.toggle_highlight()
         return
     end
 
-    if #CandelaPatternList.patterns == 0 then
+    if #CandelaPatternList.order == 0 then
         vim.notify("Candela: no patterns to toggle highlight", vim.log.levels.ERROR)
         return
     end
@@ -645,7 +651,7 @@ function M.toggle_lightbox()
         return
     end
 
-    if #CandelaPatternList.patterns == 0 then
+    if #CandelaPatternList.order == 0 then
         vim.notify("Candela: no patterns to toggle lightbox", vim.log.levels.ERROR)
         return
     end
@@ -677,7 +683,7 @@ function M.match()
         return
     end
 
-    if #CandelaPatternList.patterns == 0 then
+    if #CandelaPatternList.order == 0 then
         vim.notify("Candela: no patterns to match", vim.log.levels.ERROR)
         return
     end
@@ -689,7 +695,7 @@ function M.match()
 end
 
 function M.match_all()
-    if #CandelaPatternList.patterns == 0 then
+    if #CandelaPatternList.order == 0 then
         vim.notify("Candela: no patterns to match all", vim.log.levels.ERROR)
         return
     end
@@ -705,7 +711,7 @@ function M.find()
         return
     end
 
-    if #CandelaPatternList.patterns == 0 then
+    if #CandelaPatternList.order == 0 then
         vim.notify("Candela: no patterns to find", vim.log.levels.ERROR)
         return
     end
@@ -717,7 +723,7 @@ function M.find()
 end
 
 function M.find_all()
-    if #CandelaPatternList.patterns == 0 then
+    if #CandelaPatternList.order == 0 then
         vim.notify("Candela: no patterns to find all", vim.log.levels.ERROR)
         return
     end
