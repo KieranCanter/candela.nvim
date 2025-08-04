@@ -23,6 +23,7 @@ local function register_highlight(colors, ns, hl_group)
     vim.api.nvim_set_hl(0, hl_group, colors)
 end
 
+-- TODO: consolidate this with pattern_list hash_regex() and don't substring it?
 ---@param regex string
 ---@return string
 local function hash_regex(regex)
@@ -94,13 +95,13 @@ function M.highlight_matches(bufnr, id, pattern, cmd, args)
             if CandelaConfig.options.matching.hl_eol then
                 extmark_opts = { line_hl_group = hl_group, priority = 100 }
             else
-                extmark_opts = { end_col = string.len(line), hl_group = hl_group, priority = 100 }
+                extmark_opts = { end_col = string.len(line), hl_group = hl_group, strict = false, priority = 100 }
             end
 
             local extmark_id = vim.api.nvim_buf_set_extmark(bufnr, ns, row - 1, col, extmark_opts)
             count = count + 1
 
-            table.insert(M.match_cache[id], { extmark_id = extmark_id, line = row, end_col = string.len(line) })
+            table.insert(M.match_cache[id], { extmark_id = extmark_id, row = row, end_col = string.len(line) })
         end
     end
 
@@ -125,18 +126,22 @@ function M.toggle_match_highlights(bufnr, id, regex, toggle)
         hl_group = "Normal"
     end
 
-
     for _, match in ipairs(M.match_cache[id]) do
         local extmark_opts = {}
         if CandelaConfig.options.matching.hl_eol then
             extmark_opts = { id = match.extmark_id, line_hl_group = hl_group, priority = 100 }
         else
-            local line = vim.api.nvim_buf_get_lines(bufnr, match.line - 1, match.line, false)[1]
-            print(line)
-            extmark_opts = { id = match.extmark_id, end_col = string.len(line), hl_group = hl_group, priority = 100 }
+            local line = vim.api.nvim_buf_get_lines(bufnr, match.row - 1, match.row, false)[1]
+            extmark_opts = {
+                id = match.extmark_id,
+                end_col = string.len(line),
+                hl_group = hl_group,
+                strict = false,
+                priority = 100,
+            }
         end
 
-        vim.api.nvim_buf_set_extmark(bufnr, ns, match.line - 1, 0, extmark_opts)
+        vim.api.nvim_buf_set_extmark(bufnr, ns, match.row - 1, 0, extmark_opts)
     end
 
     return true
