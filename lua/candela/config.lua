@@ -54,7 +54,7 @@ M.defaults = {
     },
     lightbox = {
         -- lightbox view mode
-        view = "tab", -- "tab" | "system-split" | "system-vsplit" | "split-left" | "split-right" | "split-above" | "split-below"
+        view = "split-right", -- "tab" | "system-split" | "system-vsplit" | "split-left" | "split-right" | "split-above" | "split-below"
         -- place non-matched lines in folds or completely remove them
         hide_method = "remove", -- "fold" | "remove"
         -- trim beginning/ending whitespace from lightbox-highlighted lines

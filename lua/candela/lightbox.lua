@@ -31,7 +31,6 @@ end
 --]]
 
 local M = {}
-local BUFNAME = "lightbox"
 
 function M.setup()
     local opts = CandelaConfig.options.lightbox
@@ -58,11 +57,11 @@ function M.display()
     if M.open_command ~= nil then
         vim.api.nvim_exec2(M.open_command, {})
         M.window.win = vim.api.nvim_get_current_win()
+        vim.api.nvim_win_set_buf(M.window.win, M.window.buf)
     -- open in split view
     else
         M.window:open_window(true)
     end
-    vim.api.nvim_win_set_buf(M.window.win, M.window.buf)
     -- set win options
 end
 
