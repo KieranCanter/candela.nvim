@@ -133,9 +133,9 @@ function M.setup(opts)
     local prompt_height = 1 -- 1 space height for prompt
 
     local defaults = require("candela.config").defaults
-    local prompt_layout = 1
+    local prompt_layout = 0
     if opts.window.prompt_layout == "overlap" then
-        prompt_layout = -1
+        prompt_layout = 0
     elseif opts.window.prompt_layout == "border" then
         prompt_layout = 1
     else
@@ -148,7 +148,7 @@ function M.setup(opts)
             ),
             vim.log.levels.WARN
         )
-        prompt_layout = -1
+        prompt_layout = 0
     end
 
     -- Account for 2 border spaces worth of padding to center window in center of base window
