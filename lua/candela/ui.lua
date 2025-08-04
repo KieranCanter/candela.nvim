@@ -123,17 +123,27 @@ end
 ---@param icon string|nil: user config icon option
 ---@param type string: type of icon (e.g. "color" or "highlight" or "lightbox")
 ---@param subtype string|nil: subtype name (e.g. nil or "header" "toggle_on" or "toggle_off")
+---@param header string: header to preface icon (e.g. "Color" or "HL" or "LB" or "")
 ---@param default string: default fallback value
-local function format_icon(icon, type, subtype, default)
+---@return string: formatted UI string
+local function format_icon(icon, type, subtype, header, default)
     if icon == nil then
         return default
     end
 
     local width = vim.fn.strwidth(icon)
     if width == 2 then
-        return string.format("   %s", icon)
+        if subtype == "toggle_on" or subtype == "toggle_off" then
+            return string.format("   %s", icon)
+        else
+            return string.format("%s%s", header, icon)
+        end
     elseif width == 1 then
-        return string.format("  %s  ", icon)
+        if subtype == "toggle_on" or subtype == "toggle_off" then
+            return string.format("  %s  ", icon)
+        else
+            return string.format("%s %s", header, icon)
+        end
     else
         vim.notify(
             string.format(
@@ -214,7 +224,7 @@ function M.setup(opts)
     else
         title = "Color"
     end
-    title = format_icon(icons.color, "color", nil, "Color")
+    title = format_icon(icons.color, "color", nil, "Color", "Color")
     local color = CandelaWindow.new({
         relative = "win",
         width = pattern_color_width,
@@ -260,7 +270,7 @@ function M.setup(opts)
         zindex = 10,
     })
 
-    title = format_icon(icons.highlight.header, "highlight", "header", "  H  ")
+    title = format_icon(icons.highlight.header, "highlight", "header", "HL ", "  H  ")
     local highlight = CandelaWindow.new({
         relative = "win",
         width = pattern_ops_width,
@@ -275,7 +285,7 @@ function M.setup(opts)
         zindex = 10,
     })
 
-    title = format_icon(icons.lightbox.header, "lightbox", "header", "  L  ")
+    title = format_icon(icons.lightbox.header, "lightbox", "header", "LB ", "  L  ")
     local lightbox = CandelaWindow.new({
         relative = "win",
         width = pattern_ops_width,
@@ -316,10 +326,10 @@ function M.setup(opts)
     local highlight_off_def = "  N  "
     local lightbox_on_def = "  Y  "
     local lightbox_off_def = "  N  "
-    M.highlight_on = format_icon(icons.highlight.toggle_on, "highlight", "toggle_on", highlight_on_def)
-    M.highlight_off = format_icon(icons.highlight.toggle_off, "highlight", "toggle_off", highlight_off_def)
-    M.lightbox_on = format_icon(icons.lightbox.toggle_on, "lightbox", "toggle_on", lightbox_on_def)
-    M.lightbox_off = format_icon(icons.lightbox.toggle_off, "lightbox", "toggle_off", lightbox_off_def)
+    M.highlight_on = format_icon(icons.highlight.toggle_on, "highlight", "toggle_on", "", highlight_on_def)
+    M.highlight_off = format_icon(icons.highlight.toggle_off, "highlight", "toggle_off", "", highlight_off_def)
+    M.lightbox_on = format_icon(icons.lightbox.toggle_on, "lightbox", "toggle_on", "", lightbox_on_def)
+    M.lightbox_off = format_icon(icons.lightbox.toggle_off, "lightbox", "toggle_off", "", lightbox_off_def)
 
     -- TODO: handle resizing of window when vim is resized with autocmd
     -- TODO: handle resizing of count window when count exceeds width

@@ -36,8 +36,8 @@ M.defaults = {
     },
     engine = {
         -- regex search engine to use; defaults to first found tool out of the list in order
-        command = {}, -- "rg" | "ag" | "ugrep" | "ack" | "grep"
-        -- args to pass to search engine; refer to your tool's manual
+        command = nil, -- "rg" | "ag" | "ugrep" | "ack" | "grep"
+        -- extra args to pass to search engine; refer to your tool's manual
         args = {},
     },
     matching = {
@@ -115,7 +115,7 @@ M.defaults = {
 ---@return table<table>
 function M.get_engine_versions()
     local pattern = "%d+%.%d+%.*%d*"
-    local engines = { -- TODO: implement other engines
+    local engines = {
         { rg = "ripgrep" },
         { ag = "ag" },
         { ugrep = "ugrep" },
@@ -147,6 +147,44 @@ local function get_default_engine(available)
     return nil
 end
 
+local function build_search_args(command, case_option)
+    local args_map = {
+        rg = { "--line-number", "--color=never" },
+        ag = { "--numbers", "--nocolor" },
+        ugrep = { "--line-number", "--color=never" },
+        ack = { "--with-filename", "--nocolor" },
+        grep = { "--line-number", "--color=never" },
+    }
+
+    local args = vim.deepcopy(args_map[command] or {})
+    vim.list_extend(args, M.options.engine.args)
+
+    local ignorecase = vim.api.nvim_get_option_value("ignorecase", {})
+    local smartcase = vim.api.nvim_get_option_value("smartcase", {})
+
+    if case_option == "ignore" or (case_option == "system" and ignorecase) then
+        table.insert(args, "--ignore-case")
+    elseif case_option == "smart" or (case_option == "system" and smartcase) then
+        if command == "grep" then
+            vim.notify(
+                "grep does not support smart-case. Consider installing a faster regex search engine or modifying"
+                    .. "`case` in your user config to turn smart-case off. Proceeding with the case-sensitive args.",
+                vim.log.levels.WARN
+            )
+        else
+            table.insert(args, "--smart-case")
+        end
+    else
+        if command == "rg" or command == "ag" then
+            table.insert(args, "--case-sensitive")
+        elseif command == "ack" then
+            table.insert(args, "--no-ignore-case")
+        end
+    end
+
+    return args
+end
+
 ---@param opts table
 ---@return string[]
 local function get_default_args(opts)
@@ -170,86 +208,7 @@ local function get_default_args(opts)
         opts.matching.case = M.defaults.case
     end
 
-    if command == "rg" then
-        args = { "--line-number", "--color=never" }
-        if
-            opts.matching.case == "ignore"
-            or (opts.matching.case == "system" and vim.api.nvim_get_option_value("ignorecase", {}))
-        then
-            table.insert(args, "--ignore-case")
-        elseif
-            opts.matching.case == "smart"
-            or (opts.matching.case == "system" and vim.api.nvim_get_option_value("smartcase", {}))
-        then
-            table.insert(args, "--smart-case")
-        else
-            table.insert(args, "--case-sensitive")
-        end
-    elseif command == "ag" then
-        args = { "--numbers", "--nocolor" }
-        if
-            opts.matching.case == "ignore"
-            or (opts.matching.case == "system" and vim.api.nvim_get_option_value("ignorecase", {}))
-        then
-            table.insert(args, "--ignore-case")
-        elseif
-            opts.matching.case == "smart"
-            or (opts.matching.case == "system" and vim.api.nvim_get_option_value("smartcase", {}))
-        then
-            table.insert(args, "--smart-case")
-        else
-            table.insert(args, "--case-sensitive")
-        end
-    elseif command == "ugrep" then
-        args = { "--line-number", "--color=never" }
-        if
-            opts.matching.case == "ignore"
-            or (opts.matching.case == "system" and vim.api.nvim_get_option_value("ignorecase", {}))
-        then
-            table.insert(args, "--ignore-case")
-        elseif
-            opts.matching.case == "smart"
-            or (opts.matching.case == "system" and vim.api.nvim_get_option_value("smartcase", {}))
-        then
-            table.insert(args, "--smart-case")
-        end
-    elseif command == "ack" then
-        args = { "--with-filename", "--nocolor" }
-        if
-            opts.matching.case == "ignore"
-            or (opts.matching.case == "system" and vim.api.nvim_get_option_value("ignorecase", {}))
-        then
-            table.insert(args, "--ignore-case")
-        elseif
-            opts.matching.case == "smart"
-            or (opts.matching.case == "system" and vim.api.nvim_get_option_value("smartcase", {}))
-        then
-            table.insert(args, "--smart-case")
-        else
-            table.insert(args, "--no-ignore-case")
-        end
-    elseif command == "grep" then
-        args = { "--line-number", "--color=never" }
-        if
-            opts.matching.case == "ignore"
-            or (opts.matching.case == "system" and vim.api.nvim_get_option_value("ignorecase", {}))
-        then
-            table.insert(args, "--ignore-case")
-        elseif
-            opts.matching.case == "smart"
-            or (opts.matching.case == "system" and vim.api.nvim_get_option_value("smartcase", {}))
-        then
-            vim.notify(
-                "grep does not support smart-case. Consider installing a faster regex search engine or modifying"
-                    .. "`case` in your user config to turn smart-case off. Proceeding with the case-sensitive flag.",
-                vim.log.levels.WARN
-            )
-        end
-    else
-        vim.notify("No default args for search tool found", vim.log.levels.ERROR)
-        args = {}
-    end
-
+    args = build_search_args(command, opts.matching.case)
     return args
 end
 
@@ -261,7 +220,7 @@ function M.setup(opts)
 
     M.options = vim.tbl_deep_extend("force", vim.deepcopy(M.defaults), opts or {})
     local available = M.get_engine_versions()
-    M.options.engine.command = get_default_engine(available)
+    if M.options.engine.command == nil then M.options.engine.command = get_default_engine(available) end
     if M.options.engine.command == nil then return nil end
     M.options.engine.args = get_default_args(M.options)
     return M.options
