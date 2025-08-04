@@ -21,17 +21,22 @@ local Commands = {}
 ---@param field_val string|boolean|number
 ---@return string: String to input into buffer lines
 local function format_field(field, field_val)
-    if type(field_val) == "boolean" then
-        return field_val and "  ✓  " or "  ✘  "
-    elseif field == "regex" then
-        return string.format(" /%s/", field_val) or ""
-    elseif type(field_val) == "number" then
+    if field == "color" and type(field_val) == "string" then
+        return field_val
+    elseif field == "count" then
         local win_width = vim.api.nvim_win_get_width(M.windows.count.win)
         local line = tostring(field_val)
         local right_aligned = string.rep(" ", win_width - #line) .. line
         return right_aligned
+    elseif field == "regex" then
+        return string.format(" /%s/", field_val) or ""
+    elseif field == "highlight" then
+        return field_val and M.highlight_on or M.highlight_off
+    elseif field == "lightbox" then
+        return field_val and M.lightbox_on or M.lightbox_off
     else
-        return field_val or ""
+        vim.notify(string.format("[Candela] %s is not a valid field", field), vim.log.levels.ERROR)
+        return "no value"
     end
 end
 
@@ -118,10 +123,11 @@ end
 ---@param opts table
 function M.setup(opts)
     local pattern_color_width = 7 -- 7 space hexcode
-    local pattern_count_width = 4 -- 3 digit, resize to fit larger digits once more patterns are made
-    local pattern_regex_width = opts.window.width
+    local pattern_count_width = 4 -- 4 digit, resize to fit larger digits once more patterns are made
     local pattern_ops_width = 5 -- 1 space letter/symbol, 2 space margin on each side
-    local float_width = pattern_regex_width + pattern_color_width + (pattern_ops_width * 3) + 4 -- total window width
+    local float_width = opts.window.width -- total window width
+    -- Fit regex to rest of window leftover, subtract 1 for each space inbetween windows
+    local pattern_regex_width = float_width - pattern_color_width - pattern_count_width - (pattern_ops_width * 2) - 6
 
     local pattern_height = opts.window.height -- starting height
     local prompt_height = 1 -- 1 space height for prompt
@@ -150,32 +156,46 @@ function M.setup(opts)
     local horz_center = math.floor((vim.o.columns - float_width - 2) / 2)
     local vert_center = math.floor((vim.o.lines - pattern_height - prompt_height - 2) / 2)
 
+    local title = ""
+    local icons = CandelaConfig.options.icons
+    if icons.candela ~= nil then
+        title = string.format(" %sCandela ", icons.candela)
+    else
+        title = " Candela "
+    end
     local patterns = CandelaWindow.new({
         relative = "editor",
         width = float_width,
         height = float_height,
         style = "minimal",
         focusable = false,
-        title = " Candela ",
+        title = title,
         title_pos = "center",
         border = "rounded",
         col = horz_center,
         row = vert_center,
         zindex = 1,
     })
+
+    if icons.color ~= nil then
+        title = string.format("%sColor", icons.color)
+    else
+        title = "Color"
+    end
     local color = CandelaWindow.new({
         relative = "win",
         width = pattern_color_width,
         height = patterns.config.height - 2,
         style = "minimal",
         focusable = false,
-        title = "Color",
+        title = title,
         title_pos = "center",
         border = "solid",
         col = 0,
         row = 0,
         zindex = 10,
     })
+
     local count = CandelaWindow.new({
         relative = "win",
         width = pattern_count_width,
@@ -184,45 +204,63 @@ function M.setup(opts)
         focusable = false,
         title = "",
         border = "solid",
-        col = pattern_color_width,
+        col = pattern_color_width + 1,
         row = 0,
         zindex = 10,
     })
+
+    if icons.regex ~= nil then
+        title = string.format(" %sRegex", icons.regex)
+    else
+        title = " Regex"
+    end
     local regex = CandelaWindow.new({
         relative = "win",
         width = pattern_regex_width,
         height = patterns.config.height - 2,
         style = "minimal",
-        title = " Regex",
+        title = title,
         title_pos = "left",
         border = "solid",
-        col = pattern_color_width + pattern_ops_width,
+        col = pattern_color_width + pattern_count_width + 2,
         row = 0,
         zindex = 10,
     })
+
+    if icons.highlight.header ~= nil then
+        title = string.format("HL %s", icons.highlight.header)
+    else
+        title = "  H  "
+    end
     local highlight = CandelaWindow.new({
         relative = "win",
         width = pattern_ops_width,
         height = patterns.config.height - 2,
         style = "minimal",
         focusable = false,
-        title = "H",
+        title = title,
         title_pos = "center",
         border = "solid",
-        col = pattern_color_width + pattern_regex_width + pattern_ops_width + 1,
+        col = pattern_color_width + pattern_count_width + pattern_regex_width + 3,
         row = 0,
         zindex = 10,
     })
+
+    if icons.lightbox.header ~= nil then
+        title = string.format("LB %s", icons.lightbox.header)
+    else
+        title = "  L  "
+    end
     local lightbox = CandelaWindow.new({
         relative = "win",
         width = pattern_ops_width,
         height = patterns.config.height - 2,
         style = "minimal",
         focusable = false,
-        title = "L",
+        title = title,
         title_pos = "center",
         border = "solid",
-        col = pattern_color_width + pattern_regex_width + ((pattern_ops_width + 1) * 2),
+        col = pattern_color_width + pattern_count_width + pattern_regex_width + pattern_ops_width + 4,
         row = 0,
         zindex = 10,
     })
@@ -247,6 +285,36 @@ function M.setup(opts)
         lightbox = lightbox,
         prompt = prompt,
     }
+
+    -- set highlight/lightbox toggling strings since they're constant
+    local highlight_on, highlight_off = "", ""
+    if icons.highlight.toggle_on~= nil then
+        highlight_on = string.format("  %s  ", icons.highlight.toggle_on)
+    else
+        highlight_on = "  Y  "
+    end
+    if icons.highlight.toggle_off ~= nil then
+        highlight_off = string.format("  %s  ", icons.highlight.toggle_off)
+    else
+        highlight_off = "  N  "
+    end
+
+    local lightbox_on, lightbox_off = "", ""
+    if icons.lightbox.toggle_on ~= nil then
+        lightbox_on = string.format("  %s  ", icons.lightbox.toggle_on)
+    else
+        lightbox_on = "  Y  "
+    end
+    if icons.lightbox.toggle_off ~= nil then
+        lightbox_off = string.format("  %s  ", icons.lightbox.toggle_off)
+    else
+        lightbox_off = "  N  "
+    end
+
+    M.highlight_on = highlight_on
+    M.highlight_off = highlight_off
+    M.lightbox_on = lightbox_on
+    M.lightbox_off = lightbox_off
 
     -- TODO: handle resizing of window when vim is resized with autocmd
     -- TODO: handle resizing of count window when count exceeds width

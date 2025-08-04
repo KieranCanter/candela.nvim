@@ -9,10 +9,26 @@ M.version = {}
 M.defaults = {
     -- Candela-styled logs
     syntax_highlighting = true, -- true | false -- TODO: implement
+    -- Use unicode symbols in UI, set to nil to disable
+    icons = {
+        candela = "\u{1F56F}", -- patterns window title 🕯
+        color = "\u{1F3A8}", -- color column header 🎨
+        regex = "\u{1F300}", -- regex column header 🌀
+        highlight = {
+            header = "\u{1F4A1}", -- highlight column header 💡
+            toggle_on = "\u{25C9}", -- highlight toggle on ◉
+            toggle_off = "\u{25CB}", -- highlight toggle off ○
+        },
+        lightbox = {
+            header = "\u{1F50D}", -- lightbox column header 🔍
+            toggle_on = "\u{25C9}", -- lightbox toggle on ◉
+            toggle_off = "\u{25CB}", -- lightbox toggle off ○
+        },
+    },
     -- Use log syntax highlighting
     window = {
-        -- width of the patterns window
-        width = math.floor(vim.o.columns * 0.25), -- integer
+        -- initial width of the patterns window
+        width = math.floor(vim.o.columns * 0.5), -- integer
         -- initial height (number of patterns) of the patterns window
         height = 7, -- integer
         -- position of prompt window in relation to patterns window
