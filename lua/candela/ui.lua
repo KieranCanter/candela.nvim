@@ -99,7 +99,7 @@ local function refresh_all()
 
     for _, id in ipairs(CandelaPatternList.order) do
         local pattern = CandelaPatternList.patterns[id]
-        if not CandelaHighlighter.remove_match_highlights(M.base_buf, pattern.regex) then
+        if not CandelaHighlighter.remove_match_highlights(M.base_buf, id, pattern.regex) then
             return
         end
 
@@ -481,12 +481,13 @@ local function show_prompt(command, curr_line, curr_pattern)
     elseif command == Commands.EDIT then
         vim.fn.prompt_setcallback(M.windows.prompt.buf, function(regex)
             local old_regex = curr_pattern.regex
+            local old_id = CandelaPatternList.order[curr_line]
             local new_id, new_pattern = CandelaPatternList.edit_pattern(curr_line, regex)
             if new_id == nil or new_pattern == nil then
                 return M.hide_prompt()
             end
 
-            if not CandelaHighlighter.remove_match_highlights(M.base_buf, old_regex) then
+            if not CandelaHighlighter.remove_match_highlights(M.base_buf, old_id, old_regex) then
                 return
             end
 
@@ -611,6 +612,7 @@ function M.delete(ask)
     end
 
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
+    local curr_id = CandelaPatternList.order[curr_line]
     local curr_pattern = CandelaPatternList.get_pattern(curr_line)
     if ask then
         local choice = vim.fn.confirm(
@@ -628,7 +630,7 @@ function M.delete(ask)
         return
     end
 
-    if not CandelaHighlighter.remove_match_highlights(M.base_buf, curr_pattern.regex) then
+    if not CandelaHighlighter.remove_match_highlights(M.base_buf, curr_id, curr_pattern.regex) then
         return
     end
 
@@ -656,7 +658,7 @@ function M.clear(ask)
     CandelaPatternList.clear_patterns()
     for _, id in ipairs(order) do
         local pattern = patterns[id]
-        if CandelaHighlighter.remove_match_highlights(M.base_buf, pattern.regex) then
+        if CandelaHighlighter.remove_match_highlights(M.base_buf, id, pattern.regex) then
             update_lines()
             -- M.reset_height() -- TODO: Implement reset_height()
         end

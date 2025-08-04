@@ -2,8 +2,35 @@ local CandelaWindow = require("candela.window")
 local CandelaHighlighter = require("candela.highlighter")
 local CandelaConfig = require("candela.config")
 
-local M = {}
+-- Lightbox design:
+-- * fold-only: remove is too expensive; use neovim's read-only clone buffer feature and fold unmatched + unlightboxed lines
+-- * set fml (foldminlines) to 0 so every line can be folded
+-- * set foldtext to something better than default
+--   * se foldtext=foldtext#minimal()?
+--   * vim.opt.foldtext = "v:lua.MinimalFoldText()" with function _G.MinimalFoldText() that returns empty string
+--   * se `fillchars=fold:-` or `fillchars=fold\ ` to set fillchars on folded lines
+-- * with above, different fold_style options: invisible, minimal, detailed
+-- * option fold_style: invisible, minimal, compact, detailed (no fillchars, single fillchars char, full fillchars chars, first folded line shown)
+-- * option show_count: show number of folded lines or not
+-- * option fillchar: char to use for fillchars=fold:
+-- * maintain a table of [row -> {set of active pattern IDs}] in which active pattern IDs are lightbox toggled on
+--   * lines with no active patterns are folded
+-- * when a pattern is toggled on: unfold all lines covered by matches
+-- * when a pattern is toggled off: for each affected line, check if any other pattern covers it (if its active pattern IDs set is empty) and fold if no
+-- * :se foldtext=v:foldstart (starting line)
+-- * :se foldtext=v:foldend (ending line)
+-- * :se foldtext=v:folddashes (single fillchar?)
+-- * :se foldtext=v:folddashesv:folddashes (+-- # line(s) folded)
+--[[
+function _G.Invisible()
+  return ""
+end
+function _G.Count()
+    return tostring(vim.v.foldend - vim.v.foldstart + 1)
+end
+--]]
 
+local M = {}
 local BUFNAME = "lightbox"
 
 local function set_buf_options()
