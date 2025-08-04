@@ -1,12 +1,14 @@
--- module to control the highlighting of matches
+-- module to control th highlighting of matches
 
 local CandelaEngine = require("candela.engine")
 local CandelaConfig = require("candela.config")
+local CandelaLightbox = {}
 
 local M = {}
 
 function M.setup()
     M.match_cache = {}
+    CandelaLightbox = require("candela.lightbox")
 
     return M
 end
@@ -102,6 +104,7 @@ function M.highlight_matches(bufnr, id, pattern, cmd, args)
             count = count + 1
 
             table.insert(M.match_cache[id], { extmark_id = extmark_id, row = row, end_col = string.len(line) })
+            CandelaLightbox.add_to_cache(row, id)
         end
     end
 
@@ -160,6 +163,7 @@ function M.remove_match_highlights(bufnr, id, regex)
 
     vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
     M.match_cache[id] = nil
+    CandelaLightbox.remove_from_cache(id)
     return true
 end
 

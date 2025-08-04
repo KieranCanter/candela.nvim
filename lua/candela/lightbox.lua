@@ -49,7 +49,102 @@ function M.setup()
         M.open_command = nil -- no command needed, using win config to specify split direction
     end
 
+    M.lightbox_cache = {}
+    M.ranges_cache = {}
+
     return M
+end
+
+---@param row integer: line number/row
+---@param id string: pattern ID
+function M.add_to_cache(row, id)
+    M.lightbox_cache[row] = M.lightbox_cache[row] or {}
+    M.lightbox_cache[row][id] = true
+end
+
+---@param id string: pattern ID
+---@return integer[]
+function M.remove_from_cache(id)
+    local rows = CandelaHighlighter.match_cache[id]
+    if not rows then
+        return {}
+    end
+
+    local removed = {}
+
+    for row, _ in pairs(rows) do
+        if M.lightbox_cache[row] then
+            M.lightbox_cache[row][id] = nil
+            if next(M.lightbox_cache[row]) == nil then
+                M.lightbox_cache[row] = nil
+                table.insert(removed, row)
+            end
+        end
+    end
+
+    return removed
+end
+
+---@return table[]
+local function get_ranges()
+    local total_rows = vim.api.nvim_buf_line_count(M.window.buf)
+    local rows = {}
+
+    -- Collect visible matched lines
+    for row, _ in pairs(M.lightbox_cache) do
+        table.insert(rows, row)
+    end
+
+    -- If no matches, fold entire file
+    if #rows == 0 then
+        return { { 0, total_rows - 1 } }
+    end
+
+    table.sort(rows)
+
+    local ranges = {}
+    local prev = -1
+
+    -- Fold before first match if needed
+    if rows[1] > 0 then
+        table.insert(ranges, { 0, rows[1] - 1 })
+    end
+
+    -- Fold gaps inbetween
+    for i = 1, #rows - 1 do
+        local start = rows[i] + 1
+        local ending = rows[i+1] - 1
+        if start <= ending then
+            table.insert(ranges, { start, ending })
+        end
+    end
+
+    -- Fold after last match if needed
+    if rows[#rows] < total_rows - 1 then
+        table.insert(ranges, { rows[#rows] + 1, total_rows })
+    end
+
+    return ranges
+end
+
+---@param win integer
+---@param ranges table[]
+local function fold_ranges(win, ranges)
+    vim.api.nvim_win_call(win, function()
+        for _, range in ipairs(ranges) do
+            vim.api.nvim_exec2(string.format("%d,%dfold", range[1], range[2]), {})
+        end
+    end)
+end
+
+---@param win integer
+---@param ranges table[]
+local function unfold_ranges(win, ranges)
+    vim.api.nvim_win_call(win, function()
+        for _, range in ipairs(ranges) do
+            vim.api.nvim_exec2(string.format("%d,%dfoldopen", range[1], range[2]), {})
+        end
+    end)
 end
 
 function M.display()
@@ -62,7 +157,15 @@ function M.display()
     else
         M.window:open_window(true)
     end
-    -- set win options
+
+    -- set window option values
+    vim.api.nvim_set_option_value("foldmethod", "manual", { win = M.window.win })
+    vim.api.nvim_set_option_value("foldenable", true, { win = M.window.win })
+    vim.api.nvim_set_option_value("foldlevel", 0, { win = M.window.win })
+
+    local ranges = get_ranges()
+    print(vim.inspect(ranges))
+    fold_ranges(M.window.win, ranges)
 end
 
 function M.refresh()
@@ -70,9 +173,9 @@ function M.refresh()
 end
 
 function M.toggle()
-    if M.window == nil then
-        M.setup()
-    end
+    --if M.window == nil then
+    --    M.setup()
+    --end
 
     -- lightbox is open and currently focused
     if M.window:is_open() and M.window.win == vim.api.nvim_get_current_win() then

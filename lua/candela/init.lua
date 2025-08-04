@@ -57,7 +57,7 @@ function Candela.setup(opts)
     Candela.ui = CandelaUi.setup(Candela.config)
     Candela.patterns = CandelaPatternList.setup(Candela.config)
     Candela.highlighter = CandelaHighlighter.setup()
-    Candela.lightbox = CandelaLightbox
+    Candela.lightbox = CandelaLightbox.setup()
 end
 
 return Candela
