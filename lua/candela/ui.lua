@@ -120,6 +120,35 @@ local function refresh_all()
     M.base_buf = M.curr_buf
 end
 
+---@param icon string|nil: user config icon option
+---@param type string: type of icon (e.g. "color" or "highlight" or "lightbox")
+---@param subtype string|nil: subtype name (e.g. nil or "header" "toggle_on" or "toggle_off")
+---@param default string: default fallback value
+local function format_icon(icon, type, subtype, default)
+    if icon == nil then
+        return default
+    end
+
+    local width = vim.fn.strwidth(icon)
+    if width == 2 then
+        return string.format("   %s", icon)
+    elseif width == 1 then
+        return string.format("  %s  ", icon)
+    else
+        vim.notify(
+            string.format(
+                '[Candela] icons.%s%s option must be string of len 1 or 2, got "%s". Proceeding with default of "%s".',
+                type,
+                subtype and "." .. subtype or "",
+                icon,
+                default
+            ),
+            vim.log.levels.WARN
+        )
+        return default
+    end
+end
+
 ---@param opts table
 function M.setup(opts)
     local pattern_color_width = 7 -- 7 space hexcode
@@ -177,10 +206,15 @@ function M.setup(opts)
     })
 
     if icons.color ~= nil then
-        title = string.format("%sColor", icons.color)
+        if vim.fn.strwidth(icons.color) == 2 then
+            title = string.format("%sColor", icons.color)
+        else
+            title = string.format("%s Color", icons.color)
+        end
     else
         title = "Color"
     end
+    title = format_icon(icons.color, "color", nil, "Color")
     local color = CandelaWindow.new({
         relative = "win",
         width = pattern_color_width,
@@ -226,11 +260,7 @@ function M.setup(opts)
         zindex = 10,
     })
 
-    if icons.highlight.header ~= nil then
-        title = string.format("HL %s", icons.highlight.header)
-    else
-        title = "  H  "
-    end
+    title = format_icon(icons.highlight.header, "highlight", "header", "  H  ")
     local highlight = CandelaWindow.new({
         relative = "win",
         width = pattern_ops_width,
@@ -245,11 +275,7 @@ function M.setup(opts)
         zindex = 10,
     })
 
-    if icons.lightbox.header ~= nil then
-        title = string.format("LB %s", icons.lightbox.header)
-    else
-        title = "  L  "
-    end
+    title = format_icon(icons.lightbox.header, "lightbox", "header", "  L  ")
     local lightbox = CandelaWindow.new({
         relative = "win",
         width = pattern_ops_width,
@@ -286,34 +312,14 @@ function M.setup(opts)
     }
 
     -- set highlight/lightbox toggling strings since they're constant
-    local highlight_on, highlight_off = "", ""
-    if icons.highlight.toggle_on~= nil then
-        highlight_on = string.format("  %s  ", icons.highlight.toggle_on)
-    else
-        highlight_on = "  Y  "
-    end
-    if icons.highlight.toggle_off ~= nil then
-        highlight_off = string.format("  %s  ", icons.highlight.toggle_off)
-    else
-        highlight_off = "  N  "
-    end
-
-    local lightbox_on, lightbox_off = "", ""
-    if icons.lightbox.toggle_on ~= nil then
-        lightbox_on = string.format("  %s  ", icons.lightbox.toggle_on)
-    else
-        lightbox_on = "  Y  "
-    end
-    if icons.lightbox.toggle_off ~= nil then
-        lightbox_off = string.format("  %s  ", icons.lightbox.toggle_off)
-    else
-        lightbox_off = "  N  "
-    end
-
-    M.highlight_on = highlight_on
-    M.highlight_off = highlight_off
-    M.lightbox_on = lightbox_on
-    M.lightbox_off = lightbox_off
+    local highlight_on_def = "  Y  "
+    local highlight_off_def = "  N  "
+    local lightbox_on_def = "  Y  "
+    local lightbox_off_def = "  N  "
+    M.highlight_on = format_icon(icons.highlight.toggle_on, "highlight", "toggle_on", highlight_on_def)
+    M.highlight_off = format_icon(icons.highlight.toggle_off, "highlight", "toggle_off", highlight_off_def)
+    M.lightbox_on = format_icon(icons.lightbox.toggle_on, "lightbox", "toggle_on", lightbox_on_def)
+    M.lightbox_off = format_icon(icons.lightbox.toggle_off, "lightbox", "toggle_off", lightbox_off_def)
 
     -- TODO: handle resizing of window when vim is resized with autocmd
     -- TODO: handle resizing of count window when count exceeds width
