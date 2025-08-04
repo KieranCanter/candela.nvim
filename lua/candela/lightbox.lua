@@ -33,99 +33,41 @@ end
 local M = {}
 local BUFNAME = "lightbox"
 
-local function set_buf_options()
-    M.window.buf = vim.api.nvim_create_buf(true, false)
-    vim.api.nvim_set_option_value("swapfile", false, { buf = M.window.buf })
-    vim.api.nvim_set_option_value("filetype", "candela", { buf = M.window.buf })
-    vim.api.nvim_set_option_value("buftype", "nofile", { buf = M.window.buf })
-end
-
 function M.setup()
-    local view_mode = CandelaConfig.options.lightbox.view:match("split%-(%a+)")
-    local window = nil
+    local opts = CandelaConfig.options.lightbox
+    local split_dir = opts.view:match("split%-(%a+)") -- match direction if opt set, nil otherwise ("right", "below", etc.)
+    local system_split = opts.view:match("system%-(%a+)") -- match split command if opt set, nil otherwise ("split", "vsplit")
+    local tab_split = opts.view:match("tab") and "tab split" -- match tab comand if opt set, nil otherwise
 
-    if view_mode == nil then
-        window = CandelaWindow.new({})
+    if split_dir == nil then
+        M.window = CandelaWindow.new({})
+        M.open_command = system_split or tab_split
     else
-        window = CandelaWindow.new({
+        M.window = CandelaWindow.new({
             win = 0,
-            split = view_mode,
+            split = split_dir,
         })
+        M.open_command = nil -- no command needed, using win config to specify split direction
     end
-    M.window = window
-
-    set_buf_options()
-    vim.api.nvim_buf_set_name(M.window.buf, BUFNAME)
 
     return M
 end
 
-local function write_lightbox_with_fold(base_buf)
-    vim.notify("write_lightbox_with_fold() not implemented yet", vim.log.levels.WARN)
-end
-
-local function write_lightbox_with_remove(base_buf)
-    local old_lines = vim.api.nvim_buf_get_lines(base_buf, 0, -1, false)
-
-    -- match_cache: table of form { lineno, pattern, ns, hl_group }
-    local match_cache = CandelaHighlighter.get_flattened_match_cache()
-
-    for i, match in ipairs(match_cache) do
-        local curr = ""
-        if CandelaConfig.options.lightbox.trim_space then
-            curr = string.match(old_lines[match.lineno], "%s*(%a.*%a)%s*")
-        else
-            curr = old_lines[match.lineno]
-        end
-        vim.api.nvim_buf_set_lines(M.window.buf, i - 1, i, false, { curr })
-        if CandelaConfig.options.lightbox.hl_eol then
-            vim.api.nvim_buf_set_extmark(M.window.buf, match.ns, i - 1, 0, {
-                line_hl_group = match.hl_group,
-                priority = 100,
-            })
-        else
-            vim.api.nvim_buf_set_extmark(M.window.buf, match.ns, i - 1, 0, {
-                end_col = string.len(curr),
-                hl_group = match.hl_group,
-                priority = 100,
-            })
-        end
-    end
-end
-
-function M.write_lightbox()
-    local base_buf = require("candela.ui").base_buf
-    if base_buf == nil then
-        return
-    end
-
-    if CandelaConfig.options.lightbox.hide_method == "fold" then
-        write_lightbox_with_fold()
-    else
-        write_lightbox_with_remove(base_buf)
-    end
-end
-
 function M.display()
-    M.write_lightbox()
-
-    -- open in tab view
-    if CandelaConfig.options.lightbox.view == "tab" then
-        if M.tab ~= nil and vim.api.nvim_tabpage_is_valid(M.tab) then
-            vim.api.nvim_tabpage_set_win(M.tab, M.window.win)
-        else
-            vim.api.nvim_cmd({ cmd = "tabnew" }, {})
-            local temp_buf = vim.api.nvim_get_current_buf()
-            vim.api.nvim_cmd({ cmd = "buffer", args = { string.format("%s", M.window.buf) } }, {})
-            M.window.win = vim.api.nvim_get_current_win()
-            vim.api.nvim_buf_delete(temp_buf, { force = true })
-        end
+    -- open with command
+    if M.open_command ~= nil then
+        vim.api.nvim_exec2(M.open_command, {})
         M.window.win = vim.api.nvim_get_current_win()
-        set_buf_options()
     -- open in split view
     else
         M.window:open_window(true)
     end
+    vim.api.nvim_win_set_buf(M.window.win, M.window.buf)
+    -- set win options
+end
+
+function M.refresh()
+    M.window.buf = require("candela.ui").base_buf
 end
 
 function M.toggle()
@@ -133,11 +75,15 @@ function M.toggle()
         M.setup()
     end
 
+    -- lightbox is open and currently focused
     if M.window:is_open() and M.window.win == vim.api.nvim_get_current_win() then
         M.window:close_window()
+    -- lightbox is open but not focused
     elseif M.window:is_open() then
         vim.api.nvim_set_current_win(M.window.win)
+    --lightbox is closed
     else
+        M.window.buf = require("candela.ui").base_buf
         M.display()
     end
 end

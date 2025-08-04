@@ -37,7 +37,7 @@ M.defaults = {
     engine = {
         -- regex search engine to use; defaults to first found tool out of the list in order
         command = nil, -- "rg" | "ag" | "ugrep" | "ack" | "grep"
-        -- extra args to pass to search engine; refer to your tool's manual
+        -- extra args to pass to search engine; refer to your tool's manual (see args_map in doc for default args for each engine)
         args = {},
     },
     matching = {
@@ -54,7 +54,7 @@ M.defaults = {
     },
     lightbox = {
         -- lightbox view mode
-        view = "tab", -- "tab" | "split-left" | "split-right" | "split-above" | "split-below"
+        view = "tab", -- "tab" | "system-split" | "system-vsplit" | "split-left" | "split-right" | "split-above" | "split-below"
         -- place non-matched lines in folds or completely remove them
         hide_method = "remove", -- "fold" | "remove"
         -- trim beginning/ending whitespace from lightbox-highlighted lines
@@ -220,8 +220,12 @@ function M.setup(opts)
 
     M.options = vim.tbl_deep_extend("force", vim.deepcopy(M.defaults), opts or {})
     local available = M.get_engine_versions()
-    if M.options.engine.command == nil then M.options.engine.command = get_default_engine(available) end
-    if M.options.engine.command == nil then return nil end
+    if M.options.engine.command == nil then
+        M.options.engine.command = get_default_engine(available)
+    end
+    if M.options.engine.command == nil then
+        return nil
+    end
     M.options.engine.args = get_default_args(M.options)
     return M.options
 end
