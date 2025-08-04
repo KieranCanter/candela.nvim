@@ -86,7 +86,7 @@ local function resize_height()
                 vim.api.nvim_win_set_config(win.win, win.config)
             end
         end
-        M.windows.prompt.config.row = M.windows.patterns.config.height
+        M.windows.prompt.config.row = M.windows.prompt.config.row + 1
         vim.api.nvim_win_set_config(M.windows.prompt.win, M.windows.prompt.config)
     end
 end
@@ -131,14 +131,13 @@ function M.setup(opts)
 
     local pattern_height = opts.window.height -- starting height
     local prompt_height = 1 -- 1 space height for prompt
-    local float_height = pattern_height + 2 -- + prompt_height + 2
 
     local defaults = require("candela.config").defaults
-    local prompt_layout = 0
+    local prompt_layout = 1
     if opts.window.prompt_layout == "overlap" then
-        prompt_layout = 2
+        prompt_layout = -1
     elseif opts.window.prompt_layout == "border" then
-        prompt_layout = 3
+        prompt_layout = 1
     else
         vim.notify(
             string.format(
@@ -149,7 +148,7 @@ function M.setup(opts)
             ),
             vim.log.levels.WARN
         )
-        prompt_layout = 2
+        prompt_layout = -1
     end
 
     -- Account for 2 border spaces worth of padding to center window in center of base window
@@ -166,7 +165,7 @@ function M.setup(opts)
     local patterns = CandelaWindow.new({
         relative = "editor",
         width = float_width,
-        height = float_height,
+        height = pattern_height,
         style = "minimal",
         focusable = false,
         title = title,
