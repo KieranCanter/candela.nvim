@@ -50,7 +50,7 @@ function M.setup()
     end
 
     M.lightbox_cache = {}
-    M.ranges_cache = {}
+    M.folds_cache = {}
 
     return M
 end
@@ -64,15 +64,15 @@ end
 
 ---@param id string: pattern ID
 ---@return integer[]
-function M.remove_from_cache(id)
-    local rows = CandelaHighlighter.match_cache[id]
-    if not rows then
+function M.remove_from_cache(id, matches)
+    if not matches then
         return {}
     end
 
     local removed = {}
 
-    for row, _ in pairs(rows) do
+    for _, match in pairs(matches) do
+        local row = match.row
         if M.lightbox_cache[row] then
             M.lightbox_cache[row][id] = nil
             if next(M.lightbox_cache[row]) == nil then
@@ -85,8 +85,7 @@ function M.remove_from_cache(id)
     return removed
 end
 
----@return table[]
-local function get_ranges()
+local function update_folds_cache()
     local total_rows = vim.api.nvim_buf_line_count(M.window.buf)
     local rows = {}
 
@@ -97,23 +96,23 @@ local function get_ranges()
 
     -- If no matches, fold entire file
     if #rows == 0 then
-        return { { 0, total_rows - 1 } }
+        M.folds_cache = { { 1, total_rows } }
+        return
     end
 
     table.sort(rows)
 
     local ranges = {}
-    local prev = -1
 
     -- Fold before first match if needed
-    if rows[1] > 0 then
-        table.insert(ranges, { 0, rows[1] - 1 })
+    if rows[1] > 1 then
+        table.insert(ranges, { 1, rows[1] - 1 })
     end
 
     -- Fold gaps inbetween
     for i = 1, #rows - 1 do
         local start = rows[i] + 1
-        local ending = rows[i+1] - 1
+        local ending = rows[i + 1] - 1
         if start <= ending then
             table.insert(ranges, { start, ending })
         end
@@ -124,48 +123,68 @@ local function get_ranges()
         table.insert(ranges, { rows[#rows] + 1, total_rows })
     end
 
-    return ranges
+    M.folds_cache = ranges
 end
 
----@param win integer
----@param ranges table[]
-local function fold_ranges(win, ranges)
-    vim.api.nvim_win_call(win, function()
-        for _, range in ipairs(ranges) do
+local function fold_ranges()
+    vim.api.nvim_win_call(M.window.win, function()
+        for _, range in ipairs(M.folds_cache) do
             vim.api.nvim_exec2(string.format("%d,%dfold", range[1], range[2]), {})
         end
     end)
 end
 
----@param win integer
----@param ranges table[]
-local function unfold_ranges(win, ranges)
-    vim.api.nvim_win_call(win, function()
-        for _, range in ipairs(ranges) do
-            vim.api.nvim_exec2(string.format("%d,%dfoldopen", range[1], range[2]), {})
+---@param row integer
+local function delete_fold_at(row)
+    vim.api.nvim_win_set_cursor(M.window.win, { row, 0 })
+    vim.api.nvim_exec2("normal! zd", {})
+end
+
+local function delete_folds()
+    local cursor_loc = vim.api.nvim_win_get_cursor(M.window.win)
+    vim.api.nvim_win_call(M.window.win, function()
+        for _, range in ipairs(M.folds_cache) do
+            delete_fold_at(range[1])
         end
+    end)
+    vim.api.nvim_win_set_cursor(M.window.win, cursor_loc)
+    vim.api.nvim_win_call(M.window.win, function()
+    vim.api.nvim_exec2("normal! zz", {})
     end)
 end
 
-function M.display()
-    -- open with command
-    if M.open_command ~= nil then
-        vim.api.nvim_exec2(M.open_command, {})
-        M.window.win = vim.api.nvim_get_current_win()
-        vim.api.nvim_win_set_buf(M.window.win, M.window.buf)
-    -- open in split view
-    else
-        M.window:open_window(true)
+function M.update_folds()
+    if not M.window:is_open() then
+        return
     end
 
-    -- set window option values
-    vim.api.nvim_set_option_value("foldmethod", "manual", { win = M.window.win })
-    vim.api.nvim_set_option_value("foldenable", true, { win = M.window.win })
-    vim.api.nvim_set_option_value("foldlevel", 0, { win = M.window.win })
+    delete_folds()
+    update_folds_cache()
+    fold_ranges()
+end
 
-    local ranges = get_ranges()
-    print(vim.inspect(ranges))
-    fold_ranges(M.window.win, ranges)
+function M.display(is_open)
+    if is_open then
+        vim.api.nvim_set_current_win(M.window.win)
+    else
+        -- open with command
+        if M.open_command ~= nil then
+            vim.api.nvim_exec2(M.open_command, {})
+            M.window.win = vim.api.nvim_get_current_win()
+            vim.api.nvim_win_set_buf(M.window.win, M.window.buf)
+        -- open in split view
+        else
+            M.window:open_window(true)
+        end
+
+        -- set window option values
+        vim.api.nvim_set_option_value("foldmethod", "manual", { win = M.window.win })
+        vim.api.nvim_set_option_value("foldenable", true, { win = M.window.win })
+        vim.api.nvim_set_option_value("foldlevel", 0, { win = M.window.win })
+        vim.api.nvim_set_option_value("fml", 0, { win = M.window.win })
+
+        M.update_folds()
+    end
 end
 
 function M.refresh()
@@ -173,20 +192,25 @@ function M.refresh()
 end
 
 function M.toggle()
-    --if M.window == nil then
-    --    M.setup()
-    --end
+    local base_buf = require("candela.ui").base_buf
+    if not base_buf then
+        vim.notify("[Candela] no buffer initialized as match buffer, proceeding with current", vim.log.levels.WARN)
+        base_buf = vim.api.nvim_get_current_buf()
+    end
 
     -- lightbox is open and currently focused
-    if M.window:is_open() and M.window.win == vim.api.nvim_get_current_win() then
+    if M.window:is_open() and M.window.win == vim.api.nvim_get_current_win() and vim.api.nvim_win_get_buf(M.window.win) == M.window.buf then
         M.window:close_window()
     -- lightbox is open but not focused
-    elseif M.window:is_open() then
-        vim.api.nvim_set_current_win(M.window.win)
+    elseif M.window:is_open() and vim.api.nvim_win_get_buf(M.window.win) == M.window.buf then
+        M.window.buf = base_buf
+        M.display(true)
+        --vim.api.nvim_set_current_win(M.window.win)
+        --delete_folds()
     --lightbox is closed
     else
-        M.window.buf = require("candela.ui").base_buf
-        M.display()
+        M.window.buf = base_buf
+        M.display(false)
     end
 end
 

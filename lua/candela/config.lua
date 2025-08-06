@@ -1,5 +1,7 @@
 -- Module for defining user configuration
 
+-- add user config for closing lightbox when source buffer/window is closed
+
 ---@class CandelaConfig
 ---@field defaults table<string, any>
 ---@field options table<string, any>

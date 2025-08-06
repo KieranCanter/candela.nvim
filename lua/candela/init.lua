@@ -11,6 +11,7 @@
 --
 --  * future improvements
 --    * lightbox duh
+--    * for config options set to system value, resetup affected modules with new option value using autocmd on event OptionSet
 --    * lazy load more
 --    * design solution for patterns that are too long for line (set nowrap or create a SSOT for line numbers to print?)
 --    * import/export pattern list

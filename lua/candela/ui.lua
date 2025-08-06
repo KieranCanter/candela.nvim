@@ -6,6 +6,7 @@ local CandelaPatternList = require("candela.pattern_list")
 local CandelaEngine = require("candela.engine")
 local CandelaHighlighter = require("candela.highlighter")
 local CandelaFinder = require("candela.finder")
+local CandelaLightbox = require("candela.lightbox")
 
 local candela_augroup = vim.api.nvim_create_augroup("Candela", { clear = true })
 
@@ -493,6 +494,10 @@ local function show_prompt(command, curr_line, curr_pattern)
             update_lines()
             resize_height()
             M.hide_prompt()
+
+            if CandelaLightbox.window:is_open() then
+                CandelaLightbox.update_folds()
+            end
         end)
     elseif command == Commands.EDIT then
         vim.fn.prompt_setcallback(M.windows.prompt.buf, function(regex)
@@ -517,6 +522,10 @@ local function show_prompt(command, curr_line, curr_pattern)
             new_pattern.count = count
             update_lines()
             M.hide_prompt()
+
+            if CandelaLightbox.window:is_open() then
+                CandelaLightbox.update_folds()
+            end
         end)
     elseif command == Commands.COPY then
         vim.fn.prompt_setcallback(M.windows.prompt.buf, function(regex)
@@ -536,6 +545,10 @@ local function show_prompt(command, curr_line, curr_pattern)
             update_lines()
             resize_height()
             M.hide_prompt()
+
+            if CandelaLightbox.window:is_open() then
+                CandelaLightbox.update_folds()
+            end
         end)
     elseif command == Commands.CHANGE_COLOR then
         vim.fn.prompt_setcallback(M.windows.prompt.buf, function(color)
@@ -650,6 +663,10 @@ function M.delete(ask)
         return
     end
 
+    if CandelaLightbox.window:is_open() then
+        CandelaLightbox.update_folds()
+    end
+
     update_lines()
     resize_height() -- TODO: Shrink height if size decreases
 end
@@ -678,6 +695,10 @@ function M.clear(ask)
             update_lines()
             -- M.reset_height() -- TODO: Implement reset_height()
         end
+    end
+
+    if CandelaLightbox.window:is_open() then
+        CandelaLightbox.update_folds()
     end
 end
 
