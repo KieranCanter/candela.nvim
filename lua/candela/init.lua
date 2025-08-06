@@ -9,13 +9,24 @@
 --    * vim.api.nvim_win_get_cursor(0)[2] + 1 = vim.fn.line('.')
 --    * vim.api.nvim_buf_get_name(0) = vim.fn.expand('%:p') (path name)
 --
---  * future improvements
---    * lightbox duh
+--  * TODO:
+--    * lightbox config options
 --    * for config options set to system value, resetup affected modules with new option value using autocmd on event OptionSet
 --    * lazy load more
---    * design solution for patterns that are too long for line (set nowrap or create a SSOT for line numbers to print?)
 --    * import/export pattern list
---    * handle automatic foreground color changing if the colors are too similar in luminosity
+--    * palettes/colors
+--      * better default colors
+--      * handle automatic foreground color changing if the colors are too similar in luminosity
+--      * give config option to cycle colors constantly or randomly (same colors show first everytime or random selection from palette)
+--    * grow and shrink height of patterns window based on how many patterns there are
+--    * user config option for min_height/max_height of patterns
+--      * autocmd for scrolling regex buffer that scrolls other buffers accordingly
+--    * feature for finding/matching selected patterns; refactor find_all/match_all to be find_many/match_many instead
+--      * keep short-living "selected list" on patterns window opening
+--      * if selected list is zero, run find/match on current pattern
+--      * otherwise, run find_many/match_many on selected list
+--    * implement help function
+--    * write docs
 --]]
 --
 -- TODO: remove all functions that aren't needed across files from appropriate table e.g.
@@ -58,7 +69,7 @@ function Candela.setup(opts)
     Candela.ui = CandelaUi.setup(Candela.config)
     Candela.patterns = CandelaPatternList.setup(Candela.config)
     Candela.highlighter = CandelaHighlighter.setup()
-    Candela.lightbox = CandelaLightbox.setup()
+    Candela.lightbox = CandelaLightbox.setup(Candela.config)
 end
 
 return Candela

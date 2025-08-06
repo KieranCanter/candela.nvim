@@ -5,6 +5,8 @@
 ---@class CandelaConfig
 ---@field defaults table<string, any>
 ---@field options table<string, any>
+---@field version { major: integer, minor: integer, patch: integer }
+
 local M = {}
 M.version = {}
 
@@ -31,10 +33,12 @@ M.defaults = {
     window = {
         -- initial width of the patterns window
         width = math.floor(vim.o.columns * 0.5), -- integer
-        -- initial height (number of patterns) of the patterns window
-        height = 7, -- integer
+        -- minimum height (number of patterns) of the patterns window (initial height)
+        min_height = 4, -- integer
+        -- maximum height (number of patterns) of the patterns window
+        max_height = 6, -- integer
         -- position of prompt window in relation to patterns window
-        prompt_layout = "overlap", -- "overlap" | "border"
+        prompt_offset = "overlap", -- "overlap" | "border"
     },
     engine = {
         -- regex search engine to use; defaults to first found tool out of the list in order
@@ -55,14 +59,12 @@ M.defaults = {
         hl_eol = false, -- true | false
     },
     lightbox = {
-        -- lightbox view mode
+        -- how you want the lightbox window to break out
         view = "system-vsplit", -- "tab" | "system-split" | "system-vsplit" | "split-left" | "split-right" | "split-above" | "split-below"
-        -- place non-matched lines in folds or completely remove them
-        hide_method = "remove", -- "fold" | "remove"
-        -- trim beginning/ending whitespace from lightbox-highlighted lines
-        trim_space = false, -- false | true
-        -- highlight entire line (end of line) or end of text
-        hl_eol = true, -- true | false
+        -- style to format the foldtext
+        fold_style = "hidden", -- "hidden" | "dash" | "fillchar" | "count" | "dash_count" | "detailed"
+        -- fillchar for the foldtext
+        fillchar = "-",
     },
     -- file types to load Candela for
     file_types = { -- TODO: implement

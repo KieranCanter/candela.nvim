@@ -1,9 +1,6 @@
 local CandelaWindow = require("candela.window")
-local CandelaConfig = require("candela.config")
 
 -- Lightbox design:
--- * fold-only: remove is too expensive; use neovim's read-only clone buffer feature and fold unmatched + unlightboxed lines
--- * set fml (foldminlines) to 0 so every line can be folded
 -- * set foldtext to something better than default
 --   * se foldtext=foldtext#minimal()?
 --   * vim.opt.foldtext = "v:lua.MinimalFoldText()" with function _G.MinimalFoldText() that returns empty string
@@ -27,12 +24,61 @@ end
 function _G.Count()
     return tostring(vim.v.foldend - vim.v.foldstart + 1)
 end
+
+
+fold styles:
+  * hidden (no fillchars)
+  * minimal (single fillchar)
+  * filled (full fillchars)
+  * preview (first folded line)
+
+fillchar (char)
+
+show count (bool)
 --]]
 
 local M = {}
 
-function M.setup()
-    local opts = CandelaConfig.options.lightbox
+local foldtext_opts = {}
+
+---@return string
+function _G.CandelaFoldText(fold_style, show_count, fillchar)
+    local count = vim.v.foldend - vim.v.foldstart + 1
+    local line_str = "line" and count == 1 or "lines"
+    local count_text = show_count and string.format(" (%s %s)", count, line_str) or ""
+
+    if fold_style == "hidden" then
+        return "" -- show nothing
+    end
+
+    if fold_style == "minimal" then
+        return fillchar .. count_text
+    end
+
+    if fold_style == "filled" then
+        -- Fill the window width with fillchars
+        local width = vim.api.nvim_win_get_width(0)
+        return string.rep(fill, width - #count_text) .. count_text
+    end
+
+    if fold_style == "preview" then
+        local first_line = vim.fn.getline(vim.v.foldstart)
+        local preview = first_line:gsub("\t", " "):sub(1, 80)
+        return preview .. count_text
+    end
+
+    return "…" .. count_text -- fallback
+end
+
+local function apply_foldtext(opts)
+    local call_str =
+        string.format("v:lua.CandelaFoldText(%s, %s, %s)", opts.fold_style, opts.show_count, opts.fill_char)
+    vim.api.nvim_set_option_value("foldtext", call_str, { win = M.window.win })
+end
+
+---@param opts table:
+function M.setup(opts)
+    opts = opts.lightbox
     local split_dir = opts.view:match("split%-(%a+)") -- match direction if opt set, nil otherwise ("right", "below", etc.)
     local system_split = opts.view:match("system%-(%a+)") -- match split command if opt set, nil otherwise ("split", "vsplit")
     local tab_split = opts.view:match("tab") and "tab split" -- match tab comand if opt set, nil otherwise
@@ -50,6 +96,12 @@ function M.setup()
 
     M.lightbox_cache = {}
     M.folds_cache = {}
+
+    M.foldtext_opts = {
+        fold_style = opts.fold_style,
+        show_count = opts.show_count,
+        fillchar = opts.fillchar,
+    }
 
     return M
 end
@@ -130,7 +182,9 @@ end
 
 ---@param row integer
 local function delete_fold_at(row)
-    if vim.fn.foldclosed(row) == -1 then return end
+    if vim.fn.foldclosed(row) == -1 then
+        return
+    end
 
     vim.api.nvim_win_set_cursor(M.window.win, { row, 0 })
     vim.api.nvim_exec2("normal! zd", {})
@@ -145,7 +199,7 @@ local function delete_folds()
     end)
     vim.api.nvim_win_set_cursor(M.window.win, cursor_loc)
     vim.api.nvim_win_call(M.window.win, function()
-    vim.api.nvim_exec2("normal! zz", {})
+        vim.api.nvim_exec2("normal! zz", {})
     end)
 end
 
@@ -186,6 +240,8 @@ function M.display(is_open)
         vim.api.nvim_set_option_value("foldenable", true, { win = M.window.win })
         vim.api.nvim_set_option_value("foldlevel", 0, { win = M.window.win })
         vim.api.nvim_set_option_value("fml", 0, { win = M.window.win })
+        vim.api.nvim_set_option_value("foldtext", "v:lua.CandelaFoldText()", { win = M.window.win })
+        apply_foldtext(M.foldtext_opts)
 
         M.update_folds()
     end
@@ -203,7 +259,11 @@ function M.toggle()
     end
 
     -- lightbox is open and currently focused
-    if M.window:is_open() and M.window.win == vim.api.nvim_get_current_win() and vim.api.nvim_win_get_buf(M.window.win) == M.window.buf then
+    if
+        M.window:is_open()
+        and M.window.win == vim.api.nvim_get_current_win()
+        and vim.api.nvim_win_get_buf(M.window.win) == M.window.buf
+    then
         M.window:close_window()
     -- lightbox is open but not focused
     elseif M.window:is_open() and vim.api.nvim_win_get_buf(M.window.win) == M.window.buf then
@@ -211,7 +271,7 @@ function M.toggle()
         M.display(true)
         --vim.api.nvim_set_current_win(M.window.win)
         --delete_folds()
-    --lightbox is closed
+        --lightbox is closed
     else
         M.window.buf = base_buf
         M.display(false)
