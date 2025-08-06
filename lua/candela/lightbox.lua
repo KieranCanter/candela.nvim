@@ -63,13 +63,10 @@ function M.add_to_cache(row, id)
 end
 
 ---@param id string: pattern ID
----@return integer[]
 function M.remove_from_cache(id, matches)
     if not matches then
         return {}
     end
-
-    local removed = {}
 
     for _, match in pairs(matches) do
         local row = match.row
@@ -77,12 +74,9 @@ function M.remove_from_cache(id, matches)
             M.lightbox_cache[row][id] = nil
             if next(M.lightbox_cache[row]) == nil then
                 M.lightbox_cache[row] = nil
-                table.insert(removed, row)
             end
         end
     end
-
-    return removed
 end
 
 local function update_folds_cache()
@@ -126,16 +120,10 @@ local function update_folds_cache()
     M.folds_cache = ranges
 end
 
-local function fold_ranges()
-    vim.api.nvim_win_call(M.window.win, function()
-        for _, range in ipairs(M.folds_cache) do
-            vim.api.nvim_exec2(string.format("%d,%dfold", range[1], range[2]), {})
-        end
-    end)
-end
-
 ---@param row integer
 local function delete_fold_at(row)
+    if vim.fn.foldclosed(row) == -1 then return end
+
     vim.api.nvim_win_set_cursor(M.window.win, { row, 0 })
     vim.api.nvim_exec2("normal! zd", {})
 end
@@ -150,6 +138,14 @@ local function delete_folds()
     vim.api.nvim_win_set_cursor(M.window.win, cursor_loc)
     vim.api.nvim_win_call(M.window.win, function()
     vim.api.nvim_exec2("normal! zz", {})
+    end)
+end
+
+local function fold_ranges()
+    vim.api.nvim_win_call(M.window.win, function()
+        for _, range in ipairs(M.folds_cache) do
+            vim.api.nvim_exec2(string.format("%d,%dfold", range[1], range[2]), {})
+        end
     end)
 end
 
