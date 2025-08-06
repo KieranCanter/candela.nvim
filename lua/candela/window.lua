@@ -56,7 +56,7 @@ end
 
 -- Open windows based on config
 ---@param self CandelaWindow
----@param enter boolean?=false
+---@param enter boolean?: defaults to false if not provided
 function M:open_window(enter)
     if self:is_open() then
         return

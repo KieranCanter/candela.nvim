@@ -136,7 +136,7 @@ function M.get_engine_versions()
 end
 
 ---@param available table
----@return table?
+---@return string?
 local function get_default_engine(available)
     for _, engine in ipairs(available) do
         if engine[next(engine)] ~= nil then

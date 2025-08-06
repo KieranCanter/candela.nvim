@@ -16,6 +16,11 @@ local candela_augroup = vim.api.nvim_create_augroup("Candela", { clear = true })
 
 local M = {}
 
+---@alias commands string
+---| "ADD"
+---| "EDIT"
+---| "COPY"
+---| "CHANGE_COLOR"
 local Commands = {}
 
 ---@param field string: Field name
@@ -429,7 +434,7 @@ function M.show_patterns()
     vim.api.nvim_set_option_value("winhighlight", "Normal:Comment", { win = M.windows.count.win })
 end
 
----@param command string: type of command to conduct
+---@param command commands: type of command to conduct
 ---@param curr_line number?: index of currently selected line at time of command
 ---@param curr_pattern CandelaPattern?: currently selected pattern
 local function show_prompt(command, curr_line, curr_pattern)
@@ -761,13 +766,14 @@ function M.toggle_lightbox()
 
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
     local curr_id = CandelaPatternList.order[curr_line]
-    local curr_pattern = CandelaPatternList.get_pattern(curr_line)
     local is_lightboxed = CandelaPatternList.toggle_pattern_lightbox(curr_line)
-    -- NOTE: TEMPORARY FOR TESTING
-    if not CandelaHighlighter.toggle_match_highlights(M.base_buf, curr_id, curr_pattern.regex, is_lightboxed) then
-        return
+    if is_lightboxed then
+        CandelaLightbox.add_many_to_cache(CandelaHighlighter.match_cache[curr_id], curr_id)
+    else
+        CandelaLightbox.remove_from_cache(CandelaHighlighter.match_cache[curr_id], curr_id)
     end
-    -- NOTE: END TEMPORARY FOR TESTING
+    CandelaLightbox.update_folds()
+
     update_lines()
 end
 

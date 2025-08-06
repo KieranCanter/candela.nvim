@@ -1,5 +1,4 @@
 local CandelaWindow = require("candela.window")
-local CandelaHighlighter = require("candela.highlighter")
 local CandelaConfig = require("candela.config")
 
 -- Lightbox design:
@@ -62,8 +61,17 @@ function M.add_to_cache(row, id)
     M.lightbox_cache[row][id] = true
 end
 
+---@param matches table[]: table of matches from Highlighter.match_cache
 ---@param id string: pattern ID
-function M.remove_from_cache(id, matches)
+function M.add_many_to_cache(matches, id)
+    for _, match in pairs(matches) do
+        M.add_to_cache(match.row, id)
+    end
+end
+
+---@param matches table[]: table of matches from Highlighter.match_cache
+---@param id string: pattern ID
+function M.remove_from_cache(matches, id)
     if not matches then
         return {}
     end

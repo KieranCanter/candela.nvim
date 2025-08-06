@@ -162,7 +162,7 @@ function M.remove_match_highlights(bufnr, id, regex)
     end
 
     vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
-    CandelaLightbox.remove_from_cache(id, M.match_cache[id])
+    CandelaLightbox.remove_from_cache(M.match_cache[id], id)
     M.match_cache[id] = nil
     return true
 end
