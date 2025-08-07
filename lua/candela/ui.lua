@@ -702,7 +702,7 @@ function M.delete(ask)
     end
 
     update_ui_lines()
-    resize_height() -- TODO: Shrink height if size decreases
+    resize_height()
 end
 
 ---@param ask boolean: show the confirmation message or not
@@ -738,6 +738,7 @@ end
 
 function M.refresh()
     refresh_all()
+    CandelaLightbox.refresh()
 end
 
 function M.change_color()

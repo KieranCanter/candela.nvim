@@ -247,15 +247,23 @@ function M.display(is_open)
     end
 end
 
+-- Refresh Lightbox when `refresh` command is activated
 function M.refresh()
     M.window.buf = require("candela.ui").base_buf
+    if M.window:is_open() then
+        vim.api.nvim_win_close(M.window.win, true)
+        M.display(false)
+    end
 end
 
 function M.toggle()
-    local base_buf = require("candela.ui").base_buf
+    local base_buf = M.window.buf
     if not base_buf then
-        vim.notify("[Candela] no buffer initialized as match buffer, proceeding with current", vim.log.levels.WARN)
-        base_buf = vim.api.nvim_get_current_buf()
+        base_buf = require("candela.ui").base_buf
+        if not base_buf then
+            vim.notify("[Candela] no buffer initialized as match buffer, proceeding with current", vim.log.levels.WARN)
+            base_buf = vim.api.nvim_get_current_buf()
+        end
     end
 
     -- lightbox is open and currently focused
@@ -269,9 +277,7 @@ function M.toggle()
     elseif M.window:is_open() and vim.api.nvim_win_get_buf(M.window.win) == M.window.buf then
         M.window.buf = base_buf
         M.display(true)
-        --vim.api.nvim_set_current_win(M.window.win)
-        --delete_folds()
-        --lightbox is closed
+    --lightbox is closed
     else
         M.window.buf = base_buf
         M.display(false)

@@ -66,14 +66,16 @@ M.defaults = {
         -- fillchar for the foldtext
         fillchar = "-",
     },
-    -- file types to load Candela for
-    file_types = { -- TODO: implement
+    -- file types to load Candela for  TODO: implement
+    file_types = {
         ".log",
         ".txt",
     },
     palette = {
         -- replace default color palette or add to it
-        use = "replace", -- "replace" | "prepend" | "append" -- TODO: implement
+        use = "replace", -- "replace" | "prepend" | "append"  TODO: implement
+        -- replace default color palette or add to it
+        cycle = "constant", -- "constant" | "random"  TODO: implement
         -- list of colors to use for dark/light mode
         colors = {
             dark = {
