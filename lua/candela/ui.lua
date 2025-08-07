@@ -94,14 +94,21 @@ local function update_ui_toggle(kind, row, pattern)
     CandelaHighlighter.highlight_ui_toggle(M.windows[kind], kind, row, pattern)
 end
 
-local function resize_height()
+---@param delete boolean?: if deleting a pattern, don't move cursor to bottom
+local function resize_height(delete)
     local num_pats = #CandelaPatternList.order
     local old_height = vim.api.nvim_win_get_height(M.windows.patterns.win) - 2 -- Num of shown entries
     local is_under_min_height = old_height == MIN_HEIGHT and num_pats <= MIN_HEIGHT
     local is_over_max_height = old_height == MAX_HEIGHT and num_pats >= MAX_HEIGHT
 
     if is_over_max_height then
-        -- TODO: scroll to bottom of buffer because pattern got added to bottom
+        if not delete then
+            for name, window in pairs(M.windows) do
+                if name ~= "prompt" and name ~= "patterns" then
+                    vim.api.nvim_win_set_cursor(window.win, { num_pats, 0 })
+                end
+            end
+        end
         return
     end
 
@@ -702,7 +709,7 @@ function M.delete(ask)
     end
 
     update_ui_lines()
-    resize_height()
+    resize_height(true)
 end
 
 ---@param ask boolean: show the confirmation message or not
@@ -729,7 +736,7 @@ function M.clear(ask)
             update_ui_lines()
         end
     end
-    resize_height() -- TODO: Shrink height if size decreases
+    resize_height()
 
     if CandelaLightbox.window:is_open() then
         CandelaLightbox.update_folds()
