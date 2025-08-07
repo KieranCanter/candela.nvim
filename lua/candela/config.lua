@@ -12,7 +12,7 @@ M.version = {}
 
 M.defaults = {
     -- Candela-styled logs
-    syntax_highlighting = true, -- true | false -- TODO: implement
+    syntax_highlighting = true, -- true | false  TODO: implement
     -- Use unicode symbols in UI, set to nil to disable
     icons = {
         candela = "\u{1F56F}", -- patterns window title 🕯
@@ -236,7 +236,7 @@ function M.setup(opts)
     return M.options
 end
 
--- TODO: move mappings to mappings.lua file and change to callbacks instead of rhs strings
+-- TODO: move mappings to mappings.lua file
 function M.set_keymaps()
     -- NOTE: Only for dev purposes, leave for user to create
     local CandelaUi = require("candela.ui")

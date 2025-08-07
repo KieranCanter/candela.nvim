@@ -48,6 +48,8 @@ local function update_loclist(matches, kind)
 end
 
 -- TODO: use config case sensitivity for matching
+-------- can I use match_cache to get the matches instead of rerunning engine?
+-------- either way, use user config command + args instead of hardcoded rg
 ---@param bufnr number
 ---@param regex string
 ---@param engine fun(cmd: string[]): table[]
@@ -65,6 +67,8 @@ function M.find(bufnr, regex, engine)
 end
 
 -- TODO: use config case sensitivity for matching
+-------- can I use match_cache to get the matches instead of rerunning engine?
+-------- either way, use user config command + args instead of hardcoded rg
 ---@param bufnr number
 ---@param patterns CandelaPattern[]
 ---@param engine fun(cmd: string[]): table[]
