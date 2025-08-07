@@ -51,7 +51,7 @@ local function format_field(field, field_val)
 end
 
 -- Update lines of the patterns buffers
-local function update_lines()
+local function update_ui_lines()
     local all_lines = {
         color = {},
         count = {},
@@ -76,6 +76,22 @@ local function update_lines()
     end
 
     CandelaHighlighter.highlight_ui(M.windows, pattern_list)
+end
+
+-- Update toggle in the UI
+---@param kind string: which toggle to update
+---| `highlight`
+---| `lightbox`
+---@param row integer: row of UI to update
+---@param pattern CandelaPattern: pattern to get value from
+local function update_ui_toggle(kind, row, pattern)
+    local toggled_line = format_field(kind, pattern[kind])
+
+    vim.api.nvim_set_option_value("modifiable", true, { buf = M.windows[kind].buf })
+    vim.api.nvim_buf_set_lines(M.windows[kind].buf, row - 1, row, false, { toggled_line })
+    vim.api.nvim_set_option_value("modifiable", false, { buf = M.windows[kind].buf })
+
+    CandelaHighlighter.highlight_ui_toggle(M.windows[kind], kind, row, pattern)
 end
 
 local function resize_height()
@@ -131,7 +147,7 @@ local function refresh_all()
 
         pattern.count = count
         M.show_patterns()
-        update_lines()
+        update_ui_lines()
         resize_height()
         M.toggle()
     end
@@ -505,7 +521,7 @@ local function show_prompt(operation, curr_line, curr_pattern)
             end
 
             new_pattern.count = count
-            update_lines()
+            update_ui_lines()
             resize_height()
             M.hide_prompt()
 
@@ -534,7 +550,7 @@ local function show_prompt(operation, curr_line, curr_pattern)
             end
 
             new_pattern.count = count
-            update_lines()
+            update_ui_lines()
             M.hide_prompt()
 
             if CandelaLightbox.window:is_open() then
@@ -556,7 +572,7 @@ local function show_prompt(operation, curr_line, curr_pattern)
             end
 
             new_pattern.count = count
-            update_lines()
+            update_ui_lines()
             resize_height()
             M.hide_prompt()
 
@@ -575,7 +591,7 @@ local function show_prompt(operation, curr_line, curr_pattern)
                 return
             end
 
-            update_lines()
+            update_ui_lines()
             resize_height()
             M.hide_prompt()
         end)
@@ -685,7 +701,7 @@ function M.delete(ask)
         CandelaLightbox.update_folds()
     end
 
-    update_lines()
+    update_ui_lines()
     resize_height() -- TODO: Shrink height if size decreases
 end
 
@@ -710,7 +726,7 @@ function M.clear(ask)
     for _, id in ipairs(order) do
         local pattern = patterns[id]
         if CandelaHighlighter.remove_match_highlights(M.base_buf, id, pattern.regex) then
-            update_lines()
+            update_ui_lines()
         end
     end
     resize_height() -- TODO: Shrink height if size decreases
@@ -763,7 +779,8 @@ function M.toggle_highlight()
     if not CandelaHighlighter.toggle_match_highlights(M.base_buf, curr_id, curr_pattern.regex, is_highlighted) then
         return
     end
-    update_lines() -- HACK: expensive for just changing toggle in ui
+
+    update_ui_toggle("highlight", curr_line, curr_pattern)
 end
 
 function M.toggle_lightbox()
@@ -787,7 +804,7 @@ function M.toggle_lightbox()
     end
     CandelaLightbox.update_folds()
 
-    update_lines()
+    update_ui_toggle("lightbox", curr_line, CandelaPatternList.get_pattern(curr_line))
 end
 
 function M.match()
