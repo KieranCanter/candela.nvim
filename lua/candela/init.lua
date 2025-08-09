@@ -27,6 +27,7 @@
 --      * otherwise, run find_many/match_many on selected list
 --    * implement help function
 --    * write docs
+--    * make vim.notify strings consistent with format "[Candela] <message>"
 --]]
 --
 -- TODO: remove all functions that aren't needed across files from appropriate table e.g.

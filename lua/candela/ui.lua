@@ -10,13 +10,25 @@ local CandelaLightbox = require("candela.lightbox")
 
 local candela_augroup = vim.api.nvim_create_augroup("Candela", { clear = true })
 
+---@alias CandelaWindows {
+---                   patterns: CandelaWindow,
+---                   color: CandelaWindow,
+---                   count: CandelaWindow,
+---                   regex: CandelaWindow,
+---                   highlight: CandelaWindow,
+---                   lightbox: CandelaWindow,
+---                   prompt: CandelaWindow,
+---               }
+
 ---@class CandelaUi
----@field windows table<string, CandelaWindow>
+---@field windows CandelaWindows
 ---@field base_buf number
 
 local M = {}
 
+local WIDTH = 0
 local MIN_HEIGHT, MAX_HEIGHT = 0, 0
+local MARGIN = 0
 local PROMPT_OFFSET = 0
 
 ---@enum operations
@@ -201,18 +213,143 @@ local function format_icon(icon, type, subtype, header, default)
     end
 end
 
----@param opts table
-function M.setup(opts)
-    MIN_HEIGHT, MAX_HEIGHT = opts.window.min_height, opts.window.max_height
+---@param windows CandelaWindows: UI windows
+local function set_size_and_loc(windows)
+    -- TODO: find a place to put these functions
+    local function extend_table(dest, src)
+        for k, v in pairs(src) do
+            dest[k] = v
+        end
+    end
+
+    local function clamp_max(num, max)
+        if num > max then
+            return max
+        else
+            return num
+        end
+    end
+
+    local max_width = vim.o.columns - MARGIN
+    local width = clamp_max(WIDTH, max_width)
+
     local pattern_color_width = 7 -- 7 space hexcode
     local pattern_count_width = 4 -- 4 digit, resize to fit larger digits once more patterns are made
     local pattern_ops_width = 5 -- 1 space letter/symbol, 2 space margin on each side
-    local float_width = opts.window.width -- total window width
+    local float_width = width -- total window width
     -- Fit regex to rest of window leftover, subtract 1 for each space inbetween windows
     local pattern_regex_width = float_width - pattern_color_width - pattern_count_width - (pattern_ops_width * 2) - 6
 
-    local pattern_height = MIN_HEIGHT + 2 -- starting height
+    local pattern_height = nil
+    if windows.patterns.config.height == nil then
+        pattern_height = MIN_HEIGHT + 2 -- starting height
+    else
+        local max_pattern_height = vim.o.lines - MARGIN
+        pattern_height = clamp_max(windows.patterns.config.height, max_pattern_height)
+    end
     local prompt_height = 1 -- 1 space height for prompt
+
+    -- Account for 2 border spaces worth of padding to center window in center of base window
+    local horz_center = math.floor((vim.o.columns - float_width - 2) / 2)
+    local vert_center = math.floor((vim.o.lines - pattern_height - prompt_height) / 2)
+
+    -- Patterns
+    extend_table(windows.patterns.config, {
+        width = float_width,
+        height = pattern_height,
+        col = horz_center,
+        row = vert_center,
+    })
+
+    -- Color
+    extend_table(windows.color.config, {
+        width = pattern_color_width,
+        height = windows.patterns.config.height - 2,
+        col = 0,
+        row = 0,
+    })
+
+    -- Count
+    extend_table(windows.count.config, {
+        width = pattern_count_width,
+        height = windows.patterns.config.height - 2,
+        col = pattern_color_width + 1,
+        row = 0,
+    })
+
+    -- Regex
+    extend_table(windows.regex.config, {
+        width = pattern_regex_width,
+        height = windows.patterns.config.height - 2,
+        col = pattern_color_width + pattern_count_width + 2,
+        row = 0,
+    })
+
+    -- Highlight
+    extend_table(windows.highlight.config, {
+        width = pattern_ops_width,
+        height = windows.patterns.config.height - 2,
+        col = pattern_color_width + pattern_count_width + pattern_regex_width + 3,
+        row = 0,
+    })
+
+    -- Lightbox
+    extend_table(windows.lightbox.config, {
+        width = pattern_ops_width,
+        height = windows.patterns.config.height - 2,
+        col = pattern_color_width + pattern_count_width + pattern_regex_width + pattern_ops_width + 4,
+        row = 0,
+    })
+
+    -- Prompt
+    extend_table(windows.prompt.config, {
+        width = float_width,
+        height = prompt_height,
+        col = -1,
+        row = pattern_height + PROMPT_OFFSET,
+    })
+
+    -- Set window config dynamically if the window is open
+    for _, window in pairs(windows) do
+        if window:is_open() then
+            vim.api.nvim_win_set_config(window.win, window.config)
+        end
+    end
+end
+
+---@param opts table
+function M.setup(opts)
+    ---@param name string: name of option
+    ---@param num integer: option value
+    ---@return integer
+    local function validate_config_num(name, num)
+        local mins = {
+            margin = 0,
+            width = 35,
+            min_height = 1,
+            max_height = 1,
+        }
+
+        if num < mins[name] then
+            vim.notify(
+                string.format(
+                    "[Candela] option window.%s cannot be less than %s, got %s. Proceeding with default of %s",
+                    name,
+                    mins[name],
+                    num,
+                    CandelaConfig.defaults.window[name]
+                )
+            )
+            return CandelaConfig.defaults.window[name] --[[@as integer]]
+        end
+
+        return num
+    end
+
+    WIDTH = validate_config_num("width", opts.window.width)
+    MIN_HEIGHT = validate_config_num("min_height", opts.window.min_height)
+    MAX_HEIGHT = validate_config_num("max_height", opts.window.max_height)
+    MARGIN = validate_config_num("margin", opts.window.margin)
 
     local defaults = require("candela.config").defaults
     if opts.window.prompt_offset == "overlap" then
@@ -232,10 +369,6 @@ function M.setup(opts)
         PROMPT_OFFSET = 0
     end
 
-    -- Account for 2 border spaces worth of padding to center window in center of base window
-    local horz_center = math.floor((vim.o.columns - float_width - 2) / 2)
-    local vert_center = math.floor((vim.o.lines - pattern_height - prompt_height) / 2)
-
     local title = ""
     local icons = CandelaConfig.options.icons
     if icons.candela ~= nil then
@@ -245,15 +378,11 @@ function M.setup(opts)
     end
     local patterns = CandelaWindow.new({
         relative = "editor",
-        width = float_width,
-        height = pattern_height,
         style = "minimal",
         focusable = false,
         title = title,
         title_pos = "center",
         border = "rounded",
-        col = horz_center,
-        row = vert_center,
         zindex = 1,
     })
 
@@ -269,28 +398,20 @@ function M.setup(opts)
     title = format_icon(icons.color, "color", nil, "Color", "Color")
     local color = CandelaWindow.new({
         relative = "win",
-        width = pattern_color_width,
-        height = patterns.config.height - 2,
         style = "minimal",
         focusable = false,
         title = title,
         title_pos = "center",
         border = "solid",
-        col = 0,
-        row = 0,
         zindex = 10,
     })
 
     local count = CandelaWindow.new({
         relative = "win",
-        width = pattern_count_width,
-        height = patterns.config.height - 2,
         style = "minimal",
         focusable = false,
         title = "",
         border = "solid",
-        col = pattern_color_width + 1,
-        row = 0,
         zindex = 10,
     })
 
@@ -301,55 +422,39 @@ function M.setup(opts)
     end
     local regex = CandelaWindow.new({
         relative = "win",
-        width = pattern_regex_width,
-        height = patterns.config.height - 2,
         style = "minimal",
         title = title,
         title_pos = "left",
         border = "solid",
-        col = pattern_color_width + pattern_count_width + 2,
-        row = 0,
         zindex = 10,
     })
 
     title = format_icon(icons.highlight.header, "highlight", "header", "HL ", "  H  ")
     local highlight = CandelaWindow.new({
         relative = "win",
-        width = pattern_ops_width,
-        height = patterns.config.height - 2,
         style = "minimal",
         focusable = false,
         title = title,
         title_pos = "center",
         border = "solid",
-        col = pattern_color_width + pattern_count_width + pattern_regex_width + 3,
-        row = 0,
         zindex = 10,
     })
 
     title = format_icon(icons.lightbox.header, "lightbox", "header", "LB ", "  L  ")
     local lightbox = CandelaWindow.new({
         relative = "win",
-        width = pattern_ops_width,
-        height = patterns.config.height - 2,
         style = "minimal",
         focusable = false,
         title = title,
         title_pos = "center",
         border = "solid",
-        col = pattern_color_width + pattern_count_width + pattern_regex_width + pattern_ops_width + 4,
-        row = 0,
         zindex = 10,
     })
     local prompt = CandelaWindow.new({
         relative = "win",
-        width = float_width,
-        height = prompt_height,
         style = "minimal",
         title_pos = "left",
         border = "rounded",
-        col = -1,
-        row = pattern_height + PROMPT_OFFSET,
         zindex = 15,
     })
 
@@ -362,6 +467,8 @@ function M.setup(opts)
         lightbox = lightbox,
         prompt = prompt,
     }
+
+    set_size_and_loc(M.windows, opts.window.width, opts.window.margin)
 
     -- set highlight/lightbox toggling strings since they're constant
     local highlight_on_def = "  Y  "
@@ -388,6 +495,13 @@ function M.setup(opts)
     CandelaConfig.set_keymaps() -- NOTE: For dev purposes only
     CandelaConfig.set_patterns_keymaps(M.windows.regex.buf)
     CandelaConfig.set_prompt_keymaps(M.windows.prompt.buf)
+
+    vim.api.nvim_create_autocmd("VimResized", {
+        group = candela_augroup,
+        callback = function()
+            set_size_and_loc(M.windows, opts.window.width)
+        end,
+    })
 
     vim.api.nvim_create_autocmd("BufHidden", {
         group = candela_augroup,
@@ -608,7 +722,11 @@ local function show_prompt(operation, curr_line, curr_pattern)
             table.insert(operation_names, comm)
         end
         vim.notify(
-            string.format('Candela: invalid operation "%s", must be one of: %s', operation, vim.inspect(operation_names)),
+            string.format(
+                'Candela: invalid operation "%s", must be one of: %s',
+                operation,
+                vim.inspect(operation_names)
+            ),
             vim.log.levels.ERROR
         )
         return

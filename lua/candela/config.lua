@@ -34,9 +34,11 @@ M.defaults = {
         -- initial width of the patterns window
         width = math.floor(vim.o.columns * 0.5), -- integer
         -- minimum height (number of patterns) of the patterns window (initial height)
-        min_height = 4, -- integer
+        min_height = 5, -- unsigned integer
         -- maximum height (number of patterns) of the patterns window
-        max_height = 6, -- integer
+        max_height = 30, -- unsigned integer
+        -- margin space between window and Neovim bounds when Neovim is too small to fit the window
+        margin = 16, -- unsigned integer
         -- position of prompt window in relation to patterns window
         prompt_offset = "overlap", -- "overlap" | "border"
     },
