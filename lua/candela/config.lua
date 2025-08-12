@@ -243,6 +243,7 @@ function M.set_keymaps()
     -- NOTE: Only for dev purposes, leave for user to create
     local CandelaUi = require("candela.ui")
     local CandelaCommands = require("candela.commands")
+    local CandelaOperations = require("candela.operations")
 
     vim.api.nvim_set_keymap("n", "<leader>cds", "", {
         noremap = true,
@@ -257,7 +258,7 @@ function M.set_keymaps()
         silent = true,
         desc = "Candela: add pattern",
         callback = function()
-            CandelaCommands.commands.add()
+            CandelaCommands.commands.add({ "command", "#FFFFFF", true, false })
         end,
     })
     vim.api.nvim_set_keymap("n", "<leader>cdr", "", {

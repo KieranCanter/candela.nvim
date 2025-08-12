@@ -75,7 +75,7 @@ function M.highlight_matches(bufnr, id, pattern, cmd, args)
 
     local filepath = vim.api.nvim_buf_get_name(bufnr)
     if filepath == "" then
-        vim.notify("Candela: cannot search file with no file name", vim.log.levels.ERROR)
+        vim.notify("[Candela] cannot search file with no file name", vim.log.levels.ERROR)
         return -1
     end
 

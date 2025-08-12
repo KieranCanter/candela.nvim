@@ -1,14 +1,18 @@
 -- Module for defining user commands
 local CandelaUi = require("candela.ui")
+local CandelaOperations = require("candela.operations")
 local CandelaLightbox = require("candela.lightbox")
 
 local M = {}
 
 function M.setup(opts)
     M.commands = {
-        add = function()
-            CandelaUi.show_patterns()
-            CandelaUi.add()
+        add = function(args)
+            if args == nil or #args == 0 then
+                CandelaUi.add()
+            else
+                CandelaOperations.add(args)
+            end
         end,
         edit = function()
             CandelaUi.edit()
@@ -73,11 +77,12 @@ end
 ---@param args table<string, any>
 function M.dispatch(args)
     local subcommand = args[1]
+    table.remove(args, 1)
 
     if not subcommand or subcommand == "" then
         CandelaUi.toggle()
     elseif M.commands[subcommand] ~= nil then
-        M.commands[subcommand]()
+        M.commands[subcommand](args)
     else
         vim.notify('Candela: unsupported command "' .. subcommand .. '"', vim.log.levels.ERROR)
     end

@@ -28,6 +28,7 @@
 --    * implement help function
 --    * write docs
 --    * make vim.notify strings consistent with format "[Candela] <message>"
+--    * find a better place for utility functions like clamp_max in candela.ui
 --]]
 --
 -- TODO: remove all functions that aren't needed across files from appropriate table e.g.
@@ -50,7 +51,7 @@ function Candela.setup(opts)
     vim.api.nvim_create_user_command("Candela", function(args)
         CandelaCommands.dispatch(args.fargs)
     end, {
-        nargs = "?",
+        nargs = "*",
         desc = "Regex highlighter",
         complete = function()
             local commands = {}

@@ -3,6 +3,7 @@
 local CandelaConfig = require("candela.config")
 local CandelaWindow = require("candela.window")
 local CandelaPatternList = require("candela.pattern_list")
+local CandelaOperations = require("candela.operations")
 local CandelaEngine = require("candela.engine")
 local CandelaHighlighter = require("candela.highlighter")
 local CandelaFinder = require("candela.finder")
@@ -31,14 +32,6 @@ local MIN_HEIGHT, MAX_HEIGHT = 0, 0
 local MARGIN = 0
 local PROMPT_OFFSET = 0
 
----@enum operations
-local Operations = {
-    ADD = 1,
-    EDIT = 2,
-    COPY = 3,
-    CHANGE_COLOR = 4,
-}
-
 ---@param field string: Field name
 ---@param field_val string|boolean|number
 ---@return string: String to input into buffer lines
@@ -46,7 +39,14 @@ local function format_field(field, field_val)
     if field == "color" and type(field_val) == "string" then
         return field_val
     elseif field == "count" then
-        local win_width = vim.api.nvim_win_get_width(M.windows.count.win)
+        local win_width = 0
+        if M.windows.count.win == nil then
+            M.show_patterns()
+            win_width = vim.api.nvim_win_get_width(M.windows.count.win)
+            M.hide_patterns()
+        else
+            win_width = vim.api.nvim_win_get_width(M.windows.count.win)
+        end
         local line = tostring(field_val)
         local right_aligned = string.rep(" ", win_width - #line) .. line
         return right_aligned
@@ -63,7 +63,7 @@ local function format_field(field, field_val)
 end
 
 -- Update lines of the patterns buffers
-local function update_ui_lines()
+function M.update_ui_lines()
     local all_lines = {
         color = {},
         count = {},
@@ -166,7 +166,7 @@ local function refresh_all()
 
         pattern.count = count
         M.show_patterns()
-        update_ui_lines()
+        M.update_ui_lines()
         resize_height()
         M.toggle()
     end
@@ -319,6 +319,7 @@ end
 
 ---@param opts table
 function M.setup(opts)
+    -- TODO: move to config file and probably add a bunch of other helpful validation utility functions
     ---@param name string: name of option
     ---@param num integer: option value
     ---@return integer
@@ -468,7 +469,7 @@ function M.setup(opts)
         prompt = prompt,
     }
 
-    set_size_and_loc(M.windows, opts.window.width, opts.window.margin)
+    set_size_and_loc(M.windows)
 
     -- set highlight/lightbox toggling strings since they're constant
     local highlight_on_def = "  Y  "
@@ -582,11 +583,11 @@ end
 ---@param curr_line number?: index of currently selected line at time of operation
 ---@param curr_pattern CandelaPattern?: currently selected pattern
 local function show_prompt(operation, curr_line, curr_pattern)
-    if curr_line == nil and operation ~= Operations.ADD then
+    if curr_line == nil and operation ~= CandelaOperations.ADD then
         vim.notify(string.format("Candela: current line can't be nil when running %s", operation), vim.log.levels.ERROR)
         return
     end
-    if curr_pattern == nil and operation ~= Operations.ADD then
+    if curr_pattern == nil and operation ~= CandelaOperations.ADD then
         vim.notify(
             string.format("Candela: current pattern can't be nil when running %s", operation),
             vim.log.levels.ERROR
@@ -627,30 +628,19 @@ local function show_prompt(operation, curr_line, curr_pattern)
         end,
     })
 
-    if operation == Operations.ADD then
+    if operation == CandelaOperations.ADD then
         vim.fn.prompt_setcallback(M.windows.prompt.buf, function(regex)
-            local new_id, new_pattern = CandelaPatternList.add_pattern(regex)
-            if new_id == nil or new_pattern == nil then
-                return M.hide_prompt()
-            end
-
-            local cmd = CandelaConfig.options.engine.command --[[@as string]]
-            local args = CandelaConfig.options.engine.args
-            local count = CandelaHighlighter.highlight_matches(M.base_buf, new_id, new_pattern, cmd, args)
-            if count == -1 then
-                return
-            end
-
-            new_pattern.count = count
-            update_ui_lines()
-            resize_height()
+            local args = { regex }
+            CandelaOperations.add(args)
             M.hide_prompt()
+            M.update_ui_lines()
+            resize_height()
 
             if CandelaLightbox.window:is_open() then
                 CandelaLightbox.update_folds()
             end
         end)
-    elseif operation == Operations.EDIT then
+    elseif operation == CandelaOperations.EDIT then
         vim.fn.prompt_setcallback(M.windows.prompt.buf, function(regex)
             local old_regex = curr_pattern.regex
             local old_id = CandelaPatternList.order[curr_line]
@@ -671,14 +661,14 @@ local function show_prompt(operation, curr_line, curr_pattern)
             end
 
             new_pattern.count = count
-            update_ui_lines()
+            M.update_ui_lines()
             M.hide_prompt()
 
             if CandelaLightbox.window:is_open() then
                 CandelaLightbox.update_folds()
             end
         end)
-    elseif operation == Operations.COPY then
+    elseif operation == CandelaOperations.COPY then
         vim.fn.prompt_setcallback(M.windows.prompt.buf, function(regex)
             local new_id, new_pattern = CandelaPatternList.add_pattern(regex)
             if new_id == nil or new_pattern == nil then
@@ -693,7 +683,7 @@ local function show_prompt(operation, curr_line, curr_pattern)
             end
 
             new_pattern.count = count
-            update_ui_lines()
+            M.update_ui_lines()
             resize_height()
             M.hide_prompt()
 
@@ -701,7 +691,7 @@ local function show_prompt(operation, curr_line, curr_pattern)
                 CandelaLightbox.update_folds()
             end
         end)
-    elseif operation == Operations.CHANGE_COLOR then
+    elseif operation == CandelaOperations.CHANGE_COLOR then
         vim.fn.prompt_setcallback(M.windows.prompt.buf, function(color)
             local new_pattern = CandelaPatternList.change_pattern_color(curr_line, color)
             if new_pattern == nil then
@@ -712,13 +702,13 @@ local function show_prompt(operation, curr_line, curr_pattern)
                 return
             end
 
-            update_ui_lines()
+            M.update_ui_lines()
             resize_height()
             M.hide_prompt()
         end)
     else
         local operation_names = {}
-        for comm, _ in pairs(Operations) do
+        for comm, _ in pairs(M.Operations) do
             table.insert(operation_names, comm)
         end
         vim.notify(
@@ -740,8 +730,9 @@ local function show_prompt(operation, curr_line, curr_pattern)
 end
 
 function M.add()
+    M.show_patterns()
     M.windows.prompt.config.title = " Add Regex "
-    show_prompt(Operations.ADD)
+    show_prompt(CandelaOperations.ADD)
 end
 
 function M.edit()
@@ -826,7 +817,7 @@ function M.delete(ask)
         CandelaLightbox.update_folds()
     end
 
-    update_ui_lines()
+    M.update_ui_lines()
     resize_height(true)
 end
 
@@ -851,7 +842,7 @@ function M.clear(ask)
     for _, id in ipairs(order) do
         local pattern = patterns[id]
         if CandelaHighlighter.remove_match_highlights(M.base_buf, id, pattern.regex) then
-            update_ui_lines()
+            M.update_ui_lines()
         end
     end
     resize_height()
