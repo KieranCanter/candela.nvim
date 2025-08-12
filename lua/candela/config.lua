@@ -64,9 +64,11 @@ M.defaults = {
         -- how you want the lightbox window to break out
         view = "system-vsplit", -- "tab" | "system-split" | "system-vsplit" | "split-left" | "split-right" | "split-above" | "split-below"
         -- style to format the foldtext
-        fold_style = "hidden", -- "hidden" | "dash" | "fillchar" | "count" | "dash_count" | "detailed"
+        fold_style = "count", -- "fillchar" | "count" | "preview" | "detailed" | "nvim"
         -- fillchar for the foldtext
         fillchar = "-",
+        -- custom foldtext function, if not nil and a valid function, will override fold_style
+        custom_foldtext = nil, -- function()
     },
     -- file types to load Candela for  TODO: implement
     file_types = {
@@ -150,8 +152,8 @@ local function get_default_engine(available)
         end
     end
 
-    vim.notify("[Candela] No regex search tool found... how do you not at least have grep?", vim.log.levels.ERROR)
-    vim.notify("Candela will not be loaded", vim.log.levels.ERROR)
+    vim.notify("[Candela] no regex search tool found... how do you not at least have grep?", vim.log.levels.ERROR)
+    vim.notify("[Candela] will not be loaded", vim.log.levels.ERROR)
     return nil
 end
 
