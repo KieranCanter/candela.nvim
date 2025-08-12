@@ -58,10 +58,10 @@ function M.setup(opts)
         end,
         help = function()
             if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
-                vim.notify("Candela: must be in patterns window to see menu commands", vim.log.levels.ERROR)
+                vim.notify("[Candela] must be in patterns window to see menu commands", vim.log.levels.ERROR)
                 return
             end
-            vim.notify("Candela: help subcommand not implemented yet", vim.log.levels.WARN)
+            vim.notify("[Candela] help subcommand not implemented yet", vim.log.levels.WARN)
             CandelaUi.help()
         end,
         health = function()

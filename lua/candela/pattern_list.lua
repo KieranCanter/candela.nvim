@@ -80,11 +80,11 @@ end
 ---@return string?, CandelaPattern?
 function M.add_pattern(regex)
     if regex == "" then
-        vim.notify("Candela: Regex cannot be empty", vim.log.levels.ERROR)
+        vim.notify("[Candela] regex cannot be empty", vim.log.levels.ERROR)
         return
     end
     if require("candela.ui").base_buf == "" then
-        vim.notify("Candela: No valid base buffer", vim.log.levels.ERROR)
+        vim.notify("[Candela] no valid base buffer", vim.log.levels.ERROR)
         return
     end
 
@@ -96,7 +96,7 @@ function M.add_pattern(regex)
     local new_pattern = CandelaPattern.new(regex, color, highlight, lightbox, count)
     local new_id = hash_regex(regex)
     if M.patterns[new_id] ~= nil then
-        vim.notify(string.format("Regex /%s/ already exists.", regex), vim.log.levels.ERROR)
+        vim.notify(string.format("[Candela] regex /%s/ already exists.", regex), vim.log.levels.ERROR)
         return
     end
 
@@ -111,11 +111,11 @@ end
 ---@return string?, CandelaPattern?
 function M.edit_pattern(index, new_regex)
     if new_regex == "" then
-        vim.notify("Candela: Regex cannot be empty", vim.log.levels.ERROR)
+        vim.notify("[Candela] regex cannot be empty", vim.log.levels.ERROR)
         return
     end
     if require("candela.ui").base_buf == "" then
-        vim.notify("Candela: No valid base buffer", vim.log.levels.ERROR)
+        vim.notify("[Candela] no valid base buffer", vim.log.levels.ERROR)
         return
     end
 
@@ -127,7 +127,7 @@ function M.edit_pattern(index, new_regex)
 
     local new_id = hash_regex(new_regex)
     if M.patterns[new_id] ~= nil then
-        vim.notify(string.format("Regex /%s/ already exists.", new_regex), vim.log.levels.ERROR)
+        vim.notify(string.format("[Candela] regex /%s/ already exists.", new_regex), vim.log.levels.ERROR)
         return
     end
 
@@ -144,7 +144,7 @@ end
 ---@return boolean
 function M.delete_pattern(index)
     if index < 1 or index > #M.order then
-        vim.notify(string.format("Candela: no pattern at index %d", index), vim.log.levels.ERROR)
+        vim.notify(string.format("[Candela] no pattern at index %d", index), vim.log.levels.ERROR)
         return false
     end
 
@@ -152,7 +152,7 @@ function M.delete_pattern(index)
     local regex = M.patterns[id].regex
     table.remove(M.order, index)
     M.patterns[id] = nil
-    vim.notify(string.format("Candela: deleted pattern %d: /%s/", index, regex), vim.log.levels.INFO)
+    vim.notify(string.format("[Candela] deleted pattern %d: /%s/", index, regex), vim.log.levels.INFO)
 
     return true
 end
@@ -160,13 +160,13 @@ end
 ---@return boolean
 function M.clear_patterns()
     if #M.order == 0 then
-        vim.notify("Candela: cannot clear an empty patterns list", vim.log.levels.INFO)
+        vim.notify("[Candela] cannot clear an empty patterns list", vim.log.levels.INFO)
         return false
     end
 
     M.order = {}
     M.patterns = {}
-    vim.notify("Candela: cleared all patterns", vim.log.levels.INFO)
+    vim.notify("[Candela] cleared all patterns", vim.log.levels.INFO)
     return true
 end
 
@@ -176,7 +176,7 @@ function M.change_pattern_color(index, new_color)
     local id = M.order[index]
     local pattern = M.patterns[id]
     if index < 1 or index > #M.order then
-        vim.notify(string.format("Candela: no pattern at index %d", index), vim.log.levels.ERROR)
+        vim.notify(string.format("[Candela] no pattern at index %d", index), vim.log.levels.ERROR)
         return
     end
     pattern:change_color(new_color)
@@ -190,7 +190,7 @@ function M.toggle_pattern_highlight(index)
     local id = M.order[index]
     local pattern = M.patterns[id]
     if index < 1 or index > #M.order then
-        vim.notify(string.format("Candela: no pattern at index %d", index), vim.log.levels.ERROR)
+        vim.notify(string.format("[Candela] no pattern at index %d", index), vim.log.levels.ERROR)
     end
     pattern:toggle_highlight()
 
@@ -203,7 +203,7 @@ function M.toggle_pattern_lightbox(index)
     local id = M.order[index]
     local pattern = M.patterns[id]
     if index < 1 or index > #M.order then
-        vim.notify(string.format("Candela: no pattern at index %d", index), vim.log.levels.ERROR)
+        vim.notify(string.format("[Candela] no pattern at index %d", index), vim.log.levels.ERROR)
     end
     pattern:toggle_lightbox()
 

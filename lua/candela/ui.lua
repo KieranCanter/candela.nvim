@@ -147,7 +147,7 @@ end
 
 local function refresh_all()
     if M.base_buf == M.curr_buf then
-        vim.notify("Candela: current buffer is already being matched against, skipping refresh", vim.log.levels.INFO)
+        vim.notify("[Candela] current buffer is already being matched against, skipping refresh", vim.log.levels.INFO)
         return
     end
 
@@ -583,7 +583,7 @@ end
 ---@param curr_pattern CandelaPattern?: currently selected pattern
 local function show_prompt(operation, curr_line, curr_pattern)
     if curr_line == nil and operation ~= Operations.ADD then
-        vim.notify(string.format("Candela: current line can't be nil when running %s", operation), vim.log.levels.ERROR)
+        vim.notify(string.format("[Candela] current line can't be nil when running %s", operation), vim.log.levels.ERROR)
         return
     end
     if curr_pattern == nil and operation ~= Operations.ADD then
@@ -746,12 +746,12 @@ end
 
 function M.edit()
     if vim.api.nvim_get_current_win() ~= M.windows.regex.win then
-        vim.notify("Candela: must be in patterns window to edit regex", vim.log.levels.ERROR)
+        vim.notify("[Candela] must be in patterns window to edit regex", vim.log.levels.ERROR)
         return
     end
 
     if #CandelaPatternList.order == 0 then
-        vim.notify("Candela: no patterns to edit", vim.log.levels.ERROR)
+        vim.notify("[Candela] no patterns to edit", vim.log.levels.ERROR)
         return
     end
 
@@ -768,12 +768,12 @@ end
 
 function M.copy()
     if vim.api.nvim_get_current_win() ~= M.windows.regex.win then
-        vim.notify("Candela: must be in patterns window to copy regex", vim.log.levels.ERROR)
+        vim.notify("[Candela] must be in patterns window to copy regex", vim.log.levels.ERROR)
         return
     end
 
     if #CandelaPatternList.order == 0 then
-        vim.notify("Candela: no patterns to copy", vim.log.levels.ERROR)
+        vim.notify("[Candela] no patterns to copy", vim.log.levels.ERROR)
         return
     end
 
@@ -790,12 +790,12 @@ end
 ---@param ask boolean: show the confirmation message or not
 function M.delete(ask)
     if vim.api.nvim_get_current_win() ~= M.windows.regex.win then
-        vim.notify("Candela: must be in patterns window to delete pattern", vim.log.levels.ERROR)
+        vim.notify("[Candela] must be in patterns window to delete pattern", vim.log.levels.ERROR)
         return
     end
 
     if #CandelaPatternList.order == 0 then
-        vim.notify("Candela: no patterns to delete", vim.log.levels.ERROR)
+        vim.notify("[Candela] no patterns to delete", vim.log.levels.ERROR)
         return
     end
 
@@ -809,7 +809,7 @@ function M.delete(ask)
             2
         )
         if choice ~= 1 then
-            vim.notify("Candela: delete canceled", vim.log.levels.INFO)
+            vim.notify("[Candela] delete canceled", vim.log.levels.INFO)
             return
         end
     end
@@ -833,14 +833,14 @@ end
 ---@param ask boolean: show the confirmation message or not
 function M.clear(ask)
     if #CandelaPatternList.order == 0 then
-        vim.notify("Candela: no patterns to clear", vim.log.levels.ERROR)
+        vim.notify("[Candela] no patterns to clear", vim.log.levels.ERROR)
         return
     end
 
     if ask then
         local choice = vim.fn.confirm("Do you want to clear all patterns?", "&Yes\n&No", 2)
         if choice ~= 1 then
-            vim.notify("Candela: clear canceled", vim.log.levels.INFO)
+            vim.notify("[Candela] clear canceled", vim.log.levels.INFO)
             return
         end
     end
@@ -868,12 +868,12 @@ end
 
 function M.change_color()
     if vim.api.nvim_get_current_win() ~= M.windows.regex.win then
-        vim.notify("Candela: must be in patterns window to toggle regex color", vim.log.levels.ERROR)
+        vim.notify("[Candela] must be in patterns window to toggle regex color", vim.log.levels.ERROR)
         return
     end
 
     if #CandelaPatternList.order == 0 then
-        vim.notify("Candela: no patterns to change color", vim.log.levels.ERROR)
+        vim.notify("[Candela] no patterns to change color", vim.log.levels.ERROR)
         return
     end
 
@@ -889,12 +889,12 @@ end
 
 function M.toggle_highlight()
     if vim.api.nvim_get_current_win() ~= M.windows.regex.win then
-        vim.notify("Candela: must be in patterns window to toggle regex highlight", vim.log.levels.ERROR)
+        vim.notify("[Candela] must be in patterns window to toggle regex highlight", vim.log.levels.ERROR)
         return
     end
 
     if #CandelaPatternList.order == 0 then
-        vim.notify("Candela: no patterns to toggle highlight", vim.log.levels.ERROR)
+        vim.notify("[Candela] no patterns to toggle highlight", vim.log.levels.ERROR)
         return
     end
 
@@ -911,12 +911,12 @@ end
 
 function M.toggle_lightbox()
     if vim.api.nvim_get_current_win() ~= M.windows.regex.win then
-        vim.notify("Candela: must be in patterns window to toggle regex lightbox", vim.log.levels.ERROR)
+        vim.notify("[Candela] must be in patterns window to toggle regex lightbox", vim.log.levels.ERROR)
         return
     end
 
     if #CandelaPatternList.order == 0 then
-        vim.notify("Candela: no patterns to toggle lightbox", vim.log.levels.ERROR)
+        vim.notify("[Candela] no patterns to toggle lightbox", vim.log.levels.ERROR)
         return
     end
 
@@ -935,12 +935,12 @@ end
 
 function M.match()
     if vim.api.nvim_get_current_win() ~= M.windows.regex.win then
-        vim.notify("Candela: must be in patterns window to match regex", vim.log.levels.ERROR)
+        vim.notify("[Candela] must be in patterns window to match regex", vim.log.levels.ERROR)
         return
     end
 
     if #CandelaPatternList.order == 0 then
-        vim.notify("Candela: no patterns to match", vim.log.levels.ERROR)
+        vim.notify("[Candela] no patterns to match", vim.log.levels.ERROR)
         return
     end
 
@@ -952,7 +952,7 @@ end
 
 function M.match_all()
     if #CandelaPatternList.order == 0 then
-        vim.notify("Candela: no patterns to match all", vim.log.levels.ERROR)
+        vim.notify("[Candela] no patterns to match all", vim.log.levels.ERROR)
         return
     end
 
@@ -963,12 +963,12 @@ end
 
 function M.find()
     if vim.api.nvim_get_current_win() ~= M.windows.regex.win then
-        vim.notify("Candela: must be in patterns window to find instances of regex", vim.log.levels.ERROR)
+        vim.notify("[Candela] must be in patterns window to find instances of regex", vim.log.levels.ERROR)
         return
     end
 
     if #CandelaPatternList.order == 0 then
-        vim.notify("Candela: no patterns to find", vim.log.levels.ERROR)
+        vim.notify("[Candela] no patterns to find", vim.log.levels.ERROR)
         return
     end
 
@@ -980,7 +980,7 @@ end
 
 function M.find_all()
     if #CandelaPatternList.order == 0 then
-        vim.notify("Candela: no patterns to find all", vim.log.levels.ERROR)
+        vim.notify("[Candela] no patterns to find all", vim.log.levels.ERROR)
         return
     end
 
@@ -990,7 +990,7 @@ function M.find_all()
 end
 
 function M.help()
-    vim.notify("Candela: help subcommand not implemented yet", vim.log.levels.WARN)
+    vim.notify("[Candela] help subcommand not implemented yet", vim.log.levels.WARN)
 end
 
 function M.hide_patterns()

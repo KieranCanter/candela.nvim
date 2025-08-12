@@ -56,7 +56,7 @@ end
 function M.find(bufnr, regex, engine)
     local filepath = vim.api.nvim_buf_get_name(bufnr)
     if filepath == "" then
-        vim.notify("Candela: cannot search file with no file name", vim.log.levels.ERROR)
+        vim.notify("[Candela] cannot search file with no file name", vim.log.levels.ERROR)
         return 0
     end
 
@@ -74,13 +74,13 @@ end
 ---@param engine fun(cmd: string[]): table[]
 function M.find_all(bufnr, patterns, engine)
     if #patterns < 1 then
-        vim.notify("Candela: cannot run find_all on pattern list of length 0", vim.log.levels.ERROR)
+        vim.notify("[Candela] cannot run find_all on pattern list of length 0", vim.log.levels.ERROR)
         return
     end
 
     local filepath = vim.api.nvim_buf_get_name(bufnr)
     if filepath == "" then
-        vim.notify("Candela: cannot search file with no file name", vim.log.levels.ERROR)
+        vim.notify("[Candela] cannot search file with no file name", vim.log.levels.ERROR)
         return 0
     end
 
