@@ -480,9 +480,6 @@ function M.setup(opts)
     M.lightbox_on = format_icon(icons.lightbox.toggle_on, "lightbox", "toggle_on", "", lightbox_on_def)
     M.lightbox_off = format_icon(icons.lightbox.toggle_off, "lightbox", "toggle_off", "", lightbox_off_def)
 
-    -- TODO: handle resizing of window when vim is resized with autocmd
-    -- TODO: handle resizing of count window when count exceeds width
-
     for name, window in pairs(M.windows) do
         window:ensure_buffer()
         vim.api.nvim_set_option_value("swapfile", false, { buf = window.buf })
@@ -550,6 +547,11 @@ end
 
 -- Open patterns window
 function M.show_patterns()
+    local is_setup = true
+    if M.windows.regex.win == nil then
+        is_setup = false
+    end
+
     if M.base_buf == nil or vim.api.nvim_buf_get_name(M.base_buf) == "" then
         M.base_buf = vim.api.nvim_get_current_buf()
     end
@@ -576,6 +578,17 @@ function M.show_patterns()
 
     vim.api.nvim_set_option_value("wrap", false, { win = M.windows.regex.win })
     vim.api.nvim_set_option_value("winhighlight", "Normal:Comment", { win = M.windows.count.win })
+
+    if not is_setup then
+        for _, window in pairs(M.windows) do
+          if window.win and vim.api.nvim_win_is_valid(window.win) then
+            vim.api.nvim_win_call(window.win, function()
+              vim.wo.scrollbind = true
+            end)
+          end
+        end
+        vim.api.nvim_exec2("syncbind", {})
+    end
 end
 
 ---@param operation operations: type of operation to conduct
