@@ -15,14 +15,23 @@ function Candela.setup(opts)
     vim.api.nvim_create_user_command("Candela", function(args)
         CandelaCommands.dispatch(args.fargs)
     end, {
-        nargs = "?",
+        nargs = "*",
         desc = "Regex highlighter",
-        complete = function()
-            local commands = {}
-            for comm, _ in pairs(CandelaCommands.commands) do
-                table.insert(commands, comm)
+        complete = function(arglead, cmdline, _)
+            local args = vim.split(cmdline, "%s+")
+            local idx = #args - 1 -- skip :Candela argument
+
+            if idx == 1 then
+                return vim.tbl_keys(CandelaCommands.commands)
+            elseif idx == 2 then
+                local sub = args[2]
+                -- TODO: allow other appropriate commands to receive args
+                -- :Candela add <regex> or :Candela add { regex = <regex>, [color = <hex_code>], [highlight = <boolean>], [lightbox = <boolean>] }
+                -- :Candela delete <regex> or :Candela delete <index>
+                if sub == "import" or sub == "export" then
+                    return vim.fn.getcompletion(arglead, "file")
+                end
             end
-            return commands
         end,
     })
 

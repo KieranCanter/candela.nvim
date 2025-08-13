@@ -44,8 +44,10 @@ function M.highlight_ui(windows, patterns)
     end
 
     for i, pattern in ipairs(patterns) do
+        local hl_group = "CandelaHl_" .. hash_regex(pattern.regex)
+        register_highlight({ bg = pattern.color }, ns, hl_group)
         vim.api.nvim_buf_set_extmark(windows.color.buf, ns, i - 1, 0,
-            { line_hl_group = "CandelaHl_" .. hash_regex(pattern.regex) }
+            { line_hl_group = hl_group }
         )
         M.highlight_ui_toggle(windows.highlight, "highlight", i, pattern)
         M.highlight_ui_toggle(windows.lightbox, "lightbox", i, pattern)
@@ -114,7 +116,11 @@ end
 
 ---@return boolean
 function M.toggle_match_highlights(bufnr, id, regex, toggle)
-    local ns = vim.api.nvim_get_namespaces()["CandelaNs_" .. hash_regex(regex)]
+    if not M.match_cache[id] then
+        return true
+    end
+
+    local ns = vim.api.nvim_create_namespace("CandelaNs_" .. hash_regex(regex))
     if ns == nil then
         vim.notify(
             string.format("Candela: namespace does not exist: CandelaNs_%s", hash_regex(regex)),
@@ -153,7 +159,7 @@ end
 
 ---@return boolean
 function M.remove_match_highlights(bufnr, id, regex)
-    local ns = vim.api.nvim_get_namespaces()["CandelaNs_" .. hash_regex(regex)]
+    local ns = vim.api.nvim_create_namespace("CandelaNs_" .. hash_regex(regex))
     if ns == nil then
         vim.notify(
             string.format("Candela: namespace does not exist: CandelaNs_%s", hash_regex(regex)),
@@ -170,7 +176,7 @@ end
 
 ---@return boolean
 function M.change_highlight_color(regex, new_color)
-    local ns = vim.api.nvim_get_namespaces()["CandelaNs_" .. hash_regex(regex)]
+    local ns = vim.api.nvim_create_namespace("CandelaNs_" .. hash_regex(regex))
     if ns == nil then
         vim.notify(
             string.format("Candela: namespace does not exist: CandelaNs_%s", hash_regex(regex)),

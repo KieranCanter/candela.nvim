@@ -1,6 +1,7 @@
 -- Module for defining user commands
 local CandelaUi = require("candela.ui")
 local CandelaLightbox = require("candela.lightbox")
+local CandelaIo = require("candela.io")
 
 local M = {}
 
@@ -56,11 +57,33 @@ function M.setup(opts)
             CandelaUi.hide_patterns()
             CandelaLightbox.toggle()
         end,
-        help = function()
-            if vim.api.nvim_get_current_win() ~= CandelaUi.windows.regex.win then
-                vim.notify("[Candela] must be in patterns window to see menu commands", vim.log.levels.ERROR)
+        import = function(args)
+            if #args ~= 1 then
+                vim.notify(
+                    "[Candela] invalid number of arguments, `import` command must have one argument"
+                        .. "\nUsage: `Candela import <path/to/import_file.lua>`",
+                    vim.log.levels.ERROR
+                )
                 return
             end
+
+            local path = args[1]
+            CandelaIo.import_patterns(path)
+        end,
+        export = function(args)
+            if #args > 1 then
+                vim.notify(
+                    "[Candela] invalid number of arguments, `export` command must have zero or one argument"
+                        .. "\nUsage: `Candela export [path/to/export_file.lua]`",
+                    vim.log.levels.ERROR
+                )
+                return
+            end
+
+            local path = args[1]
+            CandelaIo.export_patterns(path)
+        end,
+        help = function()
             vim.notify("[Candela] help subcommand not implemented yet", vim.log.levels.WARN)
             CandelaUi.help()
         end,
@@ -73,11 +96,12 @@ end
 ---@param args table<string, any>
 function M.dispatch(args)
     local subcommand = args[1]
+    table.remove(args, 1)
 
     if not subcommand or subcommand == "" then
         CandelaUi.toggle()
     elseif M.commands[subcommand] ~= nil then
-        M.commands[subcommand]()
+        M.commands[subcommand](args)
     else
         vim.notify('Candela: unsupported command "' .. subcommand .. '"', vim.log.levels.ERROR)
     end

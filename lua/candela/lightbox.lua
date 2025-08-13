@@ -12,17 +12,18 @@ function M.generate_foldtext()
     local end_line = vim.v.foldend
     local count = end_line - start_line + 1
     local preview = get_foldtext_preview(start_line)
+    local config = require("candela.config").options.lightbox
 
-    if M.fold_style == "fillchar" then
-        local win_width = vim.api.nvim_win_get_width(M.window.win)
-        return string.rep(M.fillchar, win_width)
-    elseif M.fold_style == "count" then
+    if config.fold_style == "fillchar" then
+        local win_width = vim.api.nvim_win_get_width(config.window.win)
+        return string.rep(config.fillchar, win_width)
+    elseif config.fold_style == "count" then
         local text = count == 1 and "1 line" or (count .. " lines")
         return text
-    elseif M.fold_style == "preview" then
+    elseif config.fold_style == "preview" then
         local text = "next line: " .. preview
         return text
-    elseif M.fold_style == "detailed" then
+    elseif config.fold_style == "detailed" then
         local text = (count == 1 and "1 line" or (count .. " lines")) .. ": " .. preview
         return text
     else -- "default"
@@ -51,10 +52,6 @@ function M.setup(opts)
     M.lightbox_cache = {}
     M.folds_cache = {}
 
-    M.fold_style = opts.fold_style
-    M.fillchar = opts.fillchar
-    M.custom_foldtext = opts.custom_foldtext
-
     return M
 end
 
@@ -68,6 +65,10 @@ end
 ---@param matches table[]: table of matches from Highlighter.match_cache
 ---@param id string: pattern ID
 function M.add_many_to_cache(matches, id)
+    if not matches then
+        return
+    end
+
     for _, match in pairs(matches) do
         M.add_to_cache(match.row, id)
     end
@@ -192,8 +193,10 @@ function M.display(is_open)
         vim.api.nvim_set_option_value("foldenable", true, { win = M.window.win })
         vim.api.nvim_set_option_value("foldlevel", 0, { win = M.window.win })
         vim.api.nvim_set_option_value("fml", 0, { win = M.window.win })
-        vim.api.nvim_set_option_value("fillchars", "fold:" .. M.fillchar, { win = M.window.win })
-        if M.custom_foldtext ~= nil and type(M.custom_foldtext) == "function" then
+
+        local config = require("candela.config").options.lightbox
+        vim.api.nvim_set_option_value("fillchars", "fold:" .. config.fillchar, { win = M.window.win })
+        if config.custom_foldtext ~= nil and type(config.custom_foldtext) == "function" then
             vim.api.nvim_set_option_value("foldtext", "v:lua.require'candela.lightbox'.custom_foldtext()", { win = M.window.win })
         else
             vim.api.nvim_set_option_value("foldtext", "v:lua.require'candela.lightbox'.generate_foldtext()", { win = M.window.win })
@@ -206,7 +209,7 @@ end
 -- Refresh Lightbox when `refresh` command is activated
 function M.refresh()
     M.window.buf = require("candela.ui").base_buf
-    if M.window:is_open() then
+    if M.window:is_open() and not require("candela.ui").windows.regex:is_open() then
         vim.api.nvim_win_close(M.window.win, true)
         M.display(false)
     end

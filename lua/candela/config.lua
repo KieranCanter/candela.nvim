@@ -435,9 +435,25 @@ function M.set_patterns_keymaps(buffer)
     vim.api.nvim_buf_set_keymap(buffer, "n", "L", "", {
         noremap = true,
         silent = true,
-        desc = "Candela find all patterns in buffer",
+        desc = "Candela open/close lightbox",
         callback = function()
             CandelaCommands.commands.lightbox()
+        end,
+    })
+    vim.api.nvim_buf_set_keymap(buffer, "n", "i", "", {
+        noremap = true,
+        silent = true,
+        desc = "Import patterns from file",
+        callback = function()
+            CandelaUi.import()
+        end,
+    })
+    vim.api.nvim_buf_set_keymap(buffer, "n", "e", "", {
+        noremap = true,
+        silent = true,
+        desc = "Export patterns to file",
+        callback = function()
+            CandelaUi.export()
         end,
     })
     vim.api.nvim_buf_set_keymap(buffer, "n", "?", "", {

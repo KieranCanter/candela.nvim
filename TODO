@@ -11,7 +11,6 @@
 --
 --  * TODO:
 --    * for config options set to system value, resetup affected modules with new option value using autocmd on event OptionSet
---    * import/export pattern list
 --    * palettes/colors
 --      * better default colors
 --      * handle automatic foreground color changing if the colors are too similar in luminosity

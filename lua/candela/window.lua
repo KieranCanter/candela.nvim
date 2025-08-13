@@ -8,6 +8,7 @@
 ---@field ensure_buffer fun(self: CandelaWindow)
 ---@field is_open fun(self: CandelaWindow): boolean
 ---@field open_window fun(self: CandelaWindow, enter: boolean)
+---@field hide_window fun(self: CandelaWindow)
 ---@field close_window fun(self: CandelaWindow)
 
 local M = {}
@@ -65,6 +66,16 @@ function M:open_window(enter)
     self:ensure_buffer()
     enter = enter or false
     self.win = vim.api.nvim_open_win(self.buf, enter, self.config)
+end
+
+-- Hide window
+---@param self CandelaWindow
+function M:hide_window()
+    if not self:is_open() then
+        return
+    end
+
+    vim.api.nvim_win_hide(self.win)
 end
 
 -- Close window

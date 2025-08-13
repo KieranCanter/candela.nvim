@@ -37,6 +37,8 @@ local Operations = {
     EDIT = 2,
     COPY = 3,
     CHANGE_COLOR = 4,
+    IMPORT = 5,
+    EXPORT = 6,
 }
 
 ---@param field string: Field name
@@ -46,7 +48,7 @@ local function format_field(field, field_val)
     if field == "color" and type(field_val) == "string" then
         return field_val
     elseif field == "count" then
-        local win_width = vim.api.nvim_win_get_width(M.windows.count.win)
+        local win_width = M.windows.count.config.width
         local line = tostring(field_val)
         local right_aligned = string.rep(" ", win_width - #line) .. line
         return right_aligned
@@ -106,10 +108,29 @@ local function update_ui_toggle(kind, row, pattern)
     CandelaHighlighter.highlight_ui_toggle(M.windows[kind], kind, row, pattern)
 end
 
+function M.update_ui()
+    local was_open = M.windows.patterns:is_open()
+    if not was_open then
+        M.show_patterns()
+    end
+
+    update_ui_lines()
+    local order, patterns = CandelaPatternList.order, CandelaPatternList.patterns
+    for i, id in ipairs(order) do
+        local pattern = patterns[id]
+        update_ui_toggle("highlight", i, pattern)
+        update_ui_toggle("lightbox", i, pattern)
+    end
+
+    if not was_open then
+        M.hide_patterns()
+    end
+end
+
 ---@param delete boolean?: if deleting a pattern, don't move cursor to bottom
 local function resize_height(delete)
     local num_pats = #CandelaPatternList.order
-    local old_height = vim.api.nvim_win_get_height(M.windows.patterns.win) - 2 -- Num of shown entries
+    local old_height = M.windows.patterns.config.height - 2 -- Num of shown entries
     local is_under_min_height = old_height == MIN_HEIGHT and num_pats <= MIN_HEIGHT
     local is_over_max_height = old_height == MAX_HEIGHT and num_pats >= MAX_HEIGHT
 
@@ -153,8 +174,10 @@ local function refresh_all()
 
     for _, id in ipairs(CandelaPatternList.order) do
         local pattern = CandelaPatternList.patterns[id]
-        if not CandelaHighlighter.remove_match_highlights(M.base_buf, id, pattern.regex) then
-            return
+        if pattern.count ~= 0 then
+            if not CandelaHighlighter.remove_match_highlights(M.base_buf, id, pattern.regex) then
+                return
+            end
         end
 
         local cmd = CandelaConfig.options.engine.command --[[@as string]]
@@ -165,10 +188,8 @@ local function refresh_all()
         end
 
         pattern.count = count
-        M.show_patterns()
         update_ui_lines()
         resize_height()
-        M.toggle()
     end
 
     M.base_buf = M.curr_buf
@@ -555,6 +576,7 @@ function M.show_patterns()
     if M.base_buf == nil or vim.api.nvim_buf_get_name(M.base_buf) == "" then
         M.base_buf = vim.api.nvim_get_current_buf()
     end
+
     if M.windows.regex:is_open() then
         return
     end
@@ -595,17 +617,6 @@ end
 ---@param curr_line number?: index of currently selected line at time of operation
 ---@param curr_pattern CandelaPattern?: currently selected pattern
 local function show_prompt(operation, curr_line, curr_pattern)
-    if curr_line == nil and operation ~= Operations.ADD then
-        vim.notify(string.format("[Candela] current line can't be nil when running %s", operation), vim.log.levels.ERROR)
-        return
-    end
-    if curr_pattern == nil and operation ~= Operations.ADD then
-        vim.notify(
-            string.format("Candela: current pattern can't be nil when running %s", operation),
-            vim.log.levels.ERROR
-        )
-        return
-    end
     ---@cast curr_line number
     ---@cast curr_pattern CandelaPattern
 
@@ -726,6 +737,21 @@ local function show_prompt(operation, curr_line, curr_pattern)
             end
 
             update_ui_lines()
+            resize_height()
+            M.hide_prompt()
+        end)
+    elseif operation == Operations.IMPORT then
+        vim.fn.prompt_setcallback(M.windows.prompt.buf, function(path)
+            require("candela.io").import_patterns(path)
+
+            M.base_buf = nil
+            M.refresh()
+            M.hide_prompt()
+        end)
+    elseif operation == Operations.EXPORT then
+        vim.fn.prompt_setcallback(M.windows.prompt.buf, function(path)
+            require("candela.io").export_patterns(path)
+
             resize_height()
             M.hide_prompt()
         end)
@@ -1002,6 +1028,16 @@ function M.find_all()
     CandelaFinder.find_all(M.base_buf, CandelaPatternList.patterns, CandelaEngine.get_matches)
 end
 
+function M.import()
+    M.windows.prompt.config.title = " Import Patterns from File "
+    show_prompt(Operations.IMPORT)
+end
+
+function M.export()
+    M.windows.prompt.config.title = " Export Patterns to File (leave blank for default) "
+    show_prompt(Operations.EXPORT)
+end
+
 function M.help()
     vim.notify("[Candela] help subcommand not implemented yet", vim.log.levels.WARN)
 end
@@ -1009,7 +1045,7 @@ end
 function M.hide_patterns()
     for name, win in pairs(M.windows) do
         if name ~= "prompt" and win:is_open() then
-            win:close_window()
+            win:hide_window()
         end
     end
 end

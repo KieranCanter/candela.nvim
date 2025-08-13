@@ -77,8 +77,11 @@ local function hash_regex(regex)
 end
 
 ---@param regex string
+---@param color? string
+---@param highlight? boolean
+---@param lightbox? boolean
 ---@return string?, CandelaPattern?
-function M.add_pattern(regex)
+function M.add_pattern(regex, color, highlight, lightbox)
     if regex == "" then
         vim.notify("[Candela] regex cannot be empty", vim.log.levels.ERROR)
         return
@@ -88,9 +91,9 @@ function M.add_pattern(regex)
         return
     end
 
-    local color = M.get_next_color()
-    local highlight = true
-    local lightbox = true
+    color = color ~= nil and color or M.get_next_color()
+    highlight = highlight ~= nil and highlight or true
+    lightbox = lightbox ~= nil and lightbox or true
     local count = 0
 
     local new_pattern = CandelaPattern.new(regex, color, highlight, lightbox, count)
