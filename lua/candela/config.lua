@@ -429,7 +429,7 @@ function M.set_patterns_keymaps(buffer)
         silent = true,
         desc = "Candela match pattern in buffer",
         callback = function()
-            CandelaCommands.commands.match_all()
+            CandelaUi.match_selected()
         end,
     })
     vim.api.nvim_buf_set_keymap(buffer, "n", "f", "", {
@@ -445,7 +445,9 @@ function M.set_patterns_keymaps(buffer)
         silent = true,
         desc = "Candela find all patterns in buffer",
         callback = function()
-            CandelaCommands.commands.find_all()
+            CandelaUi.find_selected()
+            vim.api.nvim_cmd({ cmd = "lnext" }, {})
+            vim.api.nvim_cmd({ cmd = "lopen" }, {})
         end,
     })
     vim.api.nvim_buf_set_keymap(buffer, "n", "L", "", {
@@ -478,6 +480,14 @@ function M.set_patterns_keymaps(buffer)
         desc = "Candela: display keymaps",
         callback = function()
             CandelaCommands.commands.help()
+        end,
+    })
+    vim.api.nvim_buf_set_keymap(buffer, "n", "<TAB>", "", {
+        noremap = true,
+        silent = true,
+        desc = "Candela: selected current pattern",
+        callback = function()
+            CandelaUi.toggle_select_pattern()
         end,
     })
 end

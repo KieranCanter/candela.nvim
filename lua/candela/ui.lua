@@ -32,6 +32,8 @@ local MARGIN = 0
 local PROMPT_OFFSET = 0
 local SYSTEM_CASE_CHANGED = false
 
+local selected_patterns = {}
+
 ---@enum operations
 local Operations = {
     ADD = 1,
@@ -91,6 +93,7 @@ local function update_ui_lines()
     end
 
     CandelaHighlighter.highlight_ui(M.windows, pattern_list)
+    M.unselect_all()
 end
 
 -- Update toggle in the UI
@@ -116,12 +119,6 @@ function M.update_ui()
     end
 
     update_ui_lines()
-    local order, patterns = CandelaPatternList.order, CandelaPatternList.patterns
-    for i, id in ipairs(order) do
-        local pattern = patterns[id]
-        update_ui_toggle("highlight", i, pattern)
-        update_ui_toggle("lightbox", i, pattern)
-    end
 
     if not was_open then
         M.hide_patterns()
@@ -204,13 +201,17 @@ local function format_icon(icon, type, subtype, header, default)
 
     local width = vim.fn.strwidth(icon)
     if width == 2 then
-        if subtype == "toggle_on" or subtype == "toggle_off" then
+        if type == "color" then
+            return string.format("%s%s", icon, header)
+        elseif subtype == "toggle_on" or subtype == "toggle_off" then
             return string.format("   %s", icon)
         else
             return string.format("%s%s", header, icon)
         end
     elseif width == 1 then
-        if subtype == "toggle_on" or subtype == "toggle_off" then
+        if type == "color" then
+            return string.format("%s %s", icon, header)
+        elseif subtype == "toggle_on" or subtype == "toggle_off" then
             return string.format("  %s  ", icon)
         else
             return string.format("%s %s", header, icon)
@@ -997,15 +998,24 @@ function M.match()
     CandelaFinder.match(curr_pattern.regex)
 end
 
-function M.match_all()
+---@param all boolean?: match all patterns if true, otherwise defer to selected
+function M.match_selected(all)
     if #CandelaPatternList.order == 0 then
-        vim.notify("[Candela] no patterns to match all", vim.log.levels.ERROR)
+        vim.notify("[Candela] no patterns to match", vim.log.levels.ERROR)
         return
+    end
+
+    local selected = {}
+    if all == nil or not all then
+        local patterns = CandelaPatternList.patterns
+        for id, _ in pairs(selected_patterns) do
+            selected[id] = patterns[id]
+        end
     end
 
     M.hide_prompt()
     M.hide_patterns()
-    CandelaFinder.match_all(CandelaPatternList.patterns)
+    CandelaFinder.match_selected(selected)
 end
 
 function M.find()
@@ -1025,15 +1035,24 @@ function M.find()
     CandelaFinder.find(M.base_buf, curr_pattern.regex)
 end
 
-function M.find_all()
+---@param all boolean?: find all patterns if true, otherwise defer to selected
+function M.find_selected(all)
     if #CandelaPatternList.order == 0 then
         vim.notify("[Candela] no patterns to find all", vim.log.levels.ERROR)
         return
     end
 
+    local selected = {}
+    if all == nil or not all then
+        local patterns = CandelaPatternList.patterns
+        for id, _ in pairs(selected_patterns) do
+            selected[id] = patterns[id]
+        end
+    end
+
     M.hide_prompt()
     M.hide_patterns()
-    CandelaFinder.find_all(M.base_buf, CandelaPatternList.patterns)
+    CandelaFinder.find_selected(M.base_buf, selected)
 end
 
 function M.import()
@@ -1056,6 +1075,7 @@ function M.hide_patterns()
             win:hide_window()
         end
     end
+    M.unselect_all()
 end
 
 function M.hide_prompt()
@@ -1074,6 +1094,28 @@ function M.toggle()
     else
         M.show_patterns()
     end
+end
+
+function M.toggle_select_pattern()
+    if #CandelaPatternList.order == 0 then
+        return
+    end
+
+    local curr_line = vim.api.nvim_win_get_cursor(0)[1]
+    local id = CandelaPatternList.order[curr_line]
+    if selected_patterns[id] then
+        CandelaHighlighter.highlight_selected(M.windows.regex, curr_line, false)
+        selected_patterns[id] = nil
+    else
+        CandelaHighlighter.highlight_selected(M.windows.regex, curr_line, true)
+        selected_patterns[id] = true
+    end
+end
+
+function M.unselect_all()
+    local ns = vim.api.nvim_create_namespace("CandelaUi")
+    vim.api.nvim_buf_clear_namespace(M.windows.regex.buf, ns, 0, -1)
+    selected_patterns = {}
 end
 
 function M.set_system_case_changed()

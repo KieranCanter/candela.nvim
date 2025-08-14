@@ -41,7 +41,7 @@ function M.setup(opts)
             CandelaUi.match()
         end,
         match_all = function()
-            CandelaUi.match_all()
+            CandelaUi.match_selected(true)
         end,
         find = function()
             CandelaUi.find()
@@ -49,7 +49,7 @@ function M.setup(opts)
             vim.api.nvim_cmd({ cmd = "lopen" }, {})
         end,
         find_all = function()
-            CandelaUi.find_all()
+            CandelaUi.find_selected(true)
             vim.api.nvim_cmd({ cmd = "lnext" }, {})
             vim.api.nvim_cmd({ cmd = "lopen" }, {})
         end,

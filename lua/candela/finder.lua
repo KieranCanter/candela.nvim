@@ -50,7 +50,6 @@ end
 ---@param regex string
 ---@return string
 local function get_match_case(regex)
-    print(candela_ignorecase, candela_smartcase)
     if candela_smartcase then
         if contains_uppercase(regex) then
             return "\\C"
@@ -72,7 +71,10 @@ function M.match(regex)
 end
 
 --@param patterns CandelaPattern[]
-function M.match_all(patterns)
+function M.match_selected(patterns)
+    if next(patterns) == nil then
+        patterns = require("candela.pattern_list").patterns
+    end
     local parts = {}
     for _, pattern in pairs(patterns) do
         table.insert(parts, "(" .. pattern.regex .. ")")
@@ -99,11 +101,13 @@ local function update_loclist(matches, kind)
     local title
     if kind == "single" then
         title = "Candela: Single Pattern"
+    elseif kind == "selected" then
+        title = "Candela: Selected Patterns"
     elseif kind == "all" then
         title = "Candela: All Patterns"
     else
         vim.notify(
-            "Candela: to update location list, kind must be 'single' or 'all', proceeding with 'single'",
+            "Candela: to update location list, kind must be 'single', 'selected', or 'all', proceeding with 'single'",
             vim.log.levels.WARN
         )
         title = "Candela: Single Pattern"
@@ -139,10 +143,11 @@ end
 -- TODO: can I use match_cache to get the matches instead of rerunning engine?
 ---@param bufnr number
 ---@param patterns CandelaPattern[]
-function M.find_all(bufnr, patterns)
-    if #patterns < 1 then
-        vim.notify("[Candela] cannot run find_all on pattern list of length 0", vim.log.levels.ERROR)
-        return
+function M.find_selected(bufnr, patterns)
+    local search_kind = "selected"
+    if next(patterns) == nil then
+        patterns = require("candela.pattern_list").patterns
+        search_kind = "all"
     end
 
     local filepath = vim.api.nvim_buf_get_name(bufnr)
@@ -166,9 +171,10 @@ function M.find_all(bufnr, patterns)
     table.insert(command, search_str)
     table.insert(command, filepath)
 
+    -- TODO: fix not right case sensitivity arg
     local matches = require("candela.engine").get_matches(command)
 
-    update_loclist(matches, "all")
+    update_loclist(matches, search_kind)
 end
 
 return M

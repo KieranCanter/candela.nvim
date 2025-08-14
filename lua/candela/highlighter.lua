@@ -32,12 +32,13 @@ local function hash_regex(regex)
     return vim.fn.sha256(regex):sub(1, 8)
 end
 
----@param windows { color: CandelaWindow, highlight: CandelaWindow, lightbox: CandelaWindow }
+---@param windows { color: CandelaWindow, regex: CandelaWindow, highlight: CandelaWindow, lightbox: CandelaWindow }
 ---@param patterns CandelaPattern[]
 function M.highlight_ui(windows, patterns)
     local ns = vim.api.nvim_create_namespace("CandelaUi")
     if #patterns == 0 then
         vim.api.nvim_buf_clear_namespace(windows.color.buf, ns, 0, -1)
+        vim.api.nvim_buf_clear_namespace(windows.regex.buf, ns, 0, -1)
         vim.api.nvim_buf_clear_namespace(windows.highlight.buf, ns, 0, -1)
         vim.api.nvim_buf_clear_namespace(windows.lightbox.buf, ns, 0, -1)
         return
@@ -52,6 +53,18 @@ function M.highlight_ui(windows, patterns)
         M.highlight_ui_toggle(windows.highlight, "highlight", i, pattern)
         M.highlight_ui_toggle(windows.lightbox, "lightbox", i, pattern)
     end
+end
+
+function M.highlight_selected(window, row, toggled)
+    local ns = vim.api.nvim_create_namespace("CandelaUi")
+    local hl_group = "Visual"
+    if not toggled then
+        hl_group = "Normal"
+    end
+
+    vim.api.nvim_buf_set_extmark(window.buf, ns, row - 1, 0,
+        { line_hl_group = hl_group }
+    )
 end
 
 function M.highlight_ui_toggle(window, kind, row, pattern)
