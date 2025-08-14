@@ -1,10 +1,3 @@
-local CandelaConfig = require("candela.config")
-local CandelaCommands = require("candela.commands")
-local CandelaUi = require("candela.ui")
-local CandelaPatternList = require("candela.pattern_list")
-local CandelaHighlighter = require("candela.highlighter")
-local CandelaLightbox = require("candela.lightbox")
-
 ---@class Candela
 ---@field ui CandelaUi
 ---@field patterns CandelaPattern[]
@@ -13,7 +6,7 @@ local Candela = {}
 
 function Candela.setup(opts)
     vim.api.nvim_create_user_command("Candela", function(args)
-        CandelaCommands.dispatch(args.fargs)
+        require("candela.commands").dispatch(args.fargs)
     end, {
         nargs = "*",
         desc = "Regex highlighter",
@@ -22,7 +15,7 @@ function Candela.setup(opts)
             local idx = #args - 1 -- skip :Candela argument
 
             if idx == 1 then
-                return vim.tbl_keys(CandelaCommands.commands)
+                return vim.tbl_keys(require("candela.commands").commands)
             elseif idx == 2 then
                 local sub = args[2]
                 -- TODO: allow other appropriate commands to receive args
@@ -35,16 +28,17 @@ function Candela.setup(opts)
         end,
     })
 
-    Candela.config = CandelaConfig.setup(opts)
+    Candela.config = require("candela.config").setup(opts)
     if Candela.config == nil then
         package.loaded.candela = nil
         return
     end
-    Candela.commands = CandelaCommands.setup(Candela.config)
-    Candela.ui = CandelaUi.setup(Candela.config)
-    Candela.patterns = CandelaPatternList.setup(Candela.config)
-    Candela.highlighter = CandelaHighlighter.setup()
-    Candela.lightbox = CandelaLightbox.setup(Candela.config)
+    Candela.commands = require("candela.commands").setup(Candela.config)
+    Candela.ui = require("candela.ui").setup(Candela.config)
+    require("candela.finder").setup(Candela.config)
+    Candela.patterns = require("candela.pattern_list").setup(Candela.config)
+    Candela.highlighter = require("candela.highlighter").setup()
+    Candela.lightbox = require("candela.lightbox").setup(Candela.config)
 end
 
 return Candela

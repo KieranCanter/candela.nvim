@@ -8,7 +8,7 @@ local CandelaHighlighter = require("candela.highlighter")
 local CandelaFinder = require("candela.finder")
 local CandelaLightbox = require("candela.lightbox")
 
-local candela_augroup = vim.api.nvim_create_augroup("Candela", { clear = true })
+local candela_augroup = vim.api.nvim_create_augroup("Candela", { clear = false })
 
 ---@alias CandelaWindows {
 ---                   patterns: CandelaWindow,
@@ -30,6 +30,7 @@ local WIDTH = 0
 local MIN_HEIGHT, MAX_HEIGHT = 0, 0
 local MARGIN = 0
 local PROMPT_OFFSET = 0
+local SYSTEM_CASE_CHANGED = false
 
 ---@enum operations
 local Operations = {
@@ -167,11 +168,6 @@ local function resize_height(delete)
 end
 
 local function refresh_all()
-    if M.base_buf == M.curr_buf then
-        vim.notify("[Candela] current buffer is already being matched against, skipping refresh", vim.log.levels.INFO)
-        return
-    end
-
     for _, id in ipairs(CandelaPatternList.order) do
         local pattern = CandelaPatternList.patterns[id]
         if pattern.count ~= 0 then
@@ -901,8 +897,14 @@ function M.clear(ask)
 end
 
 function M.refresh()
+    if M.base_buf == M.curr_buf and not SYSTEM_CASE_CHANGED then
+        vim.notify("[Candela] current buffer is already being matched against, skipping refresh", vim.log.levels.INFO)
+        return
+    end
+
     refresh_all()
     CandelaLightbox.refresh()
+    SYSTEM_CASE_CHANGED = false
 end
 
 function M.change_color()
@@ -1014,7 +1016,7 @@ function M.find()
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
     local curr_pattern = CandelaPatternList.get_pattern(curr_line)
     M.toggle()
-    CandelaFinder.find(M.base_buf, curr_pattern.regex, CandelaEngine.get_matches)
+    CandelaFinder.find(M.base_buf, curr_pattern.regex)
 end
 
 function M.find_all()
@@ -1025,7 +1027,7 @@ function M.find_all()
 
     M.hide_prompt()
     M.hide_patterns()
-    CandelaFinder.find_all(M.base_buf, CandelaPatternList.patterns, CandelaEngine.get_matches)
+    CandelaFinder.find_all(M.base_buf, CandelaPatternList.patterns)
 end
 
 function M.import()
@@ -1066,6 +1068,10 @@ function M.toggle()
     else
         M.show_patterns()
     end
+end
+
+function M.set_system_case_changed()
+    SYSTEM_CASE_CHANGED = true
 end
 
 return M

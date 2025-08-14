@@ -46,7 +46,8 @@ M.defaults = {
     engine = {
         -- regex search engine to use; defaults to first found tool out of the list in order
         command = nil, -- "rg" | "ag" | "ugrep" | "ack" | "grep"
-        -- extra args to pass to search engine; refer to your tool's manual (see args_map in doc for default args for each engine)
+        -- extra args to pass to search engine; refer to your tool's manual
+        -- every regex search will be run with a flag to include line numbers and set color off
         args = {},
     },
     matching = {
@@ -57,7 +58,7 @@ M.defaults = {
         -- require user confirmation upon clearing all patterns
         clear_confirmation = true, -- true | false
         -- case-sensitive option for searching
-        case = "sensitive", -- "sensitive" | "ignore" | "smart" | "system"
+        case = "system", -- "sensitive" | "ignore" | "smart" | "system"
         -- highlight entire line (end of line) or end of text
         hl_eol = false, -- true | false
     },
@@ -170,16 +171,16 @@ local function build_search_args(command, case_option)
     local args = vim.deepcopy(args_map[command] or {})
     vim.list_extend(args, M.options.engine.args)
 
-    local ignorecase = vim.api.nvim_get_option_value("ignorecase", {})
     local smartcase = vim.api.nvim_get_option_value("smartcase", {})
+    local ignorecase = vim.api.nvim_get_option_value("ignorecase", {})
 
     if case_option == "ignore" or (case_option == "system" and ignorecase) then
         table.insert(args, "--ignore-case")
-    elseif case_option == "smart" or (case_option == "system" and smartcase) then
+    elseif case_option == "smart" or (case_option == "system" and ignorecase and smartcase) then
         if command == "grep" then
             vim.notify(
                 "grep does not support smart-case. Consider installing a faster regex search engine or modifying"
-                    .. "`case` in your user config to turn smart-case off. Proceeding with the case-sensitive args.",
+                .. "`case` in your user config to turn smart-case off. Proceeding with the case-sensitive args.",
                 vim.log.levels.WARN
             )
         else
@@ -238,6 +239,21 @@ function M.setup(opts)
         return nil
     end
     M.options.engine.args = get_default_args(M.options)
+
+    local candela_augroup = vim.api.nvim_create_augroup("Candela", { clear = true })
+    vim.api.nvim_create_autocmd("OptionSet", {
+        group = candela_augroup,
+        pattern = { "ignorecase", "smartcase" },
+        desc = "Update case-sensitivity globals when user changes system options",
+        callback = function()
+            if M.options.matching.case == "system" then
+                M.options.engine.args = build_search_args(M.options.engine.command, M.options.matching.case)
+                require("candela.finder").set_candela_case()
+                require("candela.ui").set_system_case_changed()
+            end
+        end,
+    })
+
     return M.options
 end
 

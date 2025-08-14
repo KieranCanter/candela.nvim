@@ -22,6 +22,7 @@
 --    * implement help function
 --    * write docs
 --    * lazy load more
+--    * move autocmds/mappings to separate file
 --]]
 --
 -- TODO: remove all functions that aren't needed across files from appropriate table e.g.
