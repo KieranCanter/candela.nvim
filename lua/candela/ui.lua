@@ -658,6 +658,7 @@ local function show_prompt(operation, curr_line, curr_pattern)
             local args = CandelaConfig.options.engine.args
             local count = CandelaHighlighter.highlight_matches(M.base_buf, new_id, new_pattern, cmd, args)
             if count == -1 then
+                CandelaPatternList.delete_pattern(#CandelaPatternList.order)
                 return
             end
 
@@ -680,6 +681,7 @@ local function show_prompt(operation, curr_line, curr_pattern)
             end
 
             if not CandelaHighlighter.remove_match_highlights(M.base_buf, old_id, old_regex) then
+                CandelaPatternList.edit_pattern(curr_line, old_regex)
                 return
             end
 
@@ -687,6 +689,7 @@ local function show_prompt(operation, curr_line, curr_pattern)
             local args = CandelaConfig.options.engine.args
             local count = CandelaHighlighter.highlight_matches(M.base_buf, new_id, new_pattern, cmd, args)
             if count == -1 then
+                CandelaPatternList.edit_pattern(curr_line, old_regex)
                 return
             end
 
@@ -709,6 +712,7 @@ local function show_prompt(operation, curr_line, curr_pattern)
             local args = CandelaConfig.options.engine.args
             local count = CandelaHighlighter.highlight_matches(M.base_buf, new_id, new_pattern, cmd, args)
             if count == -1 then
+                CandelaPatternList.delete_pattern(#CandelaPatternList.order)
                 return
             end
 
@@ -723,12 +727,14 @@ local function show_prompt(operation, curr_line, curr_pattern)
         end)
     elseif operation == Operations.CHANGE_COLOR then
         vim.fn.prompt_setcallback(M.windows.prompt.buf, function(color)
+            local old_color = CandelaPatternList.order[curr_line].color
             local new_pattern = CandelaPatternList.change_pattern_color(curr_line, color)
             if new_pattern == nil then
                 return
             end
 
             if not CandelaHighlighter.change_highlight_color(curr_pattern.regex, new_pattern.color) then
+                CandelaPatternList.change_pattern_color(curr_line, old_color)
                 return
             end
 
