@@ -38,10 +38,10 @@ function M.setup(opts)
     local system_split = opts.view:match("system%-(%a+)") -- match split command if opt set, nil otherwise ("split", "vsplit")
     local tab_split = opts.view:match("tab") and "tab split" -- match tab comand if opt set, nil otherwise
 
-    if split_dir == nil then
+    if split_dir == nil then -- using system_split or tab_split
         M.window = CandelaWindow.new({})
         M.open_command = system_split or tab_split
-    else
+    else -- using split_dir
         M.window = CandelaWindow.new({
             win = 0,
             split = split_dir,
