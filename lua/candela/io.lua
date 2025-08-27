@@ -27,12 +27,6 @@ local function unique_path(path)
 
     local new_path
     new_path = string.format("%s_%s.%s", base, os.date("%Y%m%d_%H%M%S"), ext)
-    if uv.fs_stat(path) then
-        vim.notify(
-            string.format("[Candela] file `%s` already exists, exporting to `%s` instead", path, new_path),
-            vim.log.levels.INFO
-        )
-    end
 
     return new_path
 end
@@ -55,7 +49,7 @@ function M.import_patterns(path)
                 "",
                 "file"
             )
-            M.export(export_path)
+            M.export_patterns(export_path)
         elseif choice == 3 then
             return -- cancel
         end
@@ -95,7 +89,17 @@ function M.export_patterns(path)
         )
     end
 
-    path = unique_path(path)
+    local path_exists, _ = io.open(path, "r")
+    if path_exists then
+        local choice =
+            vim.fn.confirm("[Candela] file path already exists, overwrite? Select \"No\" to automatically"
+                .. " create a unique path using the date and time.", "&Yes\n&No\n&Cancel", 1)
+        if choice == 2 then -- create unique path
+            path = unique_path(path)
+        elseif choice == 3 then -- cancel
+            return
+        end -- otherwise, choice is 1, overwrite path
+    end
 
     local file, err = io.open(path, "w")
     if not file then
