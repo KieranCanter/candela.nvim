@@ -184,8 +184,6 @@ local function refresh_all()
         update_ui_lines()
         resize_height()
     end
-
-    M.base_buf = M.curr_buf
 end
 
 ---@param icon string|nil: user config icon option
@@ -555,7 +553,7 @@ function M.setup(opts)
             M.curr_buf = bufnr
 
             if opts.matching.auto_refresh then
-                refresh_all()
+                M.refresh()
             end
         end,
     })
@@ -903,13 +901,17 @@ function M.clear(ask)
     end
 end
 
-function M.refresh()
-    if M.base_buf == M.curr_buf and not SYSTEM_CASE_CHANGED then
+---@param keep_base_buffer boolean?: defaults to false
+function M.refresh(keep_base_buffer)
+    if not keep_base_buffer and M.base_buf == M.curr_buf and not SYSTEM_CASE_CHANGED then
         vim.notify("[Candela] current buffer is already being matched against, skipping refresh", vim.log.levels.INFO)
         return
     end
 
     refresh_all()
+    if not keep_base_buffer then
+        M.base_buf = M.curr_buf
+    end
     CandelaLightbox.refresh()
     SYSTEM_CASE_CHANGED = false
 end
