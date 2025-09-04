@@ -1,6 +1,6 @@
 # Candela
 
-Multi-regex highlighter + manager, designed for efficient log analysis
+Regex highlighter. Designed for efficient log analysis. Also solved world hunger.
 
 Inspired by the [Log
 Analysis](https://marketplace.visualstudio.com/items?itemName=XinyaYang0506.log-analysis) VSCode
