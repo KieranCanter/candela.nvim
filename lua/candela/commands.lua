@@ -38,10 +38,10 @@ function M.setup(opts)
             CandelaUi.toggle_lightbox()
         end,
         match = function()
-            CandelaUi.match()
+            CandelaUi.match(false)
         end,
         match_all = function()
-            CandelaUi.match_selected(true)
+            CandelaUi.match(true)
         end,
         find = function()
             CandelaUi.find()

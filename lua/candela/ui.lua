@@ -992,41 +992,33 @@ function M.toggle_lightbox()
     update_ui_toggle("lightbox", curr_line, CandelaPatternList.get_pattern(curr_line))
 end
 
-function M.match()
-    if vim.api.nvim_get_current_win() ~= M.windows.regex.win then
-        vim.notify("[Candela] must be in patterns window to match regex", vim.log.levels.ERROR)
-        return
-    end
-
-    if #CandelaPatternList.order == 0 then
-        vim.notify("[Candela] no patterns to match", vim.log.levels.ERROR)
-        return
-    end
-
-    local curr_line = vim.api.nvim_win_get_cursor(0)[1]
-    local curr_pattern = CandelaPatternList.get_pattern(curr_line)
-    M.toggle()
-    CandelaFinder.match(curr_pattern.regex)
-end
-
----@param all boolean?: match all patterns if true, otherwise defer to selected
-function M.match_selected(all)
+---@param all boolean: whether to match selected patterns or all
+function M.match(all)
     if #CandelaPatternList.order == 0 then
         vim.notify("[Candela] no patterns to match", vim.log.levels.ERROR)
         return
     end
 
     local selected = {}
-    if all == nil or not all then
-        local patterns = CandelaPatternList.patterns
-        for id, _ in pairs(selected_patterns) do
-            selected[id] = patterns[id]
+    local count = 0
+    if not all then
+        if next(selected_patterns) == nil then
+            local curr_line = vim.api.nvim_win_get_cursor(0)[1]
+            local id = CandelaPatternList.order[curr_line]
+            selected[id] = CandelaPatternList.get_pattern(curr_line)
+            count = 1
+        else
+            local patterns = CandelaPatternList.patterns
+            for id, _ in pairs(selected_patterns) do
+                selected[id] = patterns[id]
+                count = count + 1
+            end
         end
     end
 
     M.hide_prompt()
     M.hide_patterns()
-    CandelaFinder.match_selected(selected)
+    CandelaFinder.match(selected, count)
 end
 
 function M.find()

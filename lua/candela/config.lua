@@ -426,7 +426,7 @@ function M.set_patterns_keymaps(buffer)
     vim.api.nvim_buf_set_keymap(buffer, "n", "m", "", {
         noremap = true,
         silent = true,
-        desc = "Candela match pattern in buffer",
+        desc = "Candela match selected patterns in buffer",
         callback = function()
             CandelaCommands.commands.match()
         end,
@@ -436,7 +436,7 @@ function M.set_patterns_keymaps(buffer)
         silent = true,
         desc = "Candela match pattern in buffer",
         callback = function()
-            CandelaUi.match_selected()
+            CandelaCommands.commands.match_all()
         end,
     })
     vim.api.nvim_buf_set_keymap(buffer, "n", "f", "", {

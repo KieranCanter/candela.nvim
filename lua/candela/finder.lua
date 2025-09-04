@@ -63,29 +63,31 @@ local function get_match_case(regex)
     end
 end
 
----@param regex string
-function M.match(regex)
-    local case = get_match_case(regex)
-    vim.fn.setreg("/", "\\v" .. case .. regex)
-    local ok = pcall(vim.api.nvim_exec2, "normal! n")
-    if not ok then
-        vim.notify(string.format("[Candela] no matches found for /%s/", regex), vim.log.levels.WARN)
+---@param patterns table<integer, CandelaPattern>
+---@param count integer
+function M.match(patterns, count)
+    local search_str = ""
+    if count == 1 then
+        local _, pattern = next(patterns)
+        if pattern == nil then
+            vim.notify("[Candela] finder.match() count is 1 but pattern is nil", vim.log.levels.ERROR)
+            return
+        end
+        search_str = pattern.regex
+    else
+        if count == 0 then
+            patterns = require("candela.pattern_list").patterns
+        end
+        local parts = {}
+        for _, pattern in pairs(patterns) do
+            table.insert(parts, "(" .. pattern.regex .. ")")
+        end
+        search_str = table.concat(parts, "|")
     end
-end
 
---@param patterns CandelaPattern[]
-function M.match_selected(patterns)
-    if next(patterns) == nil then
-        patterns = require("candela.pattern_list").patterns
-    end
-    local parts = {}
-    for _, pattern in pairs(patterns) do
-        table.insert(parts, "(" .. pattern.regex .. ")")
-    end
-    local search_str = table.concat(parts, "|")
     local case = get_match_case(search_str)
     vim.fn.setreg("/", "\\v" .. case .. search_str)
-    local ok = pcall(vim.api.nvim_exec2, "normal! n")
+    local ok = pcall(vim.api.nvim_exec2, "normal! n", {})
     if not ok then
         vim.notify(string.format("[Candela] no matches found for /%s/", search_str), vim.log.levels.WARN)
     end
