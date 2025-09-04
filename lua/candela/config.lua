@@ -171,9 +171,7 @@ local function build_search_args(command, case_option)
     local smartcase = vim.api.nvim_get_option_value("smartcase", {})
     local ignorecase = vim.api.nvim_get_option_value("ignorecase", {})
 
-    if case_option == "ignore" or (case_option == "system" and ignorecase) then
-        table.insert(args, "--ignore-case")
-    elseif case_option == "smart" or (case_option == "system" and ignorecase and smartcase) then
+    if case_option == "smart" or (case_option == "system" and ignorecase and smartcase) then
         if command == "grep" then
             vim.notify(
                 "grep does not support smart-case. Consider installing a faster regex search engine or modifying"
@@ -183,6 +181,8 @@ local function build_search_args(command, case_option)
         else
             table.insert(args, "--smart-case")
         end
+    elseif case_option == "ignore" or (case_option == "system" and ignorecase) then
+        table.insert(args, "--ignore-case")
     else
         if command == "rg" or command == "ag" then
             table.insert(args, "--case-sensitive")
@@ -232,10 +232,12 @@ function M.setup(opts)
     if M.options.engine.command == nil then
         M.options.engine.command = get_default_engine(available)
     end
-    if M.options.engine.command == nil then
+    if M.options.engine.command == nil then -- if engine command is still nil, no engine found
         return nil
     end
-    M.options.engine.args = get_default_args(M.options)
+    vim.defer_fn(function() -- defer to get proper neovim user options
+        M.options.engine.args = get_default_args(M.options)
+    end, 0)
 
     local candela_augroup = vim.api.nvim_create_augroup("Candela", { clear = true })
     vim.api.nvim_create_autocmd("OptionSet", {
@@ -244,6 +246,7 @@ function M.setup(opts)
         desc = "Update case-sensitivity globals when user changes system options",
         callback = function()
             if M.options.matching.case == "system" then
+                M.options.engine.args = {}
                 M.options.engine.args = build_search_args(M.options.engine.command, M.options.matching.case)
                 require("candela.finder").set_candela_case()
                 require("candela.ui").set_system_case_changed()
