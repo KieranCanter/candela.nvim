@@ -26,7 +26,7 @@ local candela_augroup = vim.api.nvim_create_augroup("Candela", { clear = false }
 
 local M = {}
 
-local WIDTH = 0
+local WIDTH_COEFF = 0
 local MIN_HEIGHT, MAX_HEIGHT = 0, 0
 local MARGIN = 0
 local PROMPT_OFFSET = 0
@@ -246,32 +246,33 @@ local function set_size_and_loc(windows)
         end
     end
 
-    local max_width = vim.o.columns - MARGIN
-    local width = clamp_max(WIDTH, max_width)
-
     local pattern_color_width = 7 -- 7 space hexcode
     local pattern_count_width = 4 -- 4 digit, resize to fit larger digits once more patterns are made
     local pattern_ops_width = 5 -- 1 space letter/symbol, 2 space margin on each side
-    local float_width = width -- total window width
+    local curr_width = math.floor(vim.o.columns * WIDTH_COEFF)
+    local max_width = vim.o.columns - MARGIN
+    local width = clamp_max(curr_width, max_width)
     -- Fit regex to rest of window leftover, subtract 1 for each space inbetween windows
-    local pattern_regex_width = float_width - pattern_color_width - pattern_count_width - (pattern_ops_width * 2) - 6
+    local pattern_regex_width = width - pattern_color_width - pattern_count_width - (pattern_ops_width * 2) - 6
 
     local pattern_height = nil
-    if windows.patterns.config.height == nil then
-        pattern_height = MIN_HEIGHT + 2 -- starting height
+    local curr_pattern_height = nil
+    local max_pattern_height = vim.o.lines - MARGIN
+    if #CandelaPatternList.order then
+        curr_pattern_height = MIN_HEIGHT + 2 -- minimum height
     else
-        local max_pattern_height = vim.o.lines - MARGIN
-        pattern_height = clamp_max(windows.patterns.config.height, max_pattern_height)
+        curr_pattern_height = windows.patterns.config.height
     end
+    pattern_height = clamp_max(curr_pattern_height, max_pattern_height)
     local prompt_height = 1 -- 1 space height for prompt
 
     -- Account for 2 border spaces worth of padding to center window in center of base window
-    local horz_center = math.floor((vim.o.columns - float_width - 2) / 2)
+    local horz_center = math.floor((vim.o.columns - width - 2) / 2)
     local vert_center = math.floor((vim.o.lines - pattern_height - prompt_height) / 2)
 
     -- Patterns
     extend_table(windows.patterns.config, {
-        width = float_width,
+        width = width,
         height = pattern_height,
         col = horz_center,
         row = vert_center,
@@ -319,7 +320,7 @@ local function set_size_and_loc(windows)
 
     -- Prompt
     extend_table(windows.prompt.config, {
-        width = float_width,
+        width = width,
         height = prompt_height,
         col = -1,
         row = pattern_height + PROMPT_OFFSET,
@@ -341,17 +342,25 @@ function M.setup(opts)
     local function validate_config_num(name, num)
         local mins = {
             margin = 0,
-            width = 35,
+            width = 0,
             min_height = 1,
             max_height = 1,
         }
+        local maxs = {
+            margin = math.huge,
+            width = 1,
+            min_height = math.huge,
+            max_height = math.huge,
+        }
 
-        if num < mins[name] then
+        if num < mins[name] or num > maxs[name] then
             vim.notify(
                 string.format(
-                    "[Candela] option window.%s cannot be less than %s, got %s. Proceeding with default of %s",
+                    "[Candela] option window.%s cannot be less than %s or greater than %s, got %s. "
+                        .. "Proceeding with default of %s",
                     name,
                     mins[name],
+                    maxs[name],
                     num,
                     CandelaConfig.defaults.window[name]
                 )
@@ -362,7 +371,7 @@ function M.setup(opts)
         return num
     end
 
-    WIDTH = validate_config_num("width", opts.window.width)
+    WIDTH_COEFF = validate_config_num("width", opts.window.width)
     MIN_HEIGHT = validate_config_num("min_height", opts.window.min_height)
     MAX_HEIGHT = validate_config_num("max_height", opts.window.max_height)
     MARGIN = validate_config_num("margin", opts.window.margin)
@@ -512,7 +521,7 @@ function M.setup(opts)
     vim.api.nvim_create_autocmd("VimResized", {
         group = candela_augroup,
         callback = function()
-            set_size_and_loc(M.windows, opts.window.width)
+            set_size_and_loc(M.windows)
         end,
     })
 
@@ -598,11 +607,11 @@ function M.show_patterns()
 
     if not is_setup then
         for _, window in pairs(M.windows) do
-          if window.win and vim.api.nvim_win_is_valid(window.win) then
-            vim.api.nvim_win_call(window.win, function()
-              vim.wo.scrollbind = true
-            end)
-          end
+            if window.win and vim.api.nvim_win_is_valid(window.win) then
+                vim.api.nvim_win_call(window.win, function()
+                    vim.wo.scrollbind = true
+                end)
+            end
         end
         vim.api.nvim_exec2("syncbind", {})
     end

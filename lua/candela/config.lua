@@ -31,8 +31,8 @@ M.defaults = {
     },
     -- Use log syntax highlighting
     window = {
-        -- initial width of the patterns window
-        width = math.floor(vim.o.columns * 0.5), -- integer
+        -- initial width of the patterns window as percentage of Neovim window width
+        width = 0.5, -- number
         -- minimum height (number of patterns) of the patterns window (initial height)
         min_height = 5, -- unsigned integer
         -- maximum height (number of patterns) of the patterns window

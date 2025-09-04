@@ -1,16 +1,11 @@
 TODO (before release):
-  * bugfix: resize width like height when neovim window size changes
-  * bugfix: regex engine flags not synced with system in the case of system* setting user config
   * when matching returns no results, capture error and vim.notify instead of throwing error
   * consolidate match/find into single functions that acts on either a single, many, or all patterns
     * match/find selected mapped to m/f not M/F
-  * palettes/colors
-    * better default colors
-    * handle automatic foreground color changing if the colors are too similar in luminosity
-    * give config option to cycle colors constantly or randomly (same colors show first everytime or random selection from palette)
+  * give config option to cycle colors constantly or randomly (same colors show first everytime or random selection from palette)
+  * improve API naming (make it as user-friendly as possible)
   * implement help function
   * write docs
-  * lazy load more
   * move autocmds/mappings to separate file
   * remove all functions that aren't needed across files from appropriate table e.g. CandelaPatternList.get_next_color() => local get_next_color()
 
@@ -19,3 +14,5 @@ TODO (can wait til after release)
   * change_color improvements:
     * set some default names for palette colors so users can do e.g. change_color("red")
     * allow users to set their own color names
+    * handle automatic foreground color changing if the colors are too similar in luminosity
+  * lazy load more
