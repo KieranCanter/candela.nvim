@@ -44,14 +44,18 @@ function M.setup(opts)
             CandelaUi.match(true)
         end,
         find = function()
-            CandelaUi.find()
-            vim.api.nvim_cmd({ cmd = "lnext" }, {})
-            vim.api.nvim_cmd({ cmd = "lopen" }, {})
+            local success = CandelaUi.find(false)
+            if success then
+                vim.api.nvim_cmd({ cmd = "lnext" }, {})
+                vim.api.nvim_cmd({ cmd = "lopen" }, {})
+            end
         end,
         find_all = function()
-            CandelaUi.find_selected(true)
-            vim.api.nvim_cmd({ cmd = "lnext" }, {})
-            vim.api.nvim_cmd({ cmd = "lopen" }, {})
+            local success = CandelaUi.find(true)
+            if success then
+                vim.api.nvim_cmd({ cmd = "lnext" }, {})
+                vim.api.nvim_cmd({ cmd = "lopen" }, {})
+            end
         end,
         lightbox = function()
             CandelaUi.hide_patterns()

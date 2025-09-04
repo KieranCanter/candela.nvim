@@ -126,49 +126,40 @@ end
 
 -- TODO: can I use match_cache to get the matches instead of rerunning engine?
 ---@param bufnr number
----@param regex string
-function M.find(bufnr, regex)
+---@param patterns table<integer, CandelaPattern>
+---@param count integer
+---@return boolean: tells caller whether find was successful or not
+function M.find(bufnr, patterns, count)
     local filepath = vim.api.nvim_buf_get_name(bufnr)
     if filepath == "" then
         vim.notify("[Candela] cannot search file with no file name", vim.log.levels.ERROR)
-        return 0
+        return false
     end
 
-    local cmd = require("candela.config").options.engine.command
-    local args = require("candela.config").options.engine.args
-    local command = { cmd }
-    for _, arg in ipairs(args) do
-        table.insert(command, arg)
-    end
-    table.insert(command, regex)
-    table.insert(command, filepath)
-
-    local matches = require("candela.engine").get_matches(command)
-
-    update_loclist(matches, "single")
-end
-
--- TODO: can I use match_cache to get the matches instead of rerunning engine?
----@param bufnr number
----@param patterns CandelaPattern[]
-function M.find_selected(bufnr, patterns)
+    local search_str = ""
     local search_kind = "selected"
-    if next(patterns) == nil then
-        patterns = require("candela.pattern_list").patterns
-        search_kind = "all"
-    end
 
-    local filepath = vim.api.nvim_buf_get_name(bufnr)
-    if filepath == "" then
-        vim.notify("[Candela] cannot search file with no file name", vim.log.levels.ERROR)
-        return 0
+    if count == 1 then
+        local _, pattern = next(patterns)
+        if pattern == nil then
+            vim.notify("[Candela] finder.find() count is 1 but pattern is nil", vim.log.levels.ERROR)
+            return false
+        end
+        search_str = pattern.regex
+        search_kind = "single"
+    else
+        if count == 0 then
+            patterns = require("candela.pattern_list").patterns
+            search_kind = "all"
+        else
+            search_kind = "selected"
+        end
+        local parts = {}
+        for _, pattern in pairs(patterns) do
+            table.insert(parts, "(" .. pattern.regex .. ")")
+        end
+        search_str = table.concat(parts, "|")
     end
-
-    local parts = {}
-    for _, pattern in pairs(patterns) do
-        table.insert(parts, "(" .. pattern.regex .. ")")
-    end
-    local search_str = table.concat(parts, "|")
 
     local cmd = require("candela.config").options.engine.command
     local args = require("candela.config").options.engine.args
@@ -179,10 +170,10 @@ function M.find_selected(bufnr, patterns)
     table.insert(command, search_str)
     table.insert(command, filepath)
 
-    -- TODO: fix not right case sensitivity arg
     local matches = require("candela.engine").get_matches(command)
 
     update_loclist(matches, search_kind)
+    return true
 end
 
 return M
