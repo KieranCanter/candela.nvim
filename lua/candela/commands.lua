@@ -26,7 +26,7 @@ function M.setup(opts)
             CandelaUi.clear(ask)
         end,
         refresh = function()
-            CandelaUi.refresh()
+            CandelaUi.refresh(true)
         end,
         change_color = function()
             CandelaUi.change_color()

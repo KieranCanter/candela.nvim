@@ -78,9 +78,9 @@ M.defaults = {
     },
     palette = {
         -- replace default color palette or add to it
-        use = "replace", -- "replace" | "prepend" | "append"  TODO: implement
+        use = "replace", -- "replace" | "prepend" | "append"
         -- replace default color palette or add to it
-        cycle = "constant", -- "constant" | "random"  TODO: implement
+        cycle = "constant", -- "constant" | "random"
         -- list of colors to use for dark/light mode
         colors = {
             dark = {
@@ -249,7 +249,6 @@ function M.setup(opts)
                 M.options.engine.args = {}
                 M.options.engine.args = build_search_args(M.options.engine.command, M.options.matching.case)
                 require("candela.finder").set_candela_case()
-                require("candela.ui").set_system_case_changed()
             end
         end,
     })
@@ -257,7 +256,8 @@ function M.setup(opts)
         group = candela_augroup,
         desc = "Refresh Candela when color scheme changes",
         callback = function()
-            require("candela.ui").refresh(true)
+            require("candela.pattern_list").setup(M.options)
+            require("candela.ui").regen_colors()
         end,
     })
 

@@ -30,7 +30,6 @@ local WIDTH_COEFF = 0
 local MIN_HEIGHT, MAX_HEIGHT = 0, 0
 local MARGIN = 0
 local PROMPT_OFFSET = 0
-local SYSTEM_CASE_CHANGED = false
 
 local selected_patterns = {}
 
@@ -164,7 +163,7 @@ local function resize_height(delete)
     end
 end
 
-local function refresh_all()
+local function refresh_to_curr_buf()
     for _, id in ipairs(CandelaPatternList.order) do
         local pattern = CandelaPatternList.patterns[id]
         if pattern.count ~= 0 then
@@ -910,19 +909,19 @@ function M.clear(ask)
     end
 end
 
+---@param force boolean?: defaults to false
 ---@param keep_base_buffer boolean?: defaults to false
-function M.refresh(keep_base_buffer)
-    if not keep_base_buffer and M.base_buf == M.curr_buf and not SYSTEM_CASE_CHANGED then
+function M.refresh(force, keep_base_buffer)
+    if not force and not keep_base_buffer and M.base_buf == M.curr_buf then
         vim.notify("[Candela] current buffer is already being matched against, skipping refresh", vim.log.levels.INFO)
         return
     end
 
-    refresh_all()
+    refresh_to_curr_buf()
     if not keep_base_buffer then
         M.base_buf = M.curr_buf
     end
     CandelaLightbox.refresh()
-    SYSTEM_CASE_CHANGED = false
 end
 
 function M.change_color()
@@ -1114,8 +1113,16 @@ function M.unselect_all()
     selected_patterns = {}
 end
 
-function M.set_system_case_changed()
-    SYSTEM_CASE_CHANGED = true
+function M.regen_colors()
+    for i, id in ipairs(CandelaPatternList.order) do
+        print(string.format("Regex: %s", CandelaPatternList.patterns[id].regex))
+        print(string.format("Color: %s", CandelaPatternList.patterns[id].color))
+        local new_color = CandelaPatternList.next_color()
+        CandelaPatternList.change_pattern_color(i, new_color)
+        print(string.format("New Color: %s\n", new_color))
+    end
+
+    M.refresh(true, true)
 end
 
 return M

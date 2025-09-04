@@ -6,10 +6,89 @@ local M = {}
 M.patterns = {}
 M.order = {}
 
-local next_color_index = 1
+---@param palette table
+local function shuffle(palette)
+    local result = {unpack(palette)}
+    for i = #result, 2, -1 do
+        local j = math.random(i)
+        result[i], result[j] = result[j], result[i]
+    end
+    return result
+end
 
+---@param mode "constant"|"random"
+---@param default string
+local function make_cycler(mode, default)
+    local index = 1
+    local palette = M.get_palette()
+    if mode == "constant" then
+        return function()
+            local next_color = palette[index]
+            index = (index % #palette) + 1
+            return next_color
+        end
+    elseif mode == "random" then
+        local shuffled = {}
+        return function()
+            if index > #shuffled then
+                shuffled = shuffle(palette)
+                index = 1
+            end
+            local next_color = shuffled[index]
+            index = index + 1
+            return next_color
+        end
+    else
+        vim.notify(
+            string.format(
+                '[Candela] option "%s" not supported for palette.cycle, proceeding with default "%s"',
+                mode,
+                default
+            ),
+            vim.log.levels.WARN
+        )
+        make_cycler(default, default)
+    end
+end
+
+
+-- TODO: move to a colors module?
 function M.setup(opts)
-    M.palette = opts.palette.colors
+    local defaults = require("candela.config").defaults
+
+    -- Set palette colors
+    if opts.palette.use == "replace" then
+        M.palette = opts.palette.colors
+    elseif opts.palette.use == "prepend" then
+        M.palette = opts.palette.colors
+        for _, color in ipairs(defaults.palette.colors.dark) do
+            table.insert(M.palette.dark, color)
+        end
+        for _, color in ipairs(defaults.palette.colors.light) do
+            table.insert(M.palette.light, color)
+        end
+    elseif opts.palette.use == "append" then
+        M.palette = defaults.palette.colors
+        for _, color in ipairs(opts.palette.colors.dark) do
+            table.insert(M.palette.dark, color)
+        end
+        for _, color in ipairs(opts.palette.colors.light) do
+            table.insert(M.palette.light, color)
+        end
+    else
+        vim.notify(
+            string.format(
+                '[Candela] option "%s" not supported for palette.use, proceeding with default "%s"',
+                opts.palette.use,
+                defaults.palette.use
+            ),
+            vim.log.levels.WARN
+        )
+        M.palette = opts.palette.colors
+    end
+
+    -- Set type of cycler
+    M.next_color = make_cycler(opts.palette.cycle, defaults.palette.cycle)
 end
 
 ---@return CandelaPattern
@@ -22,14 +101,6 @@ end
 function M.get_palette()
     local mode = vim.o.background
     return M.palette[mode] or M.palette.dark
-end
-
----@return string
-function M.get_next_color()
-    local palette = M.get_palette()
-    local next_color = palette[next_color_index]
-    next_color_index = (next_color_index % #palette) + 1
-    return next_color
 end
 
 ---@param regex string
@@ -53,7 +124,7 @@ function M.add_pattern(regex, color, highlight, lightbox)
         return
     end
 
-    color = color ~= nil and color or M.get_next_color()
+    color = color ~= nil and color or M.next_color()
     highlight = highlight ~= nil and highlight or true
     lightbox = lightbox ~= nil and lightbox or true
     local count = 0
