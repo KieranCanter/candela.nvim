@@ -36,8 +36,7 @@ M.defaults = {
         -- minimum height (number of patterns) of the patterns window (initial height)
         min_height = 5, -- unsigned integer
         -- maximum height (number of patterns) of the patterns window
-        --max_height = 30, -- unsigned integer
-        max_height = 5, -- unsigned integer
+        max_height = 30, -- unsigned integer
         -- margin space between window and Neovim bounds when Neovim is too small to fit the window
         margin = 16, -- unsigned integer
         -- position of prompt window in relation to patterns window
@@ -48,7 +47,7 @@ M.defaults = {
         command = nil, -- "rg" | "ag" | "ugrep" | "ack" | "grep"
         -- extra args to pass to search engine; refer to your tool's manual
         -- every regex search will be run with a flag to include line numbers and set color off
-        args = {},
+        args = {}, -- defaults to flags that display line numbers and remove color (flags depend on tool above)
     },
     matching = {
         -- automatically refresh pattern matching/highlighting on buffer change
@@ -85,40 +84,38 @@ M.defaults = {
         -- list of colors to use for dark/light mode
         colors = {
             dark = {
-                "#003f5c", -- deep blue
-                "#2f4b7c", -- indigo
-                "#665191", -- muted purple
-                "#a05195", -- plum
-                "#d45087", -- rose
-                "#f95d6a", -- coral red
-                "#ff7c43", -- burnt orange
-                "#ffa600", -- gold
-                "#b59f3b", -- olive yellow
-                "#5f7e0e", -- moss green
-                "#2f9e44", -- forest green
-                "#228c99", -- teal
-                "#1c7ed6", -- azure
-                "#4263eb", -- strong blue
-                "#5c5f66", -- soft gray
-                "#7c4dff", -- electric purple,
+                "#9d4564", -- dark mauve
+                "#a1464c", -- light maroon
+                "#9e4d21", -- sienna
+                "#935800", -- mud
+                "#7f6400", -- mustard
+                "#6c6c00", -- moss
+                "#4c7522", -- leaf green
+                "#257a3f", -- jewel green
+                "#007c6a", -- aquamarine
+                "#007690", -- ocean
+                "#3368ab", -- muted blue
+                "#565fac", -- dusky blue
+                "#7156a3", -- dark lavender
+                "#805098", -- eggplant
+                "#94487c", -- rouge
             },
             light = {
-                "#3c8fcf", -- muted blue
-                "#61afef", -- sky blue
-                "#88c0d0", -- nord light blue
-                "#81a1c1", -- nord steel
-                "#56b6c2", -- teal
-                "#98c379", -- green
-                "#c3e88d", -- pastel green
-                "#e5c07b", -- soft yellow
-                "#fab387", -- peach
-                "#f78c6c", -- orange
-                "#e06c75", -- red
-                "#ff6ac1", -- pink
-                "#c678dd", -- purple
-                "#bb9af7", -- violet
-                "#7dcfff", -- light aqua
-                "#9aedfe", -- icy cyan,
+                "#f08fae", -- pink sherbet
+                "#f49093", -- sea pink
+                "#f0986d", -- tangerine
+                "#e2a25d", -- desert
+                "#cbae5e", -- gold
+                "#b6b75f", -- olive
+                "#94c16f", -- pistachio
+                "#75c787", -- mantis
+                "#65c5b1", -- neptune
+                "#64bfdb", -- bluish cyan
+                "#7cb4fd", -- crystal blue
+                "#9daafe", -- periwinkle
+                "#bba0f3", -- lilac
+                "#cd9ae7", -- baby purple
+                "#e592c8", -- light orchid
             },
         },
     },
@@ -180,7 +177,7 @@ local function build_search_args(command, case_option)
         if command == "grep" then
             vim.notify(
                 "grep does not support smart-case. Consider installing a faster regex search engine or modifying"
-                .. "`case` in your user config to turn smart-case off. Proceeding with the case-sensitive args.",
+                    .. "`case` in your user config to turn smart-case off. Proceeding with the case-sensitive args.",
                 vim.log.levels.WARN
             )
         else
@@ -251,6 +248,13 @@ function M.setup(opts)
                 require("candela.finder").set_candela_case()
                 require("candela.ui").set_system_case_changed()
             end
+        end,
+    })
+    vim.api.nvim_create_autocmd("ColorScheme", {
+        group = candela_augroup,
+        desc = "Refresh Candela when color scheme changes",
+        callback = function()
+            require("candela.ui").refresh(true)
         end,
     })
 
@@ -458,7 +462,7 @@ function M.set_patterns_keymaps(buffer)
             CandelaCommands.commands.lightbox()
         end,
     })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "i", "", {
+    vim.api.nvim_buf_set_keymap(buffer, "n", "I", "", {
         noremap = true,
         silent = true,
         desc = "Import patterns from file",
@@ -466,7 +470,7 @@ function M.set_patterns_keymaps(buffer)
             CandelaUi.import()
         end,
     })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "e", "", {
+    vim.api.nvim_buf_set_keymap(buffer, "n", "E", "", {
         noremap = true,
         silent = true,
         desc = "Export patterns to file",
