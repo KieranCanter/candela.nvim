@@ -67,7 +67,10 @@ end
 function M.match(regex)
     local case = get_match_case(regex)
     vim.fn.setreg("/", "\\v" .. case .. regex)
-    vim.cmd("normal! n")
+    local ok = pcall(vim.api.nvim_exec2, "normal! n")
+    if not ok then
+        vim.notify(string.format("[Candela] no matches found for /%s/", regex), vim.log.levels.WARN)
+    end
 end
 
 --@param patterns CandelaPattern[]
@@ -82,7 +85,10 @@ function M.match_selected(patterns)
     local search_str = table.concat(parts, "|")
     local case = get_match_case(search_str)
     vim.fn.setreg("/", "\\v" .. case .. search_str)
-    vim.cmd("normal! n")
+    local ok = pcall(vim.api.nvim_exec2, "normal! n")
+    if not ok then
+        vim.notify(string.format("[Candela] no matches found for /%s/", search_str), vim.log.levels.WARN)
+    end
 end
 
 ---@param matches table[]: keys: lineno, line

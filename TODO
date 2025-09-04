@@ -1,5 +1,4 @@
 TODO (before release):
-  * when matching returns no results, capture error and vim.notify instead of throwing error
   * consolidate match/find into single functions that acts on either a single, many, or all patterns
     * match/find selected mapped to m/f not M/F
   * give config option to cycle colors constantly or randomly (same colors show first everytime or random selection from palette)
