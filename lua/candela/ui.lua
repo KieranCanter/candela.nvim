@@ -789,6 +789,12 @@ end
 
 function M.add()
     M.windows.prompt.config.title = " Add Regex "
+    vim.api.nvim_set_option_value(
+        "completefunc",
+        "",
+        { buf = M.windows.prompt.buf }
+    )
+
     show_prompt(Operations.ADD)
 end
 
@@ -804,6 +810,12 @@ function M.edit()
     end
 
     M.windows.prompt.config.title = " Edit Regex "
+    vim.api.nvim_set_option_value(
+        "completefunc",
+        "",
+        { buf = M.windows.prompt.buf }
+    )
+
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
     local curr_pattern = CandelaPatternList.get_pattern(curr_line)
 
@@ -826,6 +838,12 @@ function M.copy()
     end
 
     M.windows.prompt.config.title = " Copy Regex "
+    vim.api.nvim_set_option_value(
+        "completefunc",
+        "",
+        { buf = M.windows.prompt.buf }
+    )
+
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
     local curr_pattern = CandelaPatternList.get_pattern(curr_line)
     vim.schedule(function()
@@ -936,6 +954,12 @@ function M.change_color()
     end
 
     M.windows.prompt.config.title = " Change Color "
+    vim.api.nvim_set_option_value(
+        "completefunc",
+        "",
+        { buf = M.windows.prompt.buf }
+    )
+
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
     local curr_pattern = CandelaPatternList.get_pattern(curr_line)
     vim.schedule(function()
@@ -1053,11 +1077,25 @@ end
 function M.import()
     M.windows.prompt.config.title = " Import Patterns from File "
     show_prompt(Operations.IMPORT)
+    vim.api.nvim_set_option_value(
+        "completefunc",
+        "v:lua.require'candela.io'.filepath_completion",
+        { buf = M.windows.prompt.buf }
+    )
+    vim.api.nvim_input("<C-x><C-u>")
+    vim.api.nvim_input("<C-p>")
 end
 
 function M.export()
     M.windows.prompt.config.title = " Export Patterns to File (leave blank for default) "
     show_prompt(Operations.EXPORT)
+    vim.api.nvim_set_option_value(
+        "completefunc",
+        "v:lua.require'candela.io'.filepath_completion",
+        { buf = M.windows.prompt.buf }
+    )
+    vim.api.nvim_input("<C-x><C-u>")
+    vim.api.nvim_input("<C-p>")
 end
 
 function M.help()

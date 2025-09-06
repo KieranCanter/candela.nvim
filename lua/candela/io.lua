@@ -33,7 +33,10 @@ end
 
 function M.import_patterns(path)
     if not path:match("%.lua$") then
-        vim.notify(string.format("[Candela] path must be a `.lua` file to be imported, got: `%s`", path), vim.log.levels.ERROR)
+        vim.notify(
+            string.format("[Candela] path must be a `.lua` file to be imported, got: `%s`", path),
+            vim.log.levels.ERROR
+        )
         return
     end
 
@@ -91,9 +94,12 @@ function M.export_patterns(path)
 
     local path_exists, _ = io.open(path, "r")
     if path_exists then
-        local choice =
-            vim.fn.confirm("[Candela] file path already exists, overwrite? Select \"No\" to automatically"
-                .. " create a unique path using the date and time.", "&Yes\n&No\n&Cancel", 1)
+        local choice = vim.fn.confirm(
+            '[Candela] file path already exists, overwrite? Select "No" to automatically'
+                .. " create a unique path using the date and time.",
+            "&Yes\n&No\n&Cancel",
+            1
+        )
         if choice == 2 then -- create unique path
             path = unique_path(path)
         elseif choice == 3 then -- cancel
@@ -157,6 +163,23 @@ function M.clear()
     end
 
     vim.notify(string.format("[Candela] successfully cleared exports from `%s`", data_dir), vim.log.levels.INFO)
+end
+
+function M.filepath_completion(findstart, base)
+    if findstart == 1 then
+        -- return the byte index where the completion starts
+        local line = vim.fn.getline(".")
+        local pos = vim.fn.col(".")
+        -- backtrack until we hit whitespace
+        local start = pos
+        while start > 1 and line:sub(start - 1, start - 1):match("[%w%./~_-]") do
+            start = start - 1
+        end
+        return start - 1
+    else
+        -- return candidates from built-in file completion
+        return vim.fn.getcompletion(base, "file")
+    end
 end
 
 return M

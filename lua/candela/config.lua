@@ -502,7 +502,7 @@ function M.set_prompt_keymaps(buffer)
     vim.api.nvim_buf_set_keymap(buffer, "n", "q", "", {
         noremap = true,
         silent = true,
-        desc = "Candela: close Prompt",
+        desc = "Candela: close prompt",
         callback = function()
             CandelaUi.hide_prompt()
         end,
@@ -510,10 +510,20 @@ function M.set_prompt_keymaps(buffer)
     vim.api.nvim_buf_set_keymap(buffer, "n", "<ESC>", "", {
         noremap = true,
         silent = true,
-        desc = "Candela: close Prompt",
+        desc = "Candela: close prompt",
         callback = function()
             CandelaUi.hide_prompt()
         end,
+    })
+    vim.api.nvim_buf_set_keymap(buffer, "i", "<C-n>", "<C-x><C-u>", {
+        noremap = true,
+        silent = true,
+        desc = "Candela: next file path autocompletion",
+    })
+    vim.api.nvim_buf_set_keymap(buffer, "i", "<C-p>", "<C-x><C-u>", {
+        noremap = true,
+        silent = true,
+        desc = "Candela: previous file path autocompletion",
     })
 end
 
