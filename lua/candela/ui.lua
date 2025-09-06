@@ -3,12 +3,9 @@
 local CandelaConfig = require("candela.config")
 local CandelaWindow = require("candela.window")
 local CandelaPatternList = require("candela.pattern_list")
-local CandelaEngine = require("candela.engine")
 local CandelaHighlighter = require("candela.highlighter")
 local CandelaFinder = require("candela.finder")
 local CandelaLightbox = require("candela.lightbox")
-
-local candela_augroup = vim.api.nvim_create_augroup("Candela", { clear = false })
 
 ---@alias CandelaWindows {
 ---                   patterns: CandelaWindow,
@@ -26,6 +23,7 @@ local candela_augroup = vim.api.nvim_create_augroup("Candela", { clear = false }
 
 local M = {}
 
+local CANDELA_AUGROUP = require("candela.init").CANDELA_AUGROUP
 local WIDTH_COEFF = 0
 local MIN_HEIGHT, MAX_HEIGHT = 0, 0
 local MARGIN = 0
@@ -67,7 +65,7 @@ local function format_field(field, field_val)
 end
 
 -- Update lines of the patterns buffers
-local function update_ui_lines()
+function M.update_ui_lines()
     local all_lines = {
         color = {},
         count = {},
@@ -117,7 +115,7 @@ function M.update_ui()
         M.show_patterns()
     end
 
-    update_ui_lines()
+    M.update_ui_lines()
 
     if not was_open then
         M.hide_patterns()
@@ -125,7 +123,7 @@ function M.update_ui()
 end
 
 ---@param delete boolean?: if deleting a pattern, don't move cursor to bottom
-local function resize_height(delete)
+function M.resize_height(delete)
     local num_pats = #CandelaPatternList.order
     local old_height = M.windows.patterns.config.height - 2 -- Num of shown entries
     local is_under_min_height = old_height == MIN_HEIGHT and num_pats <= MIN_HEIGHT
@@ -174,14 +172,14 @@ local function refresh_to_curr_buf()
 
         local cmd = CandelaConfig.options.engine.command --[[@as string]]
         local args = CandelaConfig.options.engine.args
-        local count = CandelaHighlighter.highlight_matches(M.curr_buf, id, pattern, cmd, args)
+        local count = CandelaHighlighter.highlight_matches(M.curr_buf, id, pattern.regex, pattern.color, cmd, args)
         if count == -1 then
             return
         end
 
         pattern.count = count
-        update_ui_lines()
-        resize_height()
+        M.update_ui_lines()
+        M.resize_height()
     end
 end
 
@@ -518,14 +516,14 @@ function M.setup(opts)
     CandelaConfig.set_prompt_keymaps(M.windows.prompt.buf)
 
     vim.api.nvim_create_autocmd("VimResized", {
-        group = candela_augroup,
+        group = CANDELA_AUGROUP,
         callback = function()
             set_size_and_loc(M.windows)
         end,
     })
 
     vim.api.nvim_create_autocmd("BufHidden", {
-        group = candela_augroup,
+        group = CANDELA_AUGROUP,
         buffer = M.windows.regex.buf,
         callback = function()
             M.hide_patterns()
@@ -533,7 +531,7 @@ function M.setup(opts)
     })
 
     vim.api.nvim_create_autocmd("CursorMoved", {
-        group = candela_augroup,
+        group = CANDELA_AUGROUP,
         buffer = M.windows.regex.buf,
         callback = function()
             local col = vim.api.nvim_win_get_cursor(0)[2]
@@ -545,7 +543,7 @@ function M.setup(opts)
     })
 
     vim.api.nvim_create_autocmd("BufEnter", {
-        group = candela_augroup,
+        group = CANDELA_AUGROUP,
         callback = function(args)
             local bufnr = args.buf
 
@@ -602,6 +600,7 @@ function M.show_patterns()
     end
 
     vim.api.nvim_set_option_value("wrap", false, { win = M.windows.regex.win })
+    vim.api.nvim_set_option_value("wrap", false, { win = M.windows.count.win })
     vim.api.nvim_set_option_value("winhighlight", "Normal:Comment", { win = M.windows.count.win })
 
     if not is_setup then
@@ -629,7 +628,7 @@ local function show_prompt(operation, curr_line, curr_pattern)
     vim.api.nvim_set_option_value("buftype", "prompt", { buf = M.windows.prompt.buf })
 
     vim.api.nvim_create_autocmd("BufEnter", {
-        group = candela_augroup,
+        group = CANDELA_AUGROUP,
         buffer = M.windows.prompt.buf,
         desc = "Start the user in insert mode upon entering prompt window",
         callback = function()
@@ -637,7 +636,7 @@ local function show_prompt(operation, curr_line, curr_pattern)
         end,
     })
     vim.api.nvim_create_autocmd("WinLeave", {
-        group = candela_augroup,
+        group = CANDELA_AUGROUP,
         buffer = M.windows.prompt.buf,
         desc = "Ensure the regex window is focused after leaving prompt window",
         callback = function()
@@ -645,7 +644,7 @@ local function show_prompt(operation, curr_line, curr_pattern)
         end,
     })
     vim.api.nvim_create_autocmd("QuitPre", {
-        group = candela_augroup,
+        group = CANDELA_AUGROUP,
         desc = "Delete the prompt buffer right before quitting to prevent neovim asking to save prompt",
         callback = function()
             if M.windows.prompt.buf and vim.api.nvim_buf_is_valid(M.windows.prompt.buf) then
@@ -654,114 +653,29 @@ local function show_prompt(operation, curr_line, curr_pattern)
         end,
     })
 
-    if operation == Operations.ADD then
+    if operation == Operations.ADD or operation == Operations.COPY then
         vim.fn.prompt_setcallback(M.windows.prompt.buf, function(regex)
-            local new_id, new_pattern = CandelaPatternList.add_pattern(regex)
-            if new_id == nil or new_pattern == nil then
-                return M.hide_prompt()
-            end
-
-            local cmd = CandelaConfig.options.engine.command --[[@as string]]
-            local args = CandelaConfig.options.engine.args
-            local count = CandelaHighlighter.highlight_matches(M.base_buf, new_id, new_pattern, cmd, args)
-            if count == -1 then
-                CandelaPatternList.delete_pattern(#CandelaPatternList.order)
-                return
-            end
-
-            new_pattern.count = count
-            update_ui_lines()
-            resize_height()
+            CandelaPatternList.add_pattern(regex)
             M.hide_prompt()
-
-            if CandelaLightbox.window:is_open() then
-                CandelaLightbox.update_folds()
-            end
         end)
     elseif operation == Operations.EDIT then
-        vim.fn.prompt_setcallback(M.windows.prompt.buf, function(regex)
-            local old_regex = curr_pattern.regex
-            local old_id = CandelaPatternList.order[curr_line]
-            local new_id, new_pattern = CandelaPatternList.edit_pattern(curr_line --[[@as number]], regex)
-            if new_id == nil or new_pattern == nil then
-                return M.hide_prompt()
-            end
-
-            if not CandelaHighlighter.remove_match_highlights(M.base_buf, old_id, old_regex) then
-                CandelaPatternList.edit_pattern(curr_line, old_regex)
-                return
-            end
-
-            local cmd = CandelaConfig.options.engine.command --[[@as string]]
-            local args = CandelaConfig.options.engine.args
-            local count = CandelaHighlighter.highlight_matches(M.base_buf, new_id, new_pattern, cmd, args)
-            if count == -1 then
-                CandelaPatternList.edit_pattern(curr_line, old_regex)
-                return
-            end
-
-            new_pattern.count = count
-            update_ui_lines()
+        vim.fn.prompt_setcallback(M.windows.prompt.buf, function(new_regex)
+            CandelaPatternList.edit_pattern(curr_line, new_regex)
             M.hide_prompt()
-
-            if CandelaLightbox.window:is_open() then
-                CandelaLightbox.update_folds()
-            end
-        end)
-    elseif operation == Operations.COPY then
-        vim.fn.prompt_setcallback(M.windows.prompt.buf, function(regex)
-            local new_id, new_pattern = CandelaPatternList.add_pattern(regex)
-            if new_id == nil or new_pattern == nil then
-                return M.hide_prompt()
-            end
-
-            local cmd = CandelaConfig.options.engine.command --[[@as string]]
-            local args = CandelaConfig.options.engine.args
-            local count = CandelaHighlighter.highlight_matches(M.base_buf, new_id, new_pattern, cmd, args)
-            if count == -1 then
-                CandelaPatternList.delete_pattern(#CandelaPatternList.order)
-                return
-            end
-
-            new_pattern.count = count
-            update_ui_lines()
-            resize_height()
-            M.hide_prompt()
-
-            if CandelaLightbox.window:is_open() then
-                CandelaLightbox.update_folds()
-            end
         end)
     elseif operation == Operations.CHANGE_COLOR then
-        vim.fn.prompt_setcallback(M.windows.prompt.buf, function(color)
-            local old_color = CandelaPatternList.order[curr_line].color
-            local new_pattern = CandelaPatternList.change_pattern_color(curr_line, color)
-            if new_pattern == nil then
-                return
-            end
-
-            if not CandelaHighlighter.change_highlight_color(curr_pattern.regex, new_pattern.color) then
-                CandelaPatternList.change_pattern_color(curr_line, old_color)
-                return
-            end
-
-            update_ui_lines()
-            resize_height()
+        vim.fn.prompt_setcallback(M.windows.prompt.buf, function(new_color)
+            CandelaPatternList.change_pattern_color(curr_line, new_color)
             M.hide_prompt()
         end)
     elseif operation == Operations.IMPORT then
         vim.fn.prompt_setcallback(M.windows.prompt.buf, function(path)
             require("candela.io").import_patterns(path)
-
-            M.base_buf = nil
-            M.refresh()
             M.hide_prompt()
         end)
     elseif operation == Operations.EXPORT then
         vim.fn.prompt_setcallback(M.windows.prompt.buf, function(path)
             require("candela.io").export_patterns(path)
-
-            resize_height()
             M.hide_prompt()
         end)
     else
@@ -788,6 +702,7 @@ local function show_prompt(operation, curr_line, curr_pattern)
 end
 
 function M.add()
+    M.show_patterns()
     M.windows.prompt.config.title = " Add Regex "
     vim.api.nvim_set_option_value(
         "completefunc",
@@ -817,7 +732,10 @@ function M.edit()
     )
 
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
-    local curr_pattern = CandelaPatternList.get_pattern(curr_line)
+    local _, curr_pattern = CandelaPatternList.get_id_and_pattern_by_index(curr_line)
+    if curr_pattern == nil then
+        return
+    end
 
     vim.schedule(function()
         vim.api.nvim_paste(curr_pattern.regex, false, -1)
@@ -845,7 +763,10 @@ function M.copy()
     )
 
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
-    local curr_pattern = CandelaPatternList.get_pattern(curr_line)
+    local _, curr_pattern = CandelaPatternList.get_id_and_pattern_by_index(curr_line)
+    if curr_pattern == nil then
+        return
+    end
     vim.schedule(function()
         vim.api.nvim_paste(curr_pattern.regex, false, -1)
     end)
@@ -866,8 +787,10 @@ function M.delete(ask)
     end
 
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
-    local curr_id = CandelaPatternList.order[curr_line]
-    local curr_pattern = CandelaPatternList.get_pattern(curr_line)
+    local curr_id,curr_pattern = CandelaPatternList.get_id_and_pattern_by_index(curr_line)
+    if curr_pattern == nil then
+        return
+    end
     if ask then
         local choice = vim.fn.confirm(
             string.format("Do you want to delete pattern %d: /%s/?", curr_line, curr_pattern.regex),
@@ -892,8 +815,8 @@ function M.delete(ask)
         CandelaLightbox.update_folds()
     end
 
-    update_ui_lines()
-    resize_height(true)
+    M.update_ui_lines()
+    M.resize_height(true)
 end
 
 ---@param ask boolean: show the confirmation message or not
@@ -917,10 +840,10 @@ function M.clear(ask)
     for _, id in ipairs(order) do
         local pattern = patterns[id]
         if CandelaHighlighter.remove_match_highlights(M.base_buf, id, pattern.regex) then
-            update_ui_lines()
+            M.update_ui_lines()
         end
     end
-    resize_height()
+    M.resize_height()
 
     if CandelaLightbox.window:is_open() then
         CandelaLightbox.update_folds()
@@ -944,7 +867,7 @@ end
 
 function M.change_color()
     if vim.api.nvim_get_current_win() ~= M.windows.regex.win then
-        vim.notify("[Candela] must be in patterns window to toggle regex color", vim.log.levels.ERROR)
+        vim.notify("[Candela] must be in patterns window to run UI commands", vim.log.levels.ERROR)
         return
     end
 
@@ -961,7 +884,11 @@ function M.change_color()
     )
 
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
-    local curr_pattern = CandelaPatternList.get_pattern(curr_line)
+    local _, curr_pattern = CandelaPatternList.get_id_and_pattern_by_index(curr_line)
+    if curr_pattern == nil then
+        return
+    end
+
     vim.schedule(function()
         vim.api.nvim_paste(curr_pattern.color, false, -1)
     end)
@@ -981,8 +908,11 @@ function M.toggle_highlight()
     end
 
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
-    local curr_id = CandelaPatternList.order[curr_line]
-    local curr_pattern = CandelaPatternList.get_pattern(curr_line)
+    local curr_id, curr_pattern = CandelaPatternList.get_id_and_pattern_by_index(curr_line)
+    if curr_pattern == nil then
+        return
+    end
+
     local is_highlighted = CandelaPatternList.toggle_pattern_highlight(curr_line)
     if not CandelaHighlighter.toggle_match_highlights(M.base_buf, curr_id, curr_pattern.regex, is_highlighted) then
         return
@@ -1012,7 +942,11 @@ function M.toggle_lightbox()
     end
     CandelaLightbox.update_folds()
 
-    update_ui_toggle("lightbox", curr_line, CandelaPatternList.get_pattern(curr_line))
+    local _, curr_pattern = CandelaPatternList.get_id_and_pattern_by_index(curr_line)
+    if curr_pattern == nil then
+        return
+    end
+    update_ui_toggle("lightbox", curr_line, curr_pattern)
 end
 
 ---@param all boolean: whether to match selected patterns or all
@@ -1027,8 +961,11 @@ function M.match(all)
     if not all then
         if next(selected_patterns) == nil then
             local curr_line = vim.api.nvim_win_get_cursor(0)[1]
-            local id = CandelaPatternList.order[curr_line]
-            selected[id] = CandelaPatternList.get_pattern(curr_line)
+            local id, pattern = CandelaPatternList.get_id_and_pattern_by_index(curr_line)
+            if id == nil or pattern == nil then
+                return
+            end
+            selected[id] = pattern
             count = 1
         else
             local patterns = CandelaPatternList.patterns
@@ -1057,8 +994,11 @@ function M.find(all)
     if not all then
         if next(selected_patterns) == nil then
             local curr_line = vim.api.nvim_win_get_cursor(0)[1]
-            local id = CandelaPatternList.order[curr_line]
-            selected[id] = CandelaPatternList.get_pattern(curr_line)
+            local id, pattern = CandelaPatternList.get_id_and_pattern_by_index(curr_line)
+            if id == nil or pattern == nil then
+                return false
+            end
+            selected[id] = pattern
             count = 1
         else
             local patterns = CandelaPatternList.patterns

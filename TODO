@@ -1,5 +1,4 @@
 TODO (before release):
-  * improve API naming (make it as user-friendly as possible)
   * implement help function
   * write docs
   * move autocmds/mappings to separate file

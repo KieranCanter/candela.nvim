@@ -7,7 +7,7 @@
 ---@field attach_to fun(self: CandelaWindow, parent_window: CandelaWindow)
 ---@field ensure_buffer fun(self: CandelaWindow)
 ---@field is_open fun(self: CandelaWindow): boolean
----@field open_window fun(self: CandelaWindow, enter: boolean)
+---@field open_window fun(self: CandelaWindow, enter: boolean?)
 ---@field hide_window fun(self: CandelaWindow)
 ---@field close_window fun(self: CandelaWindow)
 

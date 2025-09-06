@@ -79,14 +79,15 @@ end
 
 ---@param bufnr number
 ---@param id string
----@param pattern CandelaPattern
+---@param regex string
+---@param color string
 ---@param cmd string
 ---@param args string[]
 ---@return number
-function M.highlight_matches(bufnr, id, pattern, cmd, args)
-    local ns = vim.api.nvim_create_namespace("CandelaNs_" .. hash_regex(pattern.regex))
-    local hl_group = "CandelaHl_" .. hash_regex(pattern.regex)
-    register_highlight({ bg = pattern.color }, ns, hl_group)
+function M.highlight_matches(bufnr, id, regex, color, cmd, args)
+    local ns = vim.api.nvim_create_namespace("CandelaNs_" .. hash_regex(regex))
+    local hl_group = "CandelaHl_" .. hash_regex(regex)
+    register_highlight({ bg = color }, ns, hl_group)
 
     local filepath = vim.api.nvim_buf_get_name(bufnr)
     if filepath == "" then
@@ -99,7 +100,7 @@ function M.highlight_matches(bufnr, id, pattern, cmd, args)
     for _, arg in ipairs(args) do
         table.insert(command, arg)
     end
-    table.insert(command, pattern.regex)
+    table.insert(command, regex)
     table.insert(command, filepath)
 
     local matches = CandelaEngine.get_matches(command)

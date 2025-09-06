@@ -29,9 +29,8 @@ function M.setup(opts)
     candela_ignorecase = case_opt == "ignore" or case_opt == "smart"
     candela_smartcase = case_opt == "smart"
 
-    local candela_augroup = vim.api.nvim_create_augroup("Candela", { clear = false })
     vim.api.nvim_create_autocmd("VimEnter", {
-        group = candela_augroup,
+        group = require("candela.init").CANDELA_AUGROUP,
         desc = "Initialize case-sensitivity globals to user options",
         callback = function()
             if case_opt == "system" then

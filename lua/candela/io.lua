@@ -70,7 +70,10 @@ function M.import_patterns(path)
         pattern_list.add_pattern(pattern.regex, pattern.color, pattern.highlight, pattern.lightbox)
     end
 
-    require("candela.ui").update_ui()
+    local ui = require("candela.ui")
+    ui.update_ui()
+    ui.base_buf = nil
+    ui.refresh()
 end
 
 -- Export patterns to lua table in file

@@ -239,9 +239,8 @@ function M.setup(opts)
         M.options.engine.args = get_default_args(M.options)
     end, 0)
 
-    local candela_augroup = vim.api.nvim_create_augroup("Candela", { clear = true })
     vim.api.nvim_create_autocmd("OptionSet", {
-        group = candela_augroup,
+        group = require("candela.init").CANDELA_AUGROUP,
         pattern = { "ignorecase", "smartcase" },
         desc = "Update case-sensitivity globals when user changes system options",
         callback = function()
@@ -253,7 +252,7 @@ function M.setup(opts)
         end,
     })
     vim.api.nvim_create_autocmd("ColorScheme", {
-        group = candela_augroup,
+        group = require("candela.init").CANDELA_AUGROUP,
         desc = "Refresh Candela when color scheme changes",
         callback = function()
             require("candela.pattern_list").setup(M.options)
@@ -286,7 +285,7 @@ function M.set_keymaps()
             CandelaCommands.commands.add()
         end,
     })
-    vim.api.nvim_set_keymap("n", "<leader>cdr", "", {
+    vim.api.nvim_set_keymap("n", "<leader>cdR", "", {
         noremap = true,
         silent = true,
         desc = "Candela: refresh patterns",
@@ -415,7 +414,7 @@ function M.set_patterns_keymaps(buffer)
             CandelaCommands.commands.toggle_lightbox()
         end,
     })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "r", "", {
+    vim.api.nvim_buf_set_keymap(buffer, "n", "R", "", {
         noremap = true,
         silent = true,
         desc = "Refresh patterns for current buffer",

@@ -3,6 +3,7 @@
 ---@field patterns CandelaPattern[]
 
 local Candela = {}
+Candela.CANDELA_AUGROUP = vim.api.nvim_create_augroup("Candela", { clear = false })
 
 function Candela.setup(opts)
     vim.api.nvim_create_user_command("Candela", function(args)

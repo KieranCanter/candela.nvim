@@ -8,7 +8,6 @@ local M = {}
 function M.setup(opts)
     M.commands = {
         add = function()
-            CandelaUi.show_patterns()
             CandelaUi.add()
         end,
         edit = function()
