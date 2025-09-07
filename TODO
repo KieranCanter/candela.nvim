@@ -5,5 +5,4 @@ TODO (before release):
   * write docs
 
 TODO (after release)
-  * change_color improvements:
-    * support other color spaces rgb, hsv, hsl, lch, oklch
+  * support other color spaces rgb, hsv, hsl, lch, oklch
