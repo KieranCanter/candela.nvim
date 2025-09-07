@@ -51,7 +51,7 @@ local function make_cycler(mode, default)
     end
 end
 
--- TODO: move to a colors module?
+-- NOTE: Plan to move to a colors module eventually once more color space support is added
 function M.setup(opts)
     local defaults = require("candela.config").defaults
 
@@ -121,7 +121,7 @@ end
 
 ---@param regex string
 ---@return string
-local function hash_regex(regex)
+function M.hash_regex(regex)
     return vim.fn.sha256(regex)
 end
 
@@ -139,7 +139,7 @@ function M.add_pattern(regex, color, highlight, lightbox)
         ui.base_buf = vim.api.nvim_get_current_buf()
     end
 
-    local new_id = hash_regex(regex)
+    local new_id = M.hash_regex(regex)
     if M.patterns[new_id] ~= nil then
         vim.notify(string.format("[Candela] regex /%s/ already exists.", regex), vim.log.levels.ERROR)
         return
@@ -206,7 +206,7 @@ function M.edit_pattern(index_or_regex, new_regex)
         return
     end
 
-    local new_id = hash_regex(new_regex)
+    local new_id = M.hash_regex(new_regex)
     if M.patterns[new_id] ~= nil then
         vim.notify(string.format("[Candela] regex /%s/ already exists.", new_regex), vim.log.levels.ERROR)
         return
@@ -306,8 +306,12 @@ function M.change_pattern_color(index_or_regex, new_color)
         return
     end
 
-    new_color = pattern:convert_color_string(new_color)
-    if pattern.color == new_color then -- user didn't change color when editing, do nothing
+    new_color = require("candela.pattern").convert_color_string(new_color)
+    if new_color == nil then
+        vim.notify(string.format('[Candela] "%s" is not of a valid color format', new_color), vim.log.levels.ERROR)
+        return
+    end
+    if string.upper(pattern.color) == string.upper(new_color) then -- user didn't change color when editing, do nothing
         return
     end
 

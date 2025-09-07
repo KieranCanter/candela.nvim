@@ -7,7 +7,6 @@
 ---@field lightbox boolean
 ---@field count number
 ---@field edit_regex fun(self, new_regex: string)
----@field convert_color_string fun(self)
 ---@field change_color fun(self, new_color: string)
 ---@field toggle_highlight fun(self)
 ---@field toggle_lightbox fun(self)
@@ -43,13 +42,16 @@ end
 -- Maybe through a user config where user can set a specific color space or leave it to "variable" in which they have to
 -- define what kind of color space they're using e.g. rgb(255, 255, 255) or oklch(100, 150, 360)
 ---@return string|nil
-function M:convert_color_string(color)
+function M.convert_color_string(color)
     local SWATCHES = require("candela.config").options.palette.swatches
     local color_string = string.match(color, "^%s*[%s%w]+%s*$")
 
-    local swatch = SWATCHES[vim.o.background][color_string] or SWATCHES[vim.o.background][string.upper(color_string)]
-    if swatch ~= nil then
-        print(string.upper(swatch))
+    if color_string ~= nil then
+        local swatch = SWATCHES[vim.o.background][color_string]
+            or SWATCHES[vim.o.background][string.upper(color_string)]
+        if swatch ~= nil then
+            return string.upper(swatch)
+        end
     end
 
     -- 6-digit hex code
@@ -74,7 +76,7 @@ function M:change_color(new_color)
         self.color = new_color
     end
 
-    local converted = self.convert_color_string(new_color)
+    local converted = M.convert_color_string(new_color)
     if converted ~= nil then
         self.color = converted
     else

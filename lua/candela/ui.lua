@@ -4,21 +4,10 @@ local CandelaConfig = require("candela.config")
 local CandelaWindow = require("candela.window")
 local CandelaPatternList = require("candela.pattern_list")
 local CandelaHighlighter = require("candela.highlighter")
-local CandelaFinder = require("candela.finder")
 local CandelaLightbox = require("candela.lightbox")
 
----@alias CandelaWindows {
----                   patterns: CandelaWindow,
----                   color: CandelaWindow,
----                   count: CandelaWindow,
----                   regex: CandelaWindow,
----                   highlight: CandelaWindow,
----                   lightbox: CandelaWindow,
----                   prompt: CandelaWindow,
----               }
-
 ---@class CandelaUi
----@field windows CandelaWindows
+---@field windows table<string, CandelaWindow>
 ---@field base_buf number
 
 local M = {}
@@ -27,6 +16,7 @@ local CANDELA_AUGROUP = require("candela.init").CANDELA_AUGROUP
 local WIDTH_COEFF = 0
 local MIN_HEIGHT, MAX_HEIGHT = 0, 0
 local MARGIN = 0
+local MIN_COUNT_WIDTH = 0
 local PROMPT_OFFSET = 0
 
 local selected_patterns = {}
@@ -41,84 +31,112 @@ local Operations = {
     EXPORT = 6,
 }
 
----@param field string: Field name
----@param field_val string|boolean|number
----@return string: String to input into buffer lines
-local function format_field(field, field_val)
-    if field == "color" and type(field_val) == "string" then
-        return field_val
-    elseif field == "count" then
-        local win_width = M.windows.count.config.width
-        local line = tostring(field_val)
-        local right_aligned = string.rep(" ", win_width - #line) .. line
-        return right_aligned
-    elseif field == "regex" then
-        return string.format(" /%s/", field_val) or ""
-    elseif field == "highlight" then
-        return field_val and M.highlight_on or M.highlight_off
-    elseif field == "lightbox" then
-        return field_val and M.lightbox_on or M.lightbox_off
+---@param dest table
+---@param src table
+local function extend_table(dest, src)
+    for k, v in pairs(src) do
+        dest[k] = v
+    end
+end
+
+---@param num number
+---@param max number
+---@return number
+local function clamp_max(num, max)
+    if num > max then
+        return max
     else
-        vim.notify(string.format("[Candela] %s is not a valid field", field), vim.log.levels.ERROR)
-        return "no value"
+        return num
     end
 end
 
--- Update lines of the patterns buffers
-function M.update_ui_lines()
-    local all_lines = {
-        color = {},
-        count = {},
-        regex = {},
-        highlight = {},
-        lightbox = {},
-    }
+local function set_size_and_loc()
+    local color_width = M.windows.color.config.width or 7 -- 7 space hexcode -- NOTE: may need to change in the future with new color spaces
+    -- TODO: make count width a user config
+    local count_width = M.windows.count.config.width or MIN_COUNT_WIDTH
+    local ops_width = M.windows.count.config.width or 5 -- 1 space letter/symbol, 2 space margin on each side
+    local curr_width = math.floor(vim.o.columns * WIDTH_COEFF)
+    local max_width = vim.o.columns - MARGIN
+    local width = clamp_max(curr_width, max_width)
+    -- Fit regex to rest of window leftover, subtract 1 for each space inbetween windows
+    local regex_width = width - color_width - count_width - (ops_width * 2) - 6
 
-    local pattern_list = {}
-    for _, id in ipairs(CandelaPatternList.order) do
-        local pattern = CandelaPatternList.patterns[id]
-        table.insert(pattern_list, pattern)
-        for field, _ in pairs(all_lines) do
-            table.insert(all_lines[field], format_field(field, pattern[field]))
+    local pattern_height = nil
+    local curr_pattern_height = nil
+    local max_pattern_height = vim.o.lines - MARGIN
+    if #CandelaPatternList.order then
+        curr_pattern_height = MIN_HEIGHT + 2 -- minimum height
+    else
+        curr_pattern_height = M.windows.patterns.config.height --[[@as integer]]
+    end
+    pattern_height = clamp_max(curr_pattern_height, max_pattern_height)
+    local prompt_height = 1 -- 1 space height for prompt
+
+    -- Account for 2 border spaces worth of padding to center window in center of base window
+    local horz_center = math.floor((vim.o.columns - width - 2) / 2)
+    local vert_center = math.floor((vim.o.lines - pattern_height - prompt_height) / 2)
+
+    -- Patterns
+    extend_table(M.windows.patterns.config, {
+        width = width,
+        height = pattern_height,
+        col = horz_center,
+        row = vert_center,
+    })
+
+    -- Color
+    extend_table(M.windows.color.config, {
+        width = color_width,
+        height = M.windows.patterns.config.height - 2,
+        col = 0,
+        row = 0,
+    })
+
+    -- Count
+    extend_table(M.windows.count.config, {
+        width = count_width,
+        height = M.windows.patterns.config.height - 2,
+        col = color_width + 1,
+        row = 0,
+    })
+
+    -- Regex
+    extend_table(M.windows.regex.config, {
+        width = regex_width,
+        height = M.windows.patterns.config.height - 2,
+        col = color_width + count_width + 2,
+        row = 0,
+    })
+
+    -- Highlight
+    extend_table(M.windows.highlight.config, {
+        width = ops_width,
+        height = M.windows.patterns.config.height - 2,
+        col = color_width + count_width + regex_width + 3,
+        row = 0,
+    })
+
+    -- Lightbox
+    extend_table(M.windows.lightbox.config, {
+        width = ops_width,
+        height = M.windows.patterns.config.height - 2,
+        col = color_width + count_width + regex_width + ops_width + 4,
+        row = 0,
+    })
+
+    -- Prompt
+    extend_table(M.windows.prompt.config, {
+        width = width,
+        height = prompt_height,
+        col = -1,
+        row = pattern_height + PROMPT_OFFSET,
+    })
+
+    -- Set window config dynamically if the window is open
+    for _, window in pairs(M.windows) do
+        if window:is_open() then
+            vim.api.nvim_win_set_config(window.win, window.config)
         end
-    end
-
-    for field, lines in pairs(all_lines) do
-        vim.api.nvim_set_option_value("modifiable", true, { buf = M.windows[field].buf })
-        vim.api.nvim_buf_set_lines(M.windows[field].buf, 0, -1, false, lines)
-        vim.api.nvim_set_option_value("modifiable", false, { buf = M.windows[field].buf })
-    end
-
-    CandelaHighlighter.highlight_ui(M.windows, pattern_list)
-    M.unselect_all()
-end
-
--- Update toggle in the UI
----@param kind string: which toggle to update
----| `highlight`
----| `lightbox`
----@param row integer: row of UI to update
----@param pattern CandelaPattern: pattern to get value from
-local function update_ui_toggle(kind, row, pattern)
-    local toggled_line = format_field(kind, pattern[kind])
-
-    vim.api.nvim_set_option_value("modifiable", true, { buf = M.windows[kind].buf })
-    vim.api.nvim_buf_set_lines(M.windows[kind].buf, row - 1, row, false, { toggled_line })
-    vim.api.nvim_set_option_value("modifiable", false, { buf = M.windows[kind].buf })
-
-    CandelaHighlighter.highlight_ui_toggle(M.windows[kind], kind, row, pattern)
-end
-
-function M.update_ui()
-    local was_open = M.windows.patterns:is_open()
-    if not was_open then
-        M.show_patterns()
-    end
-
-    M.update_ui_lines()
-
-    if not was_open then
-        M.hide_patterns()
     end
 end
 
@@ -158,6 +176,125 @@ function M.resize_height(delete)
             win.config.height = M.windows.patterns.config.height - 2
             vim.api.nvim_win_set_config(win.win, win.config)
         end
+    end
+end
+
+---@param color_width integer?
+---@param count_width integer?
+local function resize_width(color_width, count_width)
+    color_width = color_width or M.windows.color.config.width
+    -- TODO: make count width a user config
+    count_width = count_width or MIN_COUNT_WIDTH
+    local ops_width = M.windows.highlight.config.width
+    local curr_width = math.floor(vim.o.columns * WIDTH_COEFF)
+    local max_width = vim.o.columns - MARGIN
+    local width = clamp_max(curr_width, max_width)
+    -- Fit regex to rest of window leftover, subtract 1 for each space inbetween windows
+    local regex_width = width - color_width - count_width - (ops_width * 2) - 6
+
+    -- Color
+    M.windows.color.config.width = color_width
+    -- Count
+    M.windows.count.config.width = count_width
+    M.windows.count.config.col = color_width + 1
+    -- Regex
+    M.windows.regex.config.width = regex_width
+    M.windows.regex.config.col = color_width + count_width + 2
+
+    -- Set window config dynamically if the window is open
+    for _, window in pairs(M.windows) do
+        if window:is_open() then
+            vim.api.nvim_win_set_config(window.win, window.config)
+        end
+    end
+end
+
+---@param field string: Field name
+---@param field_val string|boolean|number
+---@return string: String to input into buffer lines
+local function format_field(field, field_val)
+    if field == "color" and type(field_val) == "string" then
+        return field_val
+    elseif field == "count" then
+        local win_width = M.windows.count.config.width
+        local line = tostring(field_val)
+        local right_aligned = string.rep(" ", win_width - #line) .. line
+        return right_aligned
+    elseif field == "regex" then
+        return string.format(" /%s/", field_val) or ""
+    elseif field == "highlight" then
+        return field_val and M.highlight_on or M.highlight_off
+    elseif field == "lightbox" then
+        return field_val and M.lightbox_on or M.lightbox_off
+    else
+        vim.notify(string.format("[Candela] %s is not a valid field", field), vim.log.levels.ERROR)
+        return "no value"
+    end
+end
+
+-- Update lines of the patterns buffers
+function M.update_ui_lines()
+    local all_lines = {
+        color = {},
+        count = {},
+        regex = {},
+        highlight = {},
+        lightbox = {},
+    }
+    local longest_count = MIN_COUNT_WIDTH --[[@as integer]]
+
+    local pattern_list = {}
+    for i, id in ipairs(CandelaPatternList.order) do
+        local pattern = CandelaPatternList.patterns[id]
+        table.insert(pattern_list, pattern)
+        for field, _ in pairs(all_lines) do
+            table.insert(all_lines[field], format_field(field, pattern[field]))
+            -- Get longest count width to resize if needed
+            if field == "count" then
+                longest_count = math.max(longest_count, tostring(all_lines[field][i]):len())
+            end
+        end
+    end
+
+    for field, lines in pairs(all_lines) do
+        vim.api.nvim_set_option_value("modifiable", true, { buf = M.windows[field].buf })
+        vim.api.nvim_buf_set_lines(M.windows[field].buf, 0, -1, false, lines)
+        vim.api.nvim_set_option_value("modifiable", false, { buf = M.windows[field].buf })
+    end
+
+    if longest_count ~= M.windows.count.config.width then
+        M.windows.count.config.width = longest_count
+        resize_width(nil, longest_count)
+    end
+
+    CandelaHighlighter.highlight_ui(M.windows, pattern_list)
+    M.unselect_all()
+end
+
+-- Update toggle in the UI
+---@param kind "highlight"|"lightbox"
+---@param row integer: row of UI to update
+---@param pattern CandelaPattern: pattern to get value from
+local function update_ui_toggle(kind, row, pattern)
+    local toggled_line = format_field(kind, pattern[kind])
+
+    vim.api.nvim_set_option_value("modifiable", true, { buf = M.windows[kind].buf })
+    vim.api.nvim_buf_set_lines(M.windows[kind].buf, row - 1, row, false, { toggled_line })
+    vim.api.nvim_set_option_value("modifiable", false, { buf = M.windows[kind].buf })
+
+    CandelaHighlighter.highlight_ui_toggle(M.windows[kind], kind, row, pattern)
+end
+
+function M.update_ui()
+    local was_open = M.windows.patterns:is_open()
+    if not was_open then
+        M.show_patterns()
+    end
+
+    M.update_ui_lines()
+
+    if not was_open then
+        M.hide_patterns()
     end
 end
 
@@ -226,111 +363,6 @@ local function format_icon(icon, type, subtype, header, default)
     end
 end
 
----@param windows CandelaWindows: UI windows
-local function set_size_and_loc(windows)
-    -- TODO: find a place to put these functions
-    local function extend_table(dest, src)
-        for k, v in pairs(src) do
-            dest[k] = v
-        end
-    end
-
-    local function clamp_max(num, max)
-        if num > max then
-            return max
-        else
-            return num
-        end
-    end
-
-    local pattern_color_width = 7 -- 7 space hexcode
-    local pattern_count_width = 4 -- 4 digit, resize to fit larger digits once more patterns are made
-    local pattern_ops_width = 5 -- 1 space letter/symbol, 2 space margin on each side
-    local curr_width = math.floor(vim.o.columns * WIDTH_COEFF)
-    local max_width = vim.o.columns - MARGIN
-    local width = clamp_max(curr_width, max_width)
-    -- Fit regex to rest of window leftover, subtract 1 for each space inbetween windows
-    local pattern_regex_width = width - pattern_color_width - pattern_count_width - (pattern_ops_width * 2) - 6
-
-    local pattern_height = nil
-    local curr_pattern_height = nil
-    local max_pattern_height = vim.o.lines - MARGIN
-    if #CandelaPatternList.order then
-        curr_pattern_height = MIN_HEIGHT + 2 -- minimum height
-    else
-        curr_pattern_height = windows.patterns.config.height
-    end
-    pattern_height = clamp_max(curr_pattern_height, max_pattern_height)
-    local prompt_height = 1 -- 1 space height for prompt
-
-    -- Account for 2 border spaces worth of padding to center window in center of base window
-    local horz_center = math.floor((vim.o.columns - width - 2) / 2)
-    local vert_center = math.floor((vim.o.lines - pattern_height - prompt_height) / 2)
-
-    -- Patterns
-    extend_table(windows.patterns.config, {
-        width = width,
-        height = pattern_height,
-        col = horz_center,
-        row = vert_center,
-    })
-
-    -- Color
-    extend_table(windows.color.config, {
-        width = pattern_color_width,
-        height = windows.patterns.config.height - 2,
-        col = 0,
-        row = 0,
-    })
-
-    -- Count
-    extend_table(windows.count.config, {
-        width = pattern_count_width,
-        height = windows.patterns.config.height - 2,
-        col = pattern_color_width + 1,
-        row = 0,
-    })
-
-    -- Regex
-    extend_table(windows.regex.config, {
-        width = pattern_regex_width,
-        height = windows.patterns.config.height - 2,
-        col = pattern_color_width + pattern_count_width + 2,
-        row = 0,
-    })
-
-    -- Highlight
-    extend_table(windows.highlight.config, {
-        width = pattern_ops_width,
-        height = windows.patterns.config.height - 2,
-        col = pattern_color_width + pattern_count_width + pattern_regex_width + 3,
-        row = 0,
-    })
-
-    -- Lightbox
-    extend_table(windows.lightbox.config, {
-        width = pattern_ops_width,
-        height = windows.patterns.config.height - 2,
-        col = pattern_color_width + pattern_count_width + pattern_regex_width + pattern_ops_width + 4,
-        row = 0,
-    })
-
-    -- Prompt
-    extend_table(windows.prompt.config, {
-        width = width,
-        height = prompt_height,
-        col = -1,
-        row = pattern_height + PROMPT_OFFSET,
-    })
-
-    -- Set window config dynamically if the window is open
-    for _, window in pairs(windows) do
-        if window:is_open() then
-            vim.api.nvim_win_set_config(window.win, window.config)
-        end
-    end
-end
-
 ---@param opts table
 function M.setup(opts)
     ---@param name string: name of option
@@ -342,12 +374,14 @@ function M.setup(opts)
             width = 0,
             min_height = 1,
             max_height = 1,
+            min_count_width = 1,
         }
         local maxs = {
             margin = math.huge,
             width = 1,
             min_height = math.huge,
             max_height = math.huge,
+            min_count_width = 10,
         }
 
         if num < mins[name] or num > maxs[name] then
@@ -372,6 +406,7 @@ function M.setup(opts)
     MIN_HEIGHT = validate_config_num("min_height", opts.window.min_height)
     MAX_HEIGHT = validate_config_num("max_height", opts.window.max_height)
     MARGIN = validate_config_num("margin", opts.window.margin)
+    MIN_COUNT_WIDTH = validate_config_num("min_count_width", opts.window.min_count_width)
 
     local defaults = require("candela.config").defaults
     if opts.window.prompt_offset == "overlap" then
@@ -490,7 +525,7 @@ function M.setup(opts)
         prompt = prompt,
     }
 
-    set_size_and_loc(M.windows, opts.window.width, opts.window.margin)
+    set_size_and_loc()
 
     -- set highlight/lightbox toggling strings since they're constant
     local highlight_on_def = "  Y  "
@@ -511,13 +546,12 @@ function M.setup(opts)
         end
     end
 
-    CandelaConfig.set_keymaps() -- NOTE: For dev purposes only
-    require("candela.mappings").set_float_keymaps()
+    require("candela.mappings").set_patterns_keymaps()
 
     vim.api.nvim_create_autocmd("VimResized", {
         group = CANDELA_AUGROUP,
         callback = function()
-            set_size_and_loc(M.windows)
+            set_size_and_loc()
         end,
     })
 
@@ -616,10 +650,8 @@ end
 
 ---@param operation operations: type of operation to conduct
 ---@param curr_line number?: index of currently selected line at time of operation
----@param curr_pattern CandelaPattern?: currently selected pattern
-local function show_prompt(operation, curr_line, curr_pattern)
+local function show_prompt(operation, curr_line)
     ---@cast curr_line number
-    ---@cast curr_pattern CandelaPattern
 
     M.windows.prompt:ensure_buffer()
     M.windows.prompt:attach_to(M.windows.patterns)
@@ -631,6 +663,7 @@ local function show_prompt(operation, curr_line, curr_pattern)
         buffer = M.windows.prompt.buf,
         desc = "Start the user in insert mode upon entering prompt window",
         callback = function()
+            require("candela.mappings").set_prompt_keymaps()
             vim.api.nvim_cmd({ cmd = "startinsert" }, {})
         end,
     })
@@ -703,13 +736,9 @@ end
 function M.add()
     M.show_patterns()
     M.windows.prompt.config.title = " Add Regex "
-    vim.api.nvim_set_option_value(
-        "completefunc",
-        "",
-        { buf = M.windows.prompt.buf }
-    )
 
     show_prompt(Operations.ADD)
+    vim.api.nvim_set_option_value("completefunc", "", { buf = M.windows.prompt.buf })
 end
 
 function M.edit()
@@ -724,11 +753,6 @@ function M.edit()
     end
 
     M.windows.prompt.config.title = " Edit Regex "
-    vim.api.nvim_set_option_value(
-        "completefunc",
-        "",
-        { buf = M.windows.prompt.buf }
-    )
 
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
     local _, curr_pattern = CandelaPatternList.get_id_and_pattern_by_index(curr_line)
@@ -740,7 +764,8 @@ function M.edit()
         vim.api.nvim_paste(curr_pattern.regex, false, -1)
     end)
 
-    show_prompt(Operations.EDIT, curr_line, curr_pattern)
+    show_prompt(Operations.EDIT, curr_line)
+    vim.api.nvim_set_option_value("completefunc", "", { buf = M.windows.prompt.buf })
 end
 
 function M.copy()
@@ -755,11 +780,6 @@ function M.copy()
     end
 
     M.windows.prompt.config.title = " Copy Regex "
-    vim.api.nvim_set_option_value(
-        "completefunc",
-        "",
-        { buf = M.windows.prompt.buf }
-    )
 
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
     local _, curr_pattern = CandelaPatternList.get_id_and_pattern_by_index(curr_line)
@@ -770,7 +790,8 @@ function M.copy()
         vim.api.nvim_paste(curr_pattern.regex, false, -1)
     end)
 
-    show_prompt(Operations.COPY, curr_line, curr_pattern)
+    show_prompt(Operations.COPY, curr_line)
+    vim.api.nvim_set_option_value("completefunc", "", { buf = M.windows.prompt.buf })
 end
 
 ---@param ask boolean: show the confirmation message or not
@@ -786,7 +807,7 @@ function M.delete(ask)
     end
 
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
-    local curr_id,curr_pattern = CandelaPatternList.get_id_and_pattern_by_index(curr_line)
+    local curr_id, curr_pattern = CandelaPatternList.get_id_and_pattern_by_index(curr_line)
     if curr_pattern == nil then
         return
     end
@@ -876,11 +897,6 @@ function M.change_color()
     end
 
     M.windows.prompt.config.title = " Change Color "
-    vim.api.nvim_set_option_value(
-        "completefunc",
-        "",
-        { buf = M.windows.prompt.buf }
-    )
 
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
     local _, curr_pattern = CandelaPatternList.get_id_and_pattern_by_index(curr_line)
@@ -892,7 +908,8 @@ function M.change_color()
         vim.api.nvim_paste(curr_pattern.color, false, -1)
     end)
 
-    show_prompt(Operations.CHANGE_COLOR, curr_line, curr_pattern)
+    show_prompt(Operations.CHANGE_COLOR, curr_line)
+    vim.api.nvim_set_option_value("completefunc", "", { buf = M.windows.prompt.buf })
 end
 
 function M.toggle_highlight()
@@ -977,7 +994,12 @@ function M.locate(all, command)
 
     M.hide_prompt()
     M.hide_patterns()
-    return command(selected)
+    local success = command(selected)
+    if success and command == require("candela.finder").find then
+        vim.api.nvim_cmd({ cmd = "lopen" }, {})
+        vim.api.nvim_cmd({ cmd = "lnext" }, {})
+    end
+    return success
 end
 
 function M.import()
@@ -1058,12 +1080,9 @@ function M.unselect_all()
 end
 
 function M.regen_colors()
-    for i, id in ipairs(CandelaPatternList.order) do
-        print(string.format("Regex: %s", CandelaPatternList.patterns[id].regex))
-        print(string.format("Color: %s", CandelaPatternList.patterns[id].color))
+    for i, _ in ipairs(CandelaPatternList.order) do
         local new_color = CandelaPatternList.next_color()
         CandelaPatternList.change_pattern_color(i, new_color)
-        print(string.format("New Color: %s\n", new_color))
     end
 
     M.refresh(true, true)

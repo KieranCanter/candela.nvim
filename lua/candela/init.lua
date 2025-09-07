@@ -36,23 +36,6 @@ function M.setup(opts)
             end
         end,
         bang = true,
-
-
-    --        local args = vim.split(cmdline, "%s+")
-    --        local idx = #args - 1 -- skip :Candela argument
-
-    --        if idx == 1 then
-    --            return vim.tbl_keys(require("candela.commands").commands)
-    --        elseif idx == 2 then
-    --            local sub = args[2]
-    --            -- TODO: allow other appropriate commands to receive args
-    --            -- :Candela add <regex> or :Candela add { regex = <regex>, [color = <hex_code>], [highlight = <boolean>], [lightbox = <boolean>] }
-    --            -- :Candela delete <regex> or :Candela delete <index>
-    --            if sub == "import" or sub == "export" then
-    --                return vim.fn.getcompletion(arglead, "file")
-    --            end
-    --        end
-    --    end,
     })
 
     M.config = require("candela.config").setup(opts)

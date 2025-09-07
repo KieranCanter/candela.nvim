@@ -39,6 +39,8 @@ M.defaults = {
         max_height = 30, -- unsigned integer
         -- margin space between window and Neovim bounds when Neovim is too small to fit the window
         margin = 16, -- unsigned integer
+        -- minimum width to allocate to the "count" column
+        min_count_width = 4, -- unsigned integer
         -- position of prompt window in relation to patterns window
         prompt_offset = "overlap", -- "overlap" | "border"
     },
@@ -71,7 +73,7 @@ M.defaults = {
         -- custom foldtext function, if not nil and a valid function, will override fold_style
         custom_foldtext = nil, -- function()
     },
-    -- file types to load Candela for  TODO: implement
+    -- file types to load Candela for TODO: implement
     file_types = {
         ".log",
         ".txt",
@@ -281,70 +283,6 @@ function M.setup(opts)
     })
 
     return M.options
-end
-
--- TODO: move mappings to mappings.lua file
-function M.set_keymaps()
-    -- NOTE: Only for dev purposes, leave for user to create
-    local CandelaUi = require("candela.ui")
-    local CandelaCommands = require("candela.commands")
-
-    vim.api.nvim_set_keymap("n", "<leader>cds", "", {
-        noremap = true,
-        silent = true,
-        desc = "Candela: toggle patterns window",
-        callback = function()
-            CandelaUi.toggle()
-        end,
-    })
-    vim.api.nvim_set_keymap("n", "<leader>cda", "", {
-        noremap = true,
-        silent = true,
-        desc = "Candela: add pattern",
-        callback = function()
-            CandelaCommands.commands.add.impl()
-        end,
-    })
-    vim.api.nvim_set_keymap("n", "<leader>cdR", "", {
-        noremap = true,
-        silent = true,
-        desc = "Candela: refresh patterns",
-        callback = function()
-            CandelaCommands.commands.refresh.impl()
-        end,
-    })
-    vim.api.nvim_set_keymap("n", "<leader>cdD", "", {
-        noremap = true,
-        silent = true,
-        desc = "Candela: clear patterns",
-        callback = function()
-            CandelaCommands.commands.clear.impl()
-        end,
-    })
-    vim.api.nvim_set_keymap("n", "<leader>cdM", "", {
-        noremap = true,
-        silent = true,
-        desc = "Candela: match all",
-        callback = function()
-            CandelaCommands.commands.match_all.impl()
-        end,
-    })
-    vim.api.nvim_set_keymap("n", "<leader>cdF", "", {
-        noremap = true,
-        silent = true,
-        desc = "Candela: find all",
-        callback = function()
-            CandelaCommands.commands.find_all.impl()
-        end,
-    })
-    vim.api.nvim_set_keymap("n", "<leader>cdL", "", {
-        noremap = true,
-        silent = true,
-        desc = "Candela: lightbox",
-        callback = function()
-            CandelaCommands.commands.lightbox.impl()
-        end,
-    })
 end
 
 return M

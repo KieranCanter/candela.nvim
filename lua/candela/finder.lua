@@ -102,15 +102,15 @@ function M.match(regexes)
 end
 
 ---@param matches table[]: keys: lineno, line
----@param kind string: "single"|"all"
+---@param kind "single"|"selected"|"all"
 local function update_loclist(matches, kind)
     local loclist = {}
     for _, entry in ipairs(matches) do
-        loclist[#loclist + 1] = {
+        table.insert(loclist, {
             bufnr = require("candela.ui").base_buf,
             lnum = entry.lineno,
             text = entry.line,
-        }
+        })
     end
 
     local context = { name = "Candela", type = kind }
@@ -132,7 +132,6 @@ local function update_loclist(matches, kind)
     vim.fn.setloclist(0, {}, " ", what)
 end
 
--- TODO: can I use match_cache to get the matches instead of rerunning engine?
 ---@param regexes table<string>: empty table represents all patterns
 ---@return boolean: tells caller whether find was successful or not
 function M.find(regexes)
