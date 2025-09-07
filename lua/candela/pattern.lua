@@ -1,5 +1,3 @@
--- Module for defining a single pattern
-
 ---@class CandelaPattern
 ---@field regex string
 ---@field color string

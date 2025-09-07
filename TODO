@@ -7,4 +7,3 @@ TODO (before release):
 TODO (after release)
   * change_color improvements:
     * support other color spaces rgb, hsv, hsl, lch, oklch
-  * lazy load more

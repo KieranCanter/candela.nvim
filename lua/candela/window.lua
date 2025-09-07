@@ -1,5 +1,3 @@
--- Module for initializing and manipulating Candela buffers/windows
-
 ---@class CandelaWindow
 ---@field buf number?
 ---@field win number?

@@ -1,7 +1,3 @@
--- Module for defining the list of patterns
-
-local CandelaPattern = require("candela.pattern")
-
 local M = {}
 M.patterns = {}
 M.order = {}
@@ -156,7 +152,7 @@ function M.add_pattern(regex, color, highlight, lightbox)
         return
     end
 
-    local new_pattern = CandelaPattern.new(regex, color, highlight, lightbox, count)
+    local new_pattern = require("candela.pattern").new(regex, color, highlight, lightbox, count)
     M.patterns[new_id] = new_pattern
     table.insert(M.order, new_id)
 

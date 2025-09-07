@@ -1,7 +1,3 @@
--- Module for initializing and manipulating the user interface
-
-local CandelaConfig = require("candela.config")
-local CandelaWindow = require("candela.window")
 local CandelaPatternList = require("candela.pattern_list")
 local CandelaHighlighter = require("candela.highlighter")
 local CandelaLightbox = require("candela.lightbox")
@@ -307,6 +303,7 @@ local function refresh_to_curr_buf()
             end
         end
 
+        local CandelaConfig = require("candela.config")
         local cmd = CandelaConfig.options.engine.command --[[@as string]]
         local args = CandelaConfig.options.engine.args
         local count = CandelaHighlighter.highlight_matches(M.curr_buf, id, pattern.regex, pattern.color, cmd, args)
@@ -384,6 +381,7 @@ function M.setup(opts)
             min_count_width = 10,
         }
 
+        local CandelaConfig = require("candela.config")
         if num < mins[name] or num > maxs[name] then
             vim.notify(
                 string.format(
@@ -426,8 +424,10 @@ function M.setup(opts)
         PROMPT_OFFSET = 0
     end
 
+    local CandelaWindow = require("candela.window")
+
     local title = ""
-    local icons = CandelaConfig.options.icons
+    local icons = require("candela.config").options.icons
     if icons.candela ~= nil then
         title = string.format(" %sCandela ", icons.candela)
     else

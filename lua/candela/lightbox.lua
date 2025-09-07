@@ -1,5 +1,3 @@
-local CandelaWindow = require("candela.window")
-
 local M = {}
 
 local function get_foldtext_preview(start_line)
@@ -38,6 +36,7 @@ function M.setup(opts)
     local system_split = opts.view:match("system%-(%a+)") -- match split command if opt set, nil otherwise ("split", "vsplit")
     local tab_split = opts.view:match("tab") and "tab split" -- match tab comand if opt set, nil otherwise
 
+    local CandelaWindow = require("candela.window")
     if split_dir == nil then -- using system_split or tab_split
         M.window = CandelaWindow.new({})
         M.open_command = system_split or tab_split

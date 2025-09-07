@@ -1,11 +1,9 @@
 -- Module for defining user commands
-local CandelaUi = require("candela.ui")
-local CandelaLightbox = require("candela.lightbox")
-local CandelaIo = require("candela.io")
-
 local M = {}
 
 function M.setup(opts)
+    local CandelaUi = require("candela.ui")
+
     M.commands = {
         add = {
             impl = function()
@@ -107,7 +105,7 @@ function M.setup(opts)
         lightbox = {
             impl = function()
                 CandelaUi.hide_patterns()
-                CandelaLightbox.toggle()
+                require("candela.lightbox").toggle()
             end,
         },
         import = {
@@ -122,7 +120,7 @@ function M.setup(opts)
                 end
 
                 local path = subargs[1]
-                CandelaIo.import_patterns(path)
+                require("candela.io").import_patterns(path)
             end,
             complete = function(sub_arglead)
                 return vim.fn.getcompletion(sub_arglead, "file")
@@ -140,7 +138,7 @@ function M.setup(opts)
                 end
 
                 local path = subargs[1]
-                CandelaIo.export_patterns(path)
+                require("candela.io").export_patterns(path)
             end,
             complete = function(sub_arglead)
                 return vim.fn.getcompletion(sub_arglead, "file")

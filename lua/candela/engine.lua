@@ -1,5 +1,3 @@
--- Regex engine to find matches
-
 ---@class CandelaMatch
 ---@field lineno integer
 ---@field line string

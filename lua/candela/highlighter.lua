@@ -1,5 +1,3 @@
--- module to control th highlighting of matches
-
 local M = {}
 
 function M.setup()
