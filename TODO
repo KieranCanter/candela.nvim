@@ -1,11 +1,10 @@
 TODO (before release):
+  * syntax highlighting option
+  * file type option
   * implement help function
   * write docs
-  * move autocmds/mappings to separate file
 
 TODO (after release)
   * change_color improvements:
-    * set some default names for palette colors so users can do e.g. change_color("red")
-    * allow users to set their own color names
-    * handle automatic foreground color changing if the colors are too similar in luminosity
+    * support other color spaces rgb, hsv, hsl, lch, oklch
   * lazy load more

@@ -118,6 +118,26 @@ M.defaults = {
                 "#E592C8", -- LIGHT ORCHID
             },
         },
+        swatches = {
+            dark = {
+                GRAY = "#676767",
+                RED = "#A1454F",
+                BLUE = "#016DA6",
+                YELLOW = "#7B6600",
+                GREEN = "#2A793C",
+                ORANGE = "#9A510B",
+                PURPLE = "#7055A3",
+            },
+            light = {
+                GRAY = "#B1B1B1",
+                RED = "#F59282",
+                BLUE = "#3BC3E5",
+                YELLOW = "#C6B14D",
+                GREEN = "#82C57C",
+                ORANGE = "#EC9C60",
+                PURPLE = "#AAA5FB",
+            },
+        },
     },
 }
 
