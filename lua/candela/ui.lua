@@ -684,7 +684,7 @@ local function show_prompt(operation, curr_line, curr_pattern)
         end
         vim.notify(
             string.format(
-                'Candela: invalid operation "%s", must be one of: %s',
+                '[Candela] invalid operation "%s", must be one of: %s',
                 operation,
                 vim.inspect(operation_names)
             ),

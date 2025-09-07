@@ -306,6 +306,7 @@ function M.change_pattern_color(index_or_regex, new_color)
         return
     end
 
+    new_color = pattern:convert_color_string(new_color)
     if pattern.color == new_color then -- user didn't change color when editing, do nothing
         return
     end

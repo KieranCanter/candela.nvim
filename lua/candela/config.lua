@@ -84,38 +84,38 @@ M.defaults = {
         -- list of colors to use for dark/light mode
         colors = {
             dark = {
-                "#9d4564", -- dark mauve
-                "#a1464c", -- light maroon
-                "#9e4d21", -- sienna
-                "#935800", -- mud
-                "#7f6400", -- mustard
-                "#6c6c00", -- moss
-                "#4c7522", -- leaf green
-                "#257a3f", -- jewel green
-                "#007c6a", -- aquamarine
-                "#007690", -- ocean
-                "#3368ab", -- muted blue
-                "#565fac", -- dusky blue
-                "#7156a3", -- dark lavender
-                "#805098", -- eggplant
-                "#94487c", -- rouge
+                "#9D4564", -- DARK MAUVE
+                "#A1464C", -- LIGHT MAROON
+                "#9E4D21", -- SIENNA
+                "#935800", -- MUD
+                "#7F6400", -- MUSTARD
+                "#6C6C00", -- MOSS
+                "#4C7522", -- LEAF GREEN
+                "#257A3F", -- JEWEL GREEN
+                "#007C6A", -- AQUAMARINE
+                "#007690", -- OCEAN
+                "#3368AB", -- MUTED BLUE
+                "#565FAC", -- DUSKY BLUE
+                "#7156A3", -- DARK LAVENDER
+                "#805098", -- EGGPLANT
+                "#94487C", -- ROUGE
             },
             light = {
-                "#f08fae", -- pink sherbet
-                "#f49093", -- sea pink
-                "#f0986d", -- tangerine
-                "#e2a25d", -- desert
-                "#cbae5e", -- gold
-                "#b6b75f", -- olive
-                "#94c16f", -- pistachio
-                "#75c787", -- mantis
-                "#65c5b1", -- neptune
-                "#64bfdb", -- bluish cyan
-                "#7cb4fd", -- crystal blue
-                "#9daafe", -- periwinkle
-                "#bba0f3", -- lilac
-                "#cd9ae7", -- baby purple
-                "#e592c8", -- light orchid
+                "#F08FAE", -- PINK SHERBET
+                "#F49093", -- SEA PINK
+                "#F0986D", -- TANGERINE
+                "#E2A25D", -- DESERT
+                "#CBAE5E", -- GOLD
+                "#B6B75F", -- OLIVE
+                "#94C16F", -- PISTACHIO
+                "#75C787", -- MANTIS
+                "#65C5B1", -- NEPTUNE
+                "#64BFDB", -- BLUISH CYAN
+                "#7CB4FD", -- CRYSTAL BLUE
+                "#9DAAFE", -- PERIWINKLE
+                "#BBA0F3", -- LILAC
+                "#CD9AE7", -- BABY PURPLE
+                "#E592C8", -- LIGHT ORCHID
             },
         },
     },

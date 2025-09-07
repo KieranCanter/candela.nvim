@@ -116,17 +116,17 @@ local function update_loclist(matches, kind)
     local context = { name = "Candela", type = kind }
     local title
     if kind == "single" then
-        title = "Candela: Single Pattern"
+        title = "[Candela] Single Pattern"
     elseif kind == "selected" then
-        title = "Candela: Selected Patterns"
+        title = "[Candela] Selected Patterns"
     elseif kind == "all" then
-        title = "Candela: All Patterns"
+        title = "[Candela] All Patterns"
     else
         vim.notify(
-            "Candela: to update location list, kind must be 'single', 'selected', or 'all', proceeding with 'single'",
+            "[Candela] to update location list, kind must be 'single', 'selected', or 'all', proceeding with 'single'",
             vim.log.levels.WARN
         )
-        title = "Candela: Single Pattern"
+        title = "[Candela] Single Pattern"
     end
     local what = { context = context, items = loclist, title = title }
     vim.fn.setloclist(0, {}, " ", what)

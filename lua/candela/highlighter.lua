@@ -137,7 +137,7 @@ function M.toggle_match_highlights(bufnr, id, regex, toggle)
     local ns = vim.api.nvim_create_namespace("CandelaNs_" .. hash_regex(regex))
     if ns == nil then
         vim.notify(
-            string.format("Candela: namespace does not exist: CandelaNs_%s", hash_regex(regex)),
+            string.format("[Candela] namespace does not exist: CandelaNs_%s", hash_regex(regex)),
             vim.log.levels.ERROR
         )
         return false
@@ -176,7 +176,7 @@ function M.remove_match_highlights(bufnr, id, regex)
     local ns = vim.api.nvim_create_namespace("CandelaNs_" .. hash_regex(regex))
     if ns == nil then
         vim.notify(
-            string.format("Candela: namespace does not exist: CandelaNs_%s", hash_regex(regex)),
+            string.format("[Candela] namespace does not exist: CandelaNs_%s", hash_regex(regex)),
             vim.log.levels.ERROR
         )
         return false
@@ -193,7 +193,7 @@ function M.change_highlight_color(regex, new_color)
     local ns = vim.api.nvim_create_namespace("CandelaNs_" .. hash_regex(regex))
     if ns == nil then
         vim.notify(
-            string.format("Candela: namespace does not exist: CandelaNs_%s", hash_regex(regex)),
+            string.format("[Candela] namespace does not exist: CandelaNs_%s", hash_regex(regex)),
             vim.log.levels.ERROR
         )
         return false
