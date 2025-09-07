@@ -62,24 +62,30 @@ local function get_match_case(regex)
     end
 end
 
----@param patterns table<integer, CandelaPattern>
----@param count integer
-function M.match(patterns, count)
+---@param regexes string[]: empty table represents all patterns
+---@return boolean: tells caller whether find was successful or not
+function M.match(regexes)
+    local bufnr = require("candela.ui").base_buf
+    if not bufnr then
+        bufnr = vim.api.nvim_get_current_buf()
+        require("candela.ui").base_buf = bufnr
+    end
+
     local search_str = ""
-    if count == 1 then
-        local _, pattern = next(patterns)
-        if pattern == nil then
-            vim.notify("[Candela] finder.match() count is 1 but pattern is nil", vim.log.levels.ERROR)
-            return
-        end
-        search_str = pattern.regex
+    local first = next(regexes)
+    local second = next(regexes, next(regexes))
+
+    if first ~= nil and second == nil then
+        search_str = regexes[first]
     else
-        if count == 0 then
-            patterns = require("candela.pattern_list").patterns
+        if first == nil then
+            for _, pattern in pairs(require("candela.pattern_list").patterns) do
+                table.insert(regexes, pattern.regex)
+            end
         end
         local parts = {}
-        for _, pattern in pairs(patterns) do
-            table.insert(parts, "(" .. pattern.regex .. ")")
+        for _, regex in pairs(regexes) do
+            table.insert(parts, "(" .. regex .. ")")
         end
         search_str = table.concat(parts, "|")
     end
@@ -89,7 +95,10 @@ function M.match(patterns, count)
     local ok = pcall(vim.api.nvim_exec2, "normal! n", {})
     if not ok then
         vim.notify(string.format("[Candela] no matches found for /%s/", search_str), vim.log.levels.WARN)
+        return false
     end
+
+    return true
 end
 
 ---@param matches table[]: keys: lineno, line
@@ -124,11 +133,15 @@ local function update_loclist(matches, kind)
 end
 
 -- TODO: can I use match_cache to get the matches instead of rerunning engine?
----@param bufnr number
----@param patterns table<integer, CandelaPattern>
----@param count integer
+---@param regexes table<string>: empty table represents all patterns
 ---@return boolean: tells caller whether find was successful or not
-function M.find(bufnr, patterns, count)
+function M.find(regexes)
+    local bufnr = require("candela.ui").base_buf
+    if not bufnr then
+        bufnr = vim.api.nvim_get_current_buf()
+        require("candela.ui").base_buf = bufnr
+    end
+
     local filepath = vim.api.nvim_buf_get_name(bufnr)
     if filepath == "" then
         vim.notify("[Candela] cannot search file with no file name", vim.log.levels.ERROR)
@@ -137,25 +150,24 @@ function M.find(bufnr, patterns, count)
 
     local search_str = ""
     local search_kind = "selected"
+    local first = next(regexes)
+    local second = next(regexes, next(regexes))
 
-    if count == 1 then
-        local _, pattern = next(patterns)
-        if pattern == nil then
-            vim.notify("[Candela] finder.find() count is 1 but pattern is nil", vim.log.levels.ERROR)
-            return false
-        end
-        search_str = pattern.regex
+    if first ~= nil and second == nil then
+        search_str = regexes[first]
         search_kind = "single"
     else
-        if count == 0 then
-            patterns = require("candela.pattern_list").patterns
+        if first == nil then
+            for _, pattern in pairs(require("candela.pattern_list").patterns) do
+                table.insert(regexes, pattern.regex)
+            end
             search_kind = "all"
         else
             search_kind = "selected"
         end
         local parts = {}
-        for _, pattern in pairs(patterns) do
-            table.insert(parts, "(" .. pattern.regex .. ")")
+        for _, regex in ipairs(regexes) do
+            table.insert(parts, "(" .. regex .. ")")
         end
         search_str = table.concat(parts, "|")
     end
@@ -170,6 +182,10 @@ function M.find(bufnr, patterns, count)
     table.insert(command, filepath)
 
     local matches = require("candela.engine").get_matches(command)
+    if next(matches) == nil then
+        vim.notify(string.format("[Candela] no matches found for /%s/", search_str), vim.log.levels.WARN)
+        return false -- nothing to find, just exit
+    end
 
     update_loclist(matches, search_kind)
     return true

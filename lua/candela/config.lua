@@ -282,7 +282,7 @@ function M.set_keymaps()
         silent = true,
         desc = "Candela: add pattern",
         callback = function()
-            CandelaCommands.commands.add()
+            CandelaCommands.commands.add.impl()
         end,
     })
     vim.api.nvim_set_keymap("n", "<leader>cdR", "", {
@@ -290,7 +290,7 @@ function M.set_keymaps()
         silent = true,
         desc = "Candela: refresh patterns",
         callback = function()
-            CandelaCommands.commands.refresh()
+            CandelaCommands.commands.refresh.impl()
         end,
     })
     vim.api.nvim_set_keymap("n", "<leader>cdD", "", {
@@ -298,7 +298,7 @@ function M.set_keymaps()
         silent = true,
         desc = "Candela: clear patterns",
         callback = function()
-            CandelaCommands.commands.clear()
+            CandelaCommands.commands.clear.impl()
         end,
     })
     vim.api.nvim_set_keymap("n", "<leader>cdM", "", {
@@ -306,7 +306,7 @@ function M.set_keymaps()
         silent = true,
         desc = "Candela: match all",
         callback = function()
-            CandelaCommands.commands.match_all()
+            CandelaCommands.commands.match_all.impl()
         end,
     })
     vim.api.nvim_set_keymap("n", "<leader>cdF", "", {
@@ -314,7 +314,7 @@ function M.set_keymaps()
         silent = true,
         desc = "Candela: find all",
         callback = function()
-            CandelaCommands.commands.find_all()
+            CandelaCommands.commands.find_all.impl()
         end,
     })
     vim.api.nvim_set_keymap("n", "<leader>cdL", "", {
@@ -322,207 +322,8 @@ function M.set_keymaps()
         silent = true,
         desc = "Candela: lightbox",
         callback = function()
-            CandelaCommands.commands.lightbox()
+            CandelaCommands.commands.lightbox.impl()
         end,
-    })
-    vim.api.nvim_set_keymap("n", "<M-k>", "[l", {})
-    vim.api.nvim_set_keymap("n", "<M-j>", "]l", {})
-    vim.api.nvim_set_keymap("n", "<M-h>", "[q", {})
-    vim.api.nvim_set_keymap("n", "<M-l>", "]q", {})
-end
-
-function M.set_patterns_keymaps(buffer)
-    local CandelaUi = require("candela.ui")
-    local CandelaCommands = require("candela.commands")
-    vim.api.nvim_buf_set_keymap(buffer, "n", "q", "", {
-        noremap = true,
-        silent = true,
-        desc = "Close Candela",
-        callback = function()
-            CandelaUi.hide_patterns()
-        end,
-    })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "<ESC>", "", {
-        noremap = true,
-        silent = true,
-        desc = "Close Candela",
-        callback = function()
-            CandelaUi.hide_patterns()
-        end,
-    })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "a", "", {
-        noremap = true,
-        silent = true,
-        desc = "Add Candela pattern",
-        callback = function()
-            CandelaCommands.commands.add()
-        end,
-    })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "e", "", {
-        noremap = true,
-        silent = true,
-        desc = "Edit Candela pattern",
-        callback = function()
-            CandelaCommands.commands.edit()
-        end,
-    })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "c", "", {
-        noremap = true,
-        silent = true,
-        desc = "Copy Candela pattern",
-        callback = function()
-            CandelaCommands.commands.copy()
-        end,
-    })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "d", "", {
-        noremap = true,
-        silent = true,
-        desc = "Delete Candela pattern",
-        callback = function()
-            CandelaCommands.commands.delete()
-        end,
-    })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "D", "", {
-        noremap = true,
-        silent = true,
-        desc = "Clear all Candela patterns",
-        callback = function()
-            CandelaCommands.commands.clear()
-        end,
-    })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "C", "", {
-        noremap = true,
-        silent = true,
-        desc = "Change Candela pattern color",
-        callback = function()
-            CandelaCommands.commands.change_color()
-        end,
-    })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "h", "", {
-        noremap = true,
-        silent = true,
-        desc = "Toggle Candela pattern highlight",
-        callback = function()
-            CandelaCommands.commands.toggle_highlight()
-        end,
-    })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "l", "", {
-        noremap = true,
-        silent = true,
-        desc = "Toggle Candela pattern lightbox",
-        callback = function()
-            CandelaCommands.commands.toggle_lightbox()
-        end,
-    })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "R", "", {
-        noremap = true,
-        silent = true,
-        desc = "Refresh patterns for current buffer",
-        callback = function()
-            CandelaCommands.commands.refresh()
-        end,
-    })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "m", "", {
-        noremap = true,
-        silent = true,
-        desc = "Candela match selected patterns in buffer",
-        callback = function()
-            CandelaCommands.commands.match()
-        end,
-    })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "M", "", {
-        noremap = true,
-        silent = true,
-        desc = "Candela match pattern in buffer",
-        callback = function()
-            CandelaCommands.commands.match_all()
-        end,
-    })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "f", "", {
-        noremap = true,
-        silent = true,
-        desc = "Candela find pattern in buffer",
-        callback = function()
-            CandelaCommands.commands.find()
-        end,
-    })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "F", "", {
-        noremap = true,
-        silent = true,
-        desc = "Candela find all patterns in buffer",
-        callback = function()
-            CandelaCommands.commands.find_all()
-        end,
-    })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "L", "", {
-        noremap = true,
-        silent = true,
-        desc = "Candela open/close lightbox",
-        callback = function()
-            CandelaCommands.commands.lightbox()
-        end,
-    })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "I", "", {
-        noremap = true,
-        silent = true,
-        desc = "Import patterns from file",
-        callback = function()
-            CandelaUi.import()
-        end,
-    })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "E", "", {
-        noremap = true,
-        silent = true,
-        desc = "Export patterns to file",
-        callback = function()
-            CandelaUi.export()
-        end,
-    })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "?", "", {
-        noremap = true,
-        silent = true,
-        desc = "Candela: display keymaps",
-        callback = function()
-            CandelaCommands.commands.help()
-        end,
-    })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "<TAB>", "", {
-        noremap = true,
-        silent = true,
-        desc = "Candela: selected current pattern",
-        callback = function()
-            CandelaUi.toggle_select_pattern()
-        end,
-    })
-end
-
-function M.set_prompt_keymaps(buffer)
-    local CandelaUi = require("candela.ui")
-    vim.api.nvim_buf_set_keymap(buffer, "n", "q", "", {
-        noremap = true,
-        silent = true,
-        desc = "Candela: close prompt",
-        callback = function()
-            CandelaUi.hide_prompt()
-        end,
-    })
-    vim.api.nvim_buf_set_keymap(buffer, "n", "<ESC>", "", {
-        noremap = true,
-        silent = true,
-        desc = "Candela: close prompt",
-        callback = function()
-            CandelaUi.hide_prompt()
-        end,
-    })
-    vim.api.nvim_buf_set_keymap(buffer, "i", "<C-n>", "<C-x><C-u>", {
-        noremap = true,
-        silent = true,
-        desc = "Candela: next file path autocompletion",
-    })
-    vim.api.nvim_buf_set_keymap(buffer, "i", "<C-p>", "<C-x><C-u>", {
-        noremap = true,
-        silent = true,
-        desc = "Candela: previous file path autocompletion",
     })
 end
 

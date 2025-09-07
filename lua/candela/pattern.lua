@@ -6,6 +6,10 @@
 ---@field highlight boolean
 ---@field lightbox boolean
 ---@field count number
+---@field edit_regex fun(self, new_regex: string)
+---@field change_color fun(self, new_color: string)
+---@field toggle_highlight fun(self)
+---@field toggle_lightbox fun(self)
 
 local M = {}
 
@@ -29,9 +33,9 @@ function M.new(regex, color, highlight, lightbox, count)
 end
 
 ---@param self CandelaPattern
----@param regex string
-function M:edit_regex(regex)
-    self.regex = regex
+---@param new_regex string
+function M:edit_regex(new_regex)
+    self.regex = new_regex
 end
 
 ---@param color string

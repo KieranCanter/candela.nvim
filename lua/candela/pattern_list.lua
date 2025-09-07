@@ -253,7 +253,7 @@ function M.delete_pattern(index)
     M.patterns[id] = nil
     vim.notify(string.format("[Candela] deleted pattern %d: /%s/", index, regex), vim.log.levels.INFO)
 
-    require("candela.ui").update_ui()
+    require("candela.ui").update_ui_lines()
 
     return true
 end
@@ -269,7 +269,7 @@ function M.clear_patterns()
     M.patterns = {}
     vim.notify("[Candela] cleared all patterns", vim.log.levels.INFO)
 
-    require("candela.ui").update_ui()
+    require("candela.ui").update_ui_lines()
 
     return true
 end

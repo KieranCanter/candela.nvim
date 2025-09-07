@@ -512,8 +512,7 @@ function M.setup(opts)
     end
 
     CandelaConfig.set_keymaps() -- NOTE: For dev purposes only
-    CandelaConfig.set_patterns_keymaps(M.windows.regex.buf)
-    CandelaConfig.set_prompt_keymaps(M.windows.prompt.buf)
+    require("candela.mappings").set_float_keymaps()
 
     vim.api.nvim_create_autocmd("VimResized", {
         group = CANDELA_AUGROUP,
@@ -950,68 +949,35 @@ function M.toggle_lightbox()
 end
 
 ---@param all boolean: whether to match selected patterns or all
-function M.match(all)
+---@param command fun(regexes: string[]): boolean match() or find() function from finder
+---@return boolean: lets the caller know to open location list or not
+function M.locate(all, command)
     if #CandelaPatternList.order == 0 then
         vim.notify("[Candela] no patterns to match", vim.log.levels.ERROR)
-        return
-    end
-
-    local selected = {}
-    local count = 0
-    if not all then
-        if next(selected_patterns) == nil then
-            local curr_line = vim.api.nvim_win_get_cursor(0)[1]
-            local id, pattern = CandelaPatternList.get_id_and_pattern_by_index(curr_line)
-            if id == nil or pattern == nil then
-                return
-            end
-            selected[id] = pattern
-            count = 1
-        else
-            local patterns = CandelaPatternList.patterns
-            for id, _ in pairs(selected_patterns) do
-                selected[id] = patterns[id]
-                count = count + 1
-            end
-        end
-    end
-
-    M.hide_prompt()
-    M.hide_patterns()
-    CandelaFinder.match(selected, count)
-end
-
----@param all boolean: whether to match selected patterns or all
----@return boolean: lets the caller know to open location list or not
-function M.find(all)
-    if #CandelaPatternList.order == 0 then
-        vim.notify("[Candela] no patterns to find", vim.log.levels.ERROR)
         return false
     end
 
     local selected = {}
-    local count = 0
     if not all then
         if next(selected_patterns) == nil then
             local curr_line = vim.api.nvim_win_get_cursor(0)[1]
-            local id, pattern = CandelaPatternList.get_id_and_pattern_by_index(curr_line)
-            if id == nil or pattern == nil then
+            local _, pattern = CandelaPatternList.get_id_and_pattern_by_index(curr_line)
+            if pattern == nil then
                 return false
             end
-            selected[id] = pattern
-            count = 1
+            table.insert(selected, pattern.regex)
         else
             local patterns = CandelaPatternList.patterns
             for id, _ in pairs(selected_patterns) do
-                selected[id] = patterns[id]
-                count = count + 1
+                local pattern = patterns[id]
+                table.insert(selected, pattern.regex)
             end
         end
     end
 
     M.hide_prompt()
     M.hide_patterns()
-    return CandelaFinder.find(M.base_buf, selected, count)
+    return command(selected)
 end
 
 function M.import()

@@ -7,107 +7,171 @@ local M = {}
 
 function M.setup(opts)
     M.commands = {
-        add = function()
-            CandelaUi.add()
-        end,
-        edit = function()
-            CandelaUi.edit()
-        end,
-        copy = function()
-            CandelaUi.copy()
-        end,
-        delete = function()
-            local ask = opts.matching.delete_confirmation
-            CandelaUi.delete(ask)
-        end,
-        clear = function()
-            local ask = opts.matching.clear_confirmation
-            CandelaUi.clear(ask)
-        end,
-        refresh = function()
-            CandelaUi.refresh(true)
-        end,
-        change_color = function()
-            CandelaUi.change_color()
-        end,
-        toggle_highlight = function()
-            CandelaUi.toggle_highlight()
-        end,
-        toggle_lightbox = function()
-            CandelaUi.toggle_lightbox()
-        end,
-        match = function()
-            CandelaUi.match(false)
-        end,
-        match_all = function()
-            CandelaUi.match(true)
-        end,
-        find = function()
-            local success = CandelaUi.find(false)
-            if success then
-                vim.api.nvim_cmd({ cmd = "lnext" }, {})
-                vim.api.nvim_cmd({ cmd = "lopen" }, {})
-            end
-        end,
-        find_all = function()
-            local success = CandelaUi.find(true)
-            if success then
-                vim.api.nvim_cmd({ cmd = "lnext" }, {})
-                vim.api.nvim_cmd({ cmd = "lopen" }, {})
-            end
-        end,
-        lightbox = function()
-            CandelaUi.hide_patterns()
-            CandelaLightbox.toggle()
-        end,
-        import = function(args)
-            if #args ~= 1 then
-                vim.notify(
-                    "[Candela] invalid number of arguments, `import` command must have one argument"
-                        .. "\nUsage: `Candela import <path/to/import_file.lua>`",
-                    vim.log.levels.ERROR
-                )
-                return
-            end
+        add = {
+            impl = function()
+                CandelaUi.add()
+            end,
+        },
+        edit = {
+            impl = function()
+                CandelaUi.edit()
+            end,
+        },
+        copy = {
+            impl = function()
+                CandelaUi.copy()
+            end,
+        },
+        delete = {
+            impl = function()
+                local ask = opts.matching.delete_confirmation
+                CandelaUi.delete(ask)
+            end,
+        },
+        clear = {
+            impl = function()
+                local ask = opts.matching.clear_confirmation
+                CandelaUi.clear(ask)
+            end,
+        },
+        refresh = {
+            impl = function()
+                CandelaUi.refresh(true)
+            end,
+        },
+        change_color = {
+            impl = function()
+                CandelaUi.change_color()
+            end,
+        },
+        toggle_highlight = {
+            impl = function()
+                CandelaUi.toggle_highlight()
+            end,
+        },
+        toggle_lightbox = {
+            impl = function()
+                CandelaUi.toggle_lightbox()
+            end,
+        },
+        match = {
+            impl = function(subargs)
+                require("candela.finder").match(subargs)
+            end,
+            complete = function(subarg_lead)
+                local regexes = {}
+                for _, pattern in pairs(require("candela.pattern_list").patterns) do
+                    table.insert(regexes, pattern.regex)
+                end
+                return vim.iter(regexes)
+                    :filter(function(regex)
+                        return regex:find(subarg_lead) ~= nil
+                    end)
+                    :totable()
+            end,
+        },
+        match_all = {
+            impl = function()
+                require("candela.finder").match({})
+            end,
+        },
+        find = {
+            impl = function(subargs)
+                local success = require("candela.finder").find(subargs)
+                if success then
+                    vim.api.nvim_cmd({ cmd = "lnext", }, {})
+                    vim.api.nvim_cmd({ cmd = "lopen", }, {})
+                end
+            end,
+            complete = function(subarg_lead)
+                local regexes = {}
+                for _, pattern in pairs(require("candela.pattern_list").patterns) do
+                    table.insert(regexes, pattern.regex)
+                end
+                return vim.iter(regexes)
+                    :filter(function(regex)
+                        return regex:find(subarg_lead) ~= nil
+                    end)
+                    :totable()
+            end,
+        },
+        find_all = {
+            impl = function()
+                local success = require("candela.finder").find({})
+                if success then
+                    vim.api.nvim_cmd({ cmd = "lnext" }, {})
+                    vim.api.nvim_cmd({ cmd = "lopen" }, {})
+                end
+            end,
+        },
+        lightbox = {
+            impl = function()
+                CandelaUi.hide_patterns()
+                CandelaLightbox.toggle()
+            end,
+        },
+        import = {
+            impl = function(subargs)
+                if #subargs ~= 1 then
+                    vim.notify(
+                        "[Candela] invalid number of arguments, `import` command must have one argument"
+                            .. "\nUsage: `Candela import <path/to/import_file.lua>`",
+                        vim.log.levels.ERROR
+                    )
+                    return
+                end
 
-            local path = args[1]
-            CandelaIo.import_patterns(path)
-        end,
-        export = function(args)
-            if #args > 1 then
-                vim.notify(
-                    "[Candela] invalid number of arguments, `export` command must have zero or one argument"
-                        .. "\nUsage: `Candela export [path/to/export_file.lua]`",
-                    vim.log.levels.ERROR
-                )
-                return
-            end
+                local path = subargs[1]
+                CandelaIo.import_patterns(path)
+            end,
+            complete = function(sub_arglead)
+                return vim.fn.getcompletion(sub_arglead, "file")
+            end,
+        },
+        export = {
+            impl = function(subargs)
+                if #subargs > 1 then
+                    vim.notify(
+                        "[Candela] invalid number of arguments, `export` command must have zero or one argument"
+                            .. "\nUsage: `Candela export [path/to/export_file.lua]`",
+                        vim.log.levels.ERROR
+                    )
+                    return
+                end
 
-            local path = args[1]
-            CandelaIo.export_patterns(path)
-        end,
-        help = function()
-            vim.notify("[Candela] help subcommand not implemented yet", vim.log.levels.WARN)
-            CandelaUi.help()
-        end,
-        health = function()
-            vim.cmd.checkhealth("candela")
-        end,
+                local path = subargs[1]
+                CandelaIo.export_patterns(path)
+            end,
+            complete = function(sub_arglead)
+                return vim.fn.getcompletion(sub_arglead, "file")
+            end,
+        },
+        help = {
+            impl = function()
+                vim.notify("[Candela] help subcommand not implemented yet", vim.log.levels.WARN)
+                CandelaUi.help()
+            end,
+        },
+        health = {
+            impl = function()
+                vim.cmd.checkhealth("candela")
+            end,
+        },
     }
 end
 
 ---@param args table<string, any>
 function M.dispatch(args)
-    local subcommand = args[1]
-    table.remove(args, 1)
-
-    if not subcommand or subcommand == "" then
-        CandelaUi.toggle()
-    elseif M.commands[subcommand] ~= nil then
-        M.commands[subcommand](args)
-    else
-        vim.notify('Candela: unsupported command "' .. subcommand .. '"', vim.log.levels.ERROR)
+    local fargs = args.fargs
+    local subcommand_key = fargs[1]
+    local subargs = #fargs > 1 and vim.list_slice(fargs, 2, #fargs) or {}
+    local subcommand = M.commands[subcommand_key]
+    if not subcommand then
+        vim.notify("[Candela] unknown command: " .. subcommand_key, vim.log.levels.ERROR)
+        return
     end
+    -- Invoke the subcommand
+    subcommand.impl(subargs, args)
 end
 
 return M
