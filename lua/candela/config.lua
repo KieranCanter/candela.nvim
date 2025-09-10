@@ -7,22 +7,31 @@ local M = {}
 M.version = {}
 
 M.defaults = {
-    -- Candela-styled logs
+    -- Candela syntax highlight
     syntax_highlighting = true, -- true | false  TODO: implement
     -- Use unicode symbols in UI, set to nil to disable
     icons = {
-        candela = "\u{1F56F}", -- patterns window title 🕯
-        color = "\u{1F3A8}", -- color column header 🎨
-        regex = "\u{1F300}", -- regex column header 🌀
+        --candela = "\u{1F56F}", -- patterns window title 🕯
+        --color = "\u{1F3A8}", -- color header 🎨
+        --regex = "\u{2728}", -- regex header ✨
+        candela = "\u{f05e2}", -- patterns window title 󰗢
+        color = "\u{e22b}", -- color header 
+        regex = "\u{f069}", -- regex header 
         highlight = {
-            header = "\u{1F4A1}", -- highlight column header 💡
-            toggle_on = "\u{25C9}", -- highlight toggle on ◉
-            toggle_off = "\u{25CB}", -- highlight toggle off ○
+            --header = "\u{1F4A1}", -- highlight header 💡
+            --toggle_on = "\u{25C9}", -- highlight toggle on ◉
+            --toggle_off = "\u{25CB}", -- highlight toggle off ○
+            header = "\u{ea61}", -- highlight header 
+            toggle_on = "\u{f1a25}", -- highlight toggle on 󱨥
+            toggle_off = "\u{f1a26}", -- highlight toggle off 󱨦
         },
         lightbox = {
-            header = "\u{1F50D}", -- lightbox column header 🔍
-            toggle_on = "\u{25C9}", -- lightbox toggle on ◉
-            toggle_off = "\u{25CB}", -- lightbox toggle off ○
+            --header = "\u{1F50D}", -- lightbox header 🔍
+            --toggle_on = "\u{25C9}", -- highlight toggle on ◉
+            --toggle_off = "\u{25CB}", -- highlight toggle off ○
+            header = "\u{e68f}", -- lightbox header 
+            toggle_on = "\u{f1a25}", -- highlight toggle on 󱨥
+            toggle_off = "\u{f1a26}", -- highlight toggle off 󱨦
         },
     },
     -- Use log syntax highlighting
@@ -37,6 +46,8 @@ M.defaults = {
         margin = 16, -- unsigned integer
         -- minimum width to allocate to the "count" column
         min_count_width = 4, -- unsigned integer
+        -- width of the toggle columns
+        toggle_width = 5, -- unsigned integer
         -- position of prompt window in relation to patterns window
         prompt_offset = "overlap", -- "overlap" | "border"
     },

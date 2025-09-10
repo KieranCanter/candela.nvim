@@ -13,6 +13,7 @@ local WIDTH_COEFF = 0
 local MIN_HEIGHT, MAX_HEIGHT = 0, 0
 local MARGIN = 0
 local MIN_COUNT_WIDTH = 0
+local TOGGLE_WIDTH = 0
 local PROMPT_OFFSET = 0
 
 local selected_patterns = {}
@@ -48,9 +49,8 @@ end
 
 local function set_size_and_loc()
     local color_width = M.windows.color.config.width or 7 -- 7 space hexcode -- NOTE: may need to change in the future with new color spaces
-    -- TODO: make count width a user config
     local count_width = M.windows.count.config.width or MIN_COUNT_WIDTH
-    local ops_width = M.windows.count.config.width or 5 -- 1 space letter/symbol, 2 space margin on each side
+    local ops_width = TOGGLE_WIDTH -- 1 space letter/symbol, 2 space margin on each side
     local curr_width = math.floor(vim.o.columns * WIDTH_COEFF)
     local max_width = vim.o.columns - MARGIN
     local width = clamp_max(curr_width, max_width)
@@ -179,9 +179,8 @@ end
 ---@param count_width integer?
 local function resize_width(color_width, count_width)
     color_width = color_width or M.windows.color.config.width
-    -- TODO: make count width a user config
     count_width = count_width or MIN_COUNT_WIDTH
-    local ops_width = M.windows.highlight.config.width
+    local ops_width = TOGGLE_WIDTH
     local curr_width = math.floor(vim.o.columns * WIDTH_COEFF)
     local max_width = vim.o.columns - MARGIN
     local width = clamp_max(curr_width, max_width)
@@ -318,71 +317,62 @@ local function refresh_to_curr_buf()
 end
 
 ---@param icon string|nil: user config icon option
----@param type string: type of icon (e.g. "color" or "highlight" or "lightbox")
----@param subtype string|nil: subtype name (e.g. nil or "header" "toggle_on" or "toggle_off")
----@param header string: header to preface icon (e.g. "Color" or "HL" or "LB" or "")
----@param default string: default fallback value
+---@param header string: string to use as header
 ---@return string: formatted UI string
-local function format_icon(icon, type, subtype, header, default)
-    if icon == nil then
-        return default
+local function format_header(icon, header)
+    local pre = ""
+    if icon and vim.fn.strwidth(icon) == 2 then
+        pre = icon
+    elseif icon and vim.fn.strwidth(icon) == 1 then
+        pre = icon .. " "
     end
 
-    local width = vim.fn.strwidth(icon)
-    if width == 2 then
-        if type == "color" then
-            return string.format("%s%s", icon, header)
-        elseif subtype == "toggle_on" or subtype == "toggle_off" then
-            return string.format("   %s", icon)
-        else
-            return string.format("%s%s", header, icon)
-        end
-    elseif width == 1 then
-        if type == "color" then
-            return string.format("%s %s", icon, header)
-        elseif subtype == "toggle_on" or subtype == "toggle_off" then
-            return string.format("  %s  ", icon)
-        else
-            return string.format("%s %s", header, icon)
-        end
+    return pre .. header
+end
+
+---@param icon string|nil: user config icon toggle_on option
+---@param type "highlight"|"lightbox"
+---@return string: formatted toggle string
+local function format_toggle(icon, type)
+    if not icon then icon = "Y" end
+
+    local width = 0
+    if type == "highlight" then
+        width = M.windows.highlight.config.width
+    elseif type == "lightbox" then
+        width = M.windows.lightbox.config.width
     else
-        vim.notify(
-            string.format(
-                '[Candela] icons.%s%s option must be string of len 1 or 2, got "%s". Proceeding with default of "%s".',
-                type,
-                subtype and "." .. subtype or "",
-                icon,
-                default
-            ),
-            vim.log.levels.WARN
-        )
-        return default
+        vim.notify(string.format("[Candela] toggle type \"%s\" not defined", type), vim.log.levels.ERROR)
     end
+
+    local spaces = string.rep(" ", (width - vim.fn.strwidth(icon)) / 2)
+    return spaces .. icon .. spaces
 end
 
 ---@param opts table
 function M.setup(opts)
     ---@param name string: name of option
-    ---@param num integer: option value
     ---@return integer
-    local function validate_config_num(name, num)
+    local function validate_config_num(name)
         local mins = {
             margin = 0,
             width = 0,
             min_height = 1,
             max_height = 1,
             min_count_width = 1,
+            toggle_width = 1,
         }
         local maxs = {
             margin = math.huge,
             width = 1,
             min_height = math.huge,
             max_height = math.huge,
-            min_count_width = 10,
+            min_count_width = math.huge,
+            toggle_width = math.huge,
         }
 
         local CandelaConfig = require("candela.config")
-        if num < mins[name] or num > maxs[name] then
+        if opts.window[name] < mins[name] or opts.window[name] > maxs[name] then
             vim.notify(
                 string.format(
                     "[Candela] option window.%s cannot be less than %s or greater than %s, got %s. "
@@ -390,21 +380,22 @@ function M.setup(opts)
                     name,
                     mins[name],
                     maxs[name],
-                    num,
+                    opts.window[name],
                     CandelaConfig.defaults.window[name]
                 )
             )
             return CandelaConfig.defaults.window[name] --[[@as integer]]
         end
 
-        return num
+        return opts.window[name]
     end
 
-    WIDTH_COEFF = validate_config_num("width", opts.window.width)
-    MIN_HEIGHT = validate_config_num("min_height", opts.window.min_height)
-    MAX_HEIGHT = validate_config_num("max_height", opts.window.max_height)
-    MARGIN = validate_config_num("margin", opts.window.margin)
-    MIN_COUNT_WIDTH = validate_config_num("min_count_width", opts.window.min_count_width)
+    WIDTH_COEFF = validate_config_num("width")
+    MIN_HEIGHT = validate_config_num("min_height")
+    MAX_HEIGHT = validate_config_num("max_height")
+    MARGIN = validate_config_num("margin")
+    MIN_COUNT_WIDTH = validate_config_num("min_count_width")
+    TOGGLE_WIDTH = validate_config_num("toggle_width")
 
     local defaults = require("candela.config").defaults
     if opts.window.prompt_offset == "overlap" then
@@ -428,11 +419,8 @@ function M.setup(opts)
 
     local title = ""
     local icons = require("candela.config").options.icons
-    if icons.candela ~= nil then
-        title = string.format(" %sCandela ", icons.candela)
-    else
-        title = " Candela "
-    end
+
+    title = " " .. format_header(icons.candela, "Candela") .. " " -- add spacing margin
     local patterns = CandelaWindow.new({
         relative = "editor",
         style = "minimal",
@@ -443,16 +431,7 @@ function M.setup(opts)
         zindex = 1,
     })
 
-    if icons.color ~= nil then
-        if vim.fn.strwidth(icons.color) == 2 then
-            title = string.format("%sColor", icons.color)
-        else
-            title = string.format("%s Color", icons.color)
-        end
-    else
-        title = "Color"
-    end
-    title = format_icon(icons.color, "color", nil, "Color", "Color")
+    title = format_header(icons.color, "Color")
     local color = CandelaWindow.new({
         relative = "win",
         style = "minimal",
@@ -472,11 +451,7 @@ function M.setup(opts)
         zindex = 10,
     })
 
-    if icons.regex ~= nil then
-        title = string.format(" %sRegex", icons.regex)
-    else
-        title = " Regex"
-    end
+    title = format_header(icons.regex, "Regex")
     local regex = CandelaWindow.new({
         relative = "win",
         style = "minimal",
@@ -486,7 +461,7 @@ function M.setup(opts)
         zindex = 10,
     })
 
-    title = format_icon(icons.highlight.header, "highlight", "header", "HL ", "  H  ")
+    title = format_header(icons.highlight.header, "HL")
     local highlight = CandelaWindow.new({
         relative = "win",
         style = "minimal",
@@ -497,7 +472,7 @@ function M.setup(opts)
         zindex = 10,
     })
 
-    title = format_icon(icons.lightbox.header, "lightbox", "header", "LB ", "  L  ")
+    title = format_header(icons.lightbox.header, "LB")
     local lightbox = CandelaWindow.new({
         relative = "win",
         style = "minimal",
@@ -528,14 +503,10 @@ function M.setup(opts)
     set_size_and_loc()
 
     -- set highlight/lightbox toggling strings since they're constant
-    local highlight_on_def = "  Y  "
-    local highlight_off_def = "  N  "
-    local lightbox_on_def = "  Y  "
-    local lightbox_off_def = "  N  "
-    M.highlight_on = format_icon(icons.highlight.toggle_on, "highlight", "toggle_on", "", highlight_on_def)
-    M.highlight_off = format_icon(icons.highlight.toggle_off, "highlight", "toggle_off", "", highlight_off_def)
-    M.lightbox_on = format_icon(icons.lightbox.toggle_on, "lightbox", "toggle_on", "", lightbox_on_def)
-    M.lightbox_off = format_icon(icons.lightbox.toggle_off, "lightbox", "toggle_off", "", lightbox_off_def)
+    M.highlight_on = format_toggle(icons.highlight.toggle_on, "highlight")
+    M.highlight_off = format_toggle(icons.highlight.toggle_off, "highlight")
+    M.lightbox_on = format_toggle(icons.lightbox.toggle_on, "lightbox")
+    M.lightbox_off = format_toggle(icons.lightbox.toggle_off, "lightbox")
 
     for name, window in pairs(M.windows) do
         window:ensure_buffer()
