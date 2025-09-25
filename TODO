@@ -3,6 +3,8 @@ TODO (before release):
   * file type option
   * implement help function
   * write docs
+  * logo
 
 TODO (after release)
   * support other color spaces rgb, hsv, hsl, lch, oklch
+  * make color picking easier

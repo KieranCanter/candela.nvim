@@ -8,33 +8,43 @@ M.version = {}
 
 M.defaults = {
     -- Candela syntax highlight
-    syntax_highlighting = true, -- true | false  TODO: implement
-    -- Use unicode symbols in UI, set to nil to disable
-    icons = {
-        --candela = "\u{1F56F}", -- patterns window title 🕯
-        --color = "\u{1F3A8}", -- color header 🎨
-        --regex = "\u{2728}", -- regex header ✨
-        candela = "\u{f05e2}", -- patterns window title 󰗢
-        color = "\u{e22b}", -- color header 
-        regex = "\u{f069}", -- regex header 
-        highlight = {
-            --header = "\u{1F4A1}", -- highlight header 💡
-            --toggle_on = "\u{25C9}", -- highlight toggle on ◉
-            --toggle_off = "\u{25CB}", -- highlight toggle off ○
-            header = "\u{ea61}", -- highlight header 
-            toggle_on = "\u{f1a25}", -- highlight toggle on 󱨥
-            toggle_off = "\u{f1a26}", -- highlight toggle off 󱨦
-        },
-        lightbox = {
-            --header = "\u{1F50D}", -- lightbox header 🔍
-            --toggle_on = "\u{25C9}", -- highlight toggle on ◉
-            --toggle_off = "\u{25CB}", -- highlight toggle off ○
-            header = "\u{e68f}", -- lightbox header 
-            toggle_on = "\u{f1a25}", -- highlight toggle on 󱨥
-            toggle_off = "\u{f1a26}", -- highlight toggle off 󱨦
-        },
+    syntax_highlighting = {  -- TODO: implement
+        enabled = true, -- true | false
+        -- file type extensions to activate syntax highlighting for
+        file_types = { "log", "txt" }, -- string
     },
-    -- Use log syntax highlighting
+    -- Use icons in UI, set to nil to disable
+    icons = vim.g.have_nerd_font -- Uses nerd font icons if nerd font is installed
+            and {
+                candela = "\u{f05e2}", -- patterns window title 󰗢
+                color = "\u{e22b}", -- color header 
+                regex = "\u{f069}", -- regex header 
+                highlight = {
+                    header = "\u{ea61}", -- highlight header 
+                    toggle_on = "\u{f1a25}", -- highlight toggle on 󱨥
+                    toggle_off = "\u{f1a26}", -- highlight toggle off 󱨦
+                },
+                lightbox = {
+                    header = "\u{e68f}", -- lightbox header 
+                    toggle_on = "\u{f1a25}", -- highlight toggle on 󱨥
+                    toggle_off = "\u{f1a26}", -- highlight toggle off 󱨦
+                },
+            }
+        or { -- If no nerd font, uses unicode emojis
+            candela = "\u{1F56F}", -- patterns window title 🕯
+            color = "\u{1F3A8}", -- color header 🎨
+            regex = "\u{2728}", -- regex header ✨
+            highlight = {
+                header = "\u{1F4A1}", -- highlight header 💡
+                toggle_on = "\u{25C9}", -- highlight toggle on ◉
+                toggle_off = "\u{25CB}", -- highlight toggle off ○
+            },
+            lightbox = {
+                header = "\u{1F50D}", -- lightbox header 🔍
+                toggle_on = "\u{25C9}", -- highlight toggle on ◉
+                toggle_off = "\u{25CB}", -- highlight toggle off ○
+            },
+        },
     window = {
         -- initial width of the patterns window as percentage of Neovim window width
         width = 0.5, -- number

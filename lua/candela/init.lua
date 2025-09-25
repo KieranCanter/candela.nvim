@@ -49,6 +49,7 @@ function M.setup(opts)
     M.patterns = require("candela.pattern_list").setup(M.config)
     M.highlighter = require("candela.highlighter").setup()
     M.lightbox = require("candela.lightbox").setup(M.config)
+    require("candela.syntax").setup() -- FIX: hide behind user config enabling
 end
 
 return M
