@@ -1,93 +1,192 @@
 local M = {}
 
-local function define_highlights()
-    local highlights = {
+function M.enable(opts)
+    vim.cmd("syntax enable")
+
+    M.syntax_groups = {
         -- Main Sections
-        ["@candela.log.date"] = "Constant",
-        ["@candela.log.time"] = "Function",
-        ["@candela.log.host"] = "Type",
-        ["@candela.log.facility"] = "Title",
-        ["@candela.log.process"] = "Tag",
-        ["@candela.log.body"] = "Normal",
+        ["CandelaLogDate"] = "Constant",
+        ["CandelaLogTime"] = "Function",
+        ["CandelaLogHost"] = "Type",
+        ["CandelaLogFacility"] = "Title",
+        ["CandelaLogProcess"] = "Tag",
+        ["CandelaLogBody"] = "Normal",
 
         -- Log levels
-        ["@candela.log.level.fatal"] = "ErrorMsg",
-        ["@candela.log.level.error"] = "Error",
-        ["@candela.log.level.warning"] = "WarningMsg",
-        ["@candela.log.level.info"] = "Repeat",
-        ["@candela.log.level.debug"] = "Debug",
-        ["@candela.log.level.trace"] = "Comment",
+        ["CandelaLogLevelFatal"] = "ErrorMsg",
+        ["CandelaLogLevelError"] = "Error",
+        ["CandelaLogLevelWarning"] = "WarningMsg",
+        ["CandelaLogLevelInfo"] = "Repeat",
+        ["CandelaLogLevelDebug"] = "Debug",
+        ["CandelaLogLevelTrace"] = "Comment",
 
         -- Types
-        ["@candela.log.type.int"] = "Number",
-        ["@candela.log.type.bin"] = "Number",
-        ["@candela.log.type.oct"] = "Number",
-        ["@candela.log.type.hex"] = "Number",
-        ["@candela.log.type.float"] = "Float",
-        ["@candela.log.type.bool"] = "Boolean",
-        ["@candela.log.type.null"] = "Constant",
-        ["@candela.log.type.char"] = "Character",
-        ["@candela.log.type.string"] = "String",
+        ["CandelaLogTypeInt"] = "Number",
+        ["CandelaLogTypeBin"] = "Number",
+        ["CandelaLogTypeOct"] = "Number",
+        ["CandelaLogTypeHex"] = "Number",
+        ["CandelaLogTypeFloat"] = "Float",
+        ["CandelaLogTypeBool"] = "Boolean",
+        ["CandelaLogTypeNull"] = "Constant",
+        ["CandelaLogTypeChar"] = "Character",
+        ["CandelaLogTypeString"] = "String",
 
         -- Entities
-        ["@candela.log.entity.url"] = "Underlined",
-        ["@candela.log.entity.domain"] = "Identifier",
-        ["@candela.log.entity.uuid"] = "Label",
-        ["@candela.log.entity.path"] = "Directory",
-        ["@candela.log.entity.md5"] = "Label",
-        ["@candela.log.entity.sha"] = "Label",
-        ["@candela.log.entity.ipv4"] = "Special",
-        ["@candela.log.entity.ipv6"] = "Special",
-        ["@candela.log.entity.mac"] = "Special",
+        ["CandelaLogEntityUrl"] = "Underlined",
+        ["CandelaLogEntityDomain"] = "Identifier",
+        ["CandelaLogEntityUuid"] = "Label",
+        ["CandelaLogEntityPath"] = "Directory",
+        ["CandelaLogEntityMd5"] = "Label",
+        ["CandelaLogEntitySha"] = "Label",
+        ["CandelaLogEntityIpv4"] = "Special",
+        ["CandelaLogEntityIpv6"] = "Special",
+        ["CandelaLogEntityMac"] = "Special",
 
         -- Special
-        ["@candela.log.separator"] = "Comment",
-        ["@candela.log.symbol"] = "Operator",
+        ["CandelaLogSeparator"] = "Comment",
+        ["CandelaLogSymbol"] = "Operator",
     }
 
-    for group, link in pairs(highlights) do
-        vim.api.nvim_set_hl(0, group, { link = link })
+    M.syntax = {
+        -- Symbols / separators
+        ["CandelaLogSymbol"] = { type = "match", pattern = "[!@#$%^&*;:?]" },
+        ["CandelaLogSeparator"] = {
+            type = "match",
+            pattern = [[-\{3,}\|=\{3,}\|#\{3,}\|\*\{3,}\|<\{3,}\|>\{3,}]],
+        },
+
+        -- Strings
+        ["CandelaLogTypeString"] = {
+            { type = "region", start = [["]], ["end"] = [["]], skip = [[\\\.]] },
+            { type = "region", start = [[`]], ["end"] = [[`]], skip = [[\\\.]] },
+            { type = "region", start = [[\(s\)\@<!'\(s\|t\)\@!]], ["end"] = [[']], skip = [[\\\.]] },
+        },
+        ["CandelaLogTypeChar"] = { type = "region", start = [[']], ["end"] = [[']], skip = [[\\\.]] },
+
+        -- Numbers
+        ["CandelaLogTypeInt"] = { type = "match", pattern = [[\<\d\+\>]] },
+        ["CandelaLogTypeFloat"] = { type = "match", pattern = [[\<\d\+\.\d\+\([eE][+-]\?\d\+\)\?\>]] },
+        ["CandelaLogTypeBin"] = { type = "match", pattern = [[\<0[bB][01]\+\>]] },
+        ["CandelaLogTypeOct"] = { type = "match", pattern = [[\<0[oO]\o\+\>]] },
+        ["CandelaLogTypeHex"] = {
+            { type = "match", pattern = [[\<0[xX]\x\+\>]] },
+            { type = "match", pattern = [[\<\x\{4,}\>]] },
+        },
+
+        -- Constants
+        ["CandelaLogTypeBool"] = {
+            type = "keyword",
+            keywords = { "TRUE", "True", "true", "FALSE", "False", "false" },
+        },
+        ["CandelaLogTypeNull"] = { type = "keyword", keywords = { "NULL", "Null", "null" } },
+
+        -- Dates
+        ["CandelaLogDate"] = {
+            { type = "match", pattern = [[\<\d\{2}[-\/]\d\{2}\>]] },
+            { type = "match", pattern = [[\<\d\{4}[-\/]\d\{2}[-\/]\d\{2}\>]] },
+            { type = "match", pattern = [[\<\d\{2}[-\/]\d\{2}[-\/]\d\{4}\>]] },
+            { type = "match", pattern = [[\<\d\{4}-\d\{2}-\d\{2}T]] },
+            { type = "match", pattern = [[\<\a\{3} \d\{1,2}\(,\? \d\{4}\)\?\>]] },
+            { type = "match", pattern = [[\<\d\{1,2}[- ]\a\{3}[- ]\d\{4}\>]] },
+        },
+
+        -- Times
+        ["CandelaLogTime"] = { type = "match", pattern = [[\d\{2}:\d\{2}:\d\{2}\(\.\d\{2,6}\)\?]] },
+
+        -- Entities
+        ["CandelaLogEntityUrl"] = { type = "match", pattern = [[\<https\?:\/\/\S\+]] },
+        ["CandelaLogEntityIpv4"] = { type = "match", pattern = [[\<\d\{1,3}\(\.\d\{1,3}\)\{3}\(\/\d\+\)\?\>]] },
+        ["CandelaLogEntityIpv6"] = { type = "match", pattern = [[\<\x\{1,4}\(:\x\{1,4}\)\{7}\(\/\d\+\)\?\>]] },
+        ["CandelaLogEntityMac"] = { type = "match", pattern = [[\<\x\{2}\([:-]\?\x\{2}\)\{5}\>]] },
+        ["CandelaLogEntityUuid"] = { type = "match", pattern = [[\<\x\{8}-\x\{4}-\x\{4}-\x\{4}-\x\{12}\>]] },
+        ["CandelaLogEntityMd5"] = { type = "match", pattern = [[\<\x\{32}\>]] },
+        ["CandelaLogEntitySha"] = {
+            type = "match",
+            pattern = [[\<\(\x\{40}\|\x\{56}\|\x\{64}\|\x\{96}\|\x\{128}\)\>]],
+        },
+        ["CandelaLogEntityPath"] = {
+            { type = "match", pattern = [[\(^\|\s\|=\)\zs\(\.\{0,2}\|\~\)\/[^ \t\n\r]\+\ze]] },
+            { type = "match", pattern = [[\(^\|\s\|=\)\zs\a:\\[^ \t\n\r]\+\ze]] },
+            { type = "match", pattern = [[\(^\|\s\|=\)\zs\\\\[^ \t\n\r]\+\ze]] },
+        },
+
+        -- Log levels
+        ["CandelaLogLevelFatal"] = { type = "keyword", keywords = { "FATAL", "Fatal", "fatal" } },
+        ["CandelaLogLevelError"] = { type = "keyword", keywords = { "ERROR", "Error", "error", "ERR", "Err", "err" } },
+        ["CandelaLogLevelWarning"] = {
+            type = "keyword",
+            keywords = { "WARN", "Warn", "warn", "WARNING", "Warning", "warning" },
+        },
+        ["CandelaLogLevelInfo"] = { type = "keyword", keywords = { "INFO", "Info", "info" } },
+        ["CandelaLogLevelDebug"] = { type = "keyword", keywords = { "DEBUG", "Debug", "debug", "DBG", "Dbg", "dbg" } },
+        ["CandelaLogLevelTrace"] = { type = "keyword", keywords = { "TRACE", "Trace", "trace" } },
+    }
+
+    local filetypes = {}
+    for _, ext in ipairs(opts.file_types) do
+        table.insert(filetypes, "*." .. ext)
     end
+    vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
+        pattern = filetypes,
+        callback = function()
+            M.apply()
+            for name, link in pairs(M.syntax_groups) do
+                vim.cmd(string.format("highlight default link %s %s", name, link))
+            end
+        end,
+    })
 end
 
-local function attach_syntax(bufnr)
-    bufnr = bufnr or vim.api.nvim_get_current_buf()
+---@class SynKeyword
+---@field type "keyword"
+---@field keywords string[]
 
-    -- Regex for each highlight group
-    local syntax = {
-        -- TODO: continue from here with patterns
-        { "vim.api", "@candela.log.date" },
-    }
+---@class SynMatch
+---@field type "match"
+---@field pattern string
 
-    local ns = vim.api.nvim_create_namespace("CandelaSyntax")
-    vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
+---@class SynRegion
+---@field type "region"
+---@field start string
+---@field ["end"] string
+---@field skip string
 
-    -- Apply per line
-    local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
-    for lnum, line in ipairs(lines) do
-        for _, pat in ipairs(syntax) do
-            local regex, hl_group = pat[1], pat[2]
-            local s, e, _ = line:find(regex)
-            if s and e then
-                vim.api.nvim_buf_set_extmark(bufnr, ns, lnum - 1, s - 1, {
-                    end_col = e,
-                    hl_group = hl_group,
-                })
-            end
+---@alias Syn
+---| SynKeyword
+---| SynMatch
+---| SynRegion
+
+---@param hl_group string: highlight group
+---@param defs Syn|Syn[]
+function M.apply_syntax(hl_group, defs)
+    if type(defs[1]) ~= "table" then
+        defs = { defs }
+    end
+
+    for _, def in pairs(defs) do
+        if def.type == "match" then
+            vim.cmd(string.format("syntax match %s '%s'", hl_group, def.pattern))
+        elseif def.type == "region" then
+            vim.cmd(
+                string.format(
+                    "syntax region %s start=/%s/ end=/%s/ skip=/%s/",
+                    hl_group,
+                    def.start,
+                    def["end"],
+                    def.skip
+                )
+            )
+        elseif def.type == "keyword" then
+            vim.cmd(string.format("syntax keyword %s %s", hl_group, table.concat(def.keywords, " ")))
         end
     end
 end
 
-function M.setup()
-    define_highlights()
-
-    -- Autocmd to apply on log files
-    vim.api.nvim_create_autocmd("FileType", {
-        pattern = "lua",
-        callback = function(args)
-            attach_syntax(args.buf)
-        end,
-    })
+function M.apply()
+    -- Define syntax from table
+    for hl_group, def in pairs(M.syntax) do
+        M.apply_syntax(hl_group, def)
+    end
 end
 
 return M
