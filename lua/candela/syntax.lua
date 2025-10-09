@@ -1,15 +1,23 @@
+-- Derived from log-highlight.nvim by Fei Shao (fei6409 on GitHub)
+-- https://github.com/fei6409/log-highlight.nvim
+
 local M = {}
 
 function M.enable(opts)
     vim.cmd("syntax enable")
 
     M.syntax_groups = {
-        -- Main Sections
+        -- Dates/Times
         ["CandelaLogDate"] = "Constant",
+        ["CandelaLogWeekday"] = "Constant",
         ["CandelaLogTime"] = "Function",
-        ["CandelaLogHost"] = "Type",
-        ["CandelaLogFacility"] = "Title",
-        ["CandelaLogProcess"] = "Tag",
+        ["CandelaLogTimeAMPM"] = "Function",
+        ["CandelaLogTimeZone"] = "Function",
+        ["CandelaLogTimeDuration"] = "Function",
+
+        -- Main Sections
+        ["CandelaLogSysColumn"] = "Type",
+        ["CandelaLogSysProcess"] = "Title",
         ["CandelaLogBody"] = "Normal",
 
         -- Log levels
@@ -26,14 +34,13 @@ function M.enable(opts)
         ["CandelaLogTypeOct"] = "Number",
         ["CandelaLogTypeHex"] = "Number",
         ["CandelaLogTypeFloat"] = "Float",
-        ["CandelaLogTypeBool"] = "Boolean",
-        ["CandelaLogTypeNull"] = "Constant",
         ["CandelaLogTypeChar"] = "Character",
         ["CandelaLogTypeString"] = "String",
+        ["CandelaLogTypeBool"] = "Boolean",
+        ["CandelaLogTypeNull"] = "Constant",
 
         -- Entities
         ["CandelaLogEntityUrl"] = "Underlined",
-        ["CandelaLogEntityDomain"] = "Identifier",
         ["CandelaLogEntityUuid"] = "Label",
         ["CandelaLogEntityPath"] = "Directory",
         ["CandelaLogEntityMd5"] = "Label",
@@ -47,145 +54,98 @@ function M.enable(opts)
         ["CandelaLogSymbol"] = "Operator",
     }
 
-    M.syntax = {
-        -- Symbols / separators
-        ["CandelaLogSymbol"] = { type = "match", pattern = "[!@#$%^&*;:?]" },
-        ["CandelaLogSeparator"] = {
-            type = "match",
-            pattern = [[-\{3,}\|=\{3,}\|#\{3,}\|\*\{3,}\|<\{3,}\|>\{3,}]],
-        },
+    M.syntax_commands = {
+        -- Symbols / special characters
+        [=[syntax match CandelaLogSymbol '[!@#$%^&*;:?]']=],
+
+        -- Separators
+        [=[syntax match CandelaLogSeparator '-\{3,}\|=\{3,}\|#\{3,}\|\*\{3,}\|<\{3,}\|>\{3,}']=],
 
         -- Strings
-        ["CandelaLogTypeString"] = {
-            { type = "region", start = [["]], ["end"] = [["]], skip = [[\\\.]] },
-            { type = "region", start = [[`]], ["end"] = [[`]], skip = [[\\\.]] },
-            { type = "region", start = [[\(s\)\@<!'\(s\|t\)\@!]], ["end"] = [[']], skip = [[\\\.]] },
-        },
-        ["CandelaLogTypeChar"] = { type = "region", start = [[']], ["end"] = [[']], skip = [[\\\.]] },
+        [=[syntax region CandelaLogTypeString start=/"/ end=/"/ end=/$/ skip=/\\./]=],
+        [=[syntax region CandelaLogTypeString start=/`/ end=/`/ end=/$/ skip=/\\./]=],
+        [=[syntax region CandelaLogTypeString start=/\(s\)\@<!'\(s \|t \)\@!/ end=/'/ end=/$/ skip=/\\./]=],
 
         -- Numbers
-        ["CandelaLogTypeInt"] = { type = "match", pattern = [[\<\d\+\>]] },
-        ["CandelaLogTypeFloat"] = { type = "match", pattern = [[\<\d\+\.\d\+\([eE][+-]\?\d\+\)\?\>]] },
-        ["CandelaLogTypeBin"] = { type = "match", pattern = [[\<0[bB][01]\+\>]] },
-        ["CandelaLogTypeOct"] = { type = "match", pattern = [[\<0[oO]\o\+\>]] },
-        ["CandelaLogTypeHex"] = {
-            { type = "match", pattern = [[\<0[xX]\x\+\>]] },
-            { type = "match", pattern = [[\<\x\{4,}\>]] },
-        },
+        [=[syntax match CandelaLogTypeInt '\<\d\+\>']=],
+        [=[syntax match CandelaLogTypeBin '\<0[bB][01]\+\>']=],
+        [=[syntax match CandelaLogTypeOct '\<0[oO]\o\+\>']=],
+        [=[syntax match CandelaLogTypeHex '\<0[xX]\x\+\>']=],
+        [=[syntax match CandelaLogTypeHex '\<\x\{4,}\>']=],
+        [=[syntax match CandelaLogTypeFloat '\<\d\+\.\d\+\([eE][+-]\?\d\+\)\?\>']=],
+        [=[syntax match CandelaLogTypeInt '\'\d\d\+\>']=],
+        [=[syntax match CandelaLogTypeBin '\'\b[01]\+\>']=],
+        [=[syntax match CandelaLogTypeOct '\'\o\o\+\>']=],
+        [=[syntax match CandelaLogTypeHex '\'\h\x\+\>']=],
 
         -- Constants
-        ["CandelaLogTypeBool"] = {
-            type = "keyword",
-            keywords = { "TRUE", "True", "true", "FALSE", "False", "false" },
-        },
-        ["CandelaLogTypeNull"] = { type = "keyword", keywords = { "NULL", "Null", "null" } },
+        [=[syntax keyword CandelaLogTypeBool TRUE True true FALSE False false]=],
+        [=[syntax keyword CandelaLogTypeNull NULL Null null]=],
 
         -- Dates
-        ["CandelaLogDate"] = {
-            { type = "match", pattern = [[\<\d\{2}[-\/]\d\{2}\>]] },
-            { type = "match", pattern = [[\<\d\{4}[-\/]\d\{2}[-\/]\d\{2}\>]] },
-            { type = "match", pattern = [[\<\d\{2}[-\/]\d\{2}[-\/]\d\{4}\>]] },
-            { type = "match", pattern = [[\<\d\{4}-\d\{2}-\d\{2}T]] },
-            { type = "match", pattern = [[\<\a\{3} \d\{1,2}\(,\? \d\{4}\)\?\>]] },
-            { type = "match", pattern = [[\<\d\{1,2}[- ]\a\{3}[- ]\d\{4}\>]] },
-        },
+        [=[syntax match CandelaLogDate '\<\d\{2}[-/]\d\{2}\>']=],
+        [=[syntax match CandelaLogDate '\<\d\{4}[-/]\d\{2}[-/]\d\{2}\>']=],
+        [=[syntax match CandelaLogDate '\<\d\{2}[-/]\d\{2}[-/]\d\{4}\>']=],
+        [=[syntax match CandelaLogDate '\<\d\{4}-\d\{2}-\d\{2}T']=],
+        [=[syntax match CandelaLogDate '\<\a\{3} \d\{1,2}\(,\? \d\{4}\)\?\>']=],
+        [=[syntax match CandelaLogDate '\<\d\{1,2}[- ]\a\{3}[- ]\d\{4}\>']=],
 
-        -- Times
-        ["CandelaLogTime"] = { type = "match", pattern = [[\d\{2}:\d\{2}:\d\{2}\(\.\d\{2,6}\)\?]] },
+        -- Weekdays
+        [=[syntax keyword CandelaLogWeekday Mon Tue Wed Thu Fri Sat Sun]=],
 
-        -- Entities
-        ["CandelaLogEntityUrl"] = { type = "match", pattern = [[\<https\?:\/\/\S\+]] },
-        ["CandelaLogEntityIpv4"] = { type = "match", pattern = [[\<\d\{1,3}\(\.\d\{1,3}\)\{3}\(\/\d\+\)\?\>]] },
-        ["CandelaLogEntityIpv6"] = { type = "match", pattern = [[\<\x\{1,4}\(:\x\{1,4}\)\{7}\(\/\d\+\)\?\>]] },
-        ["CandelaLogEntityMac"] = { type = "match", pattern = [[\<\x\{2}\([:-]\?\x\{2}\)\{5}\>]] },
-        ["CandelaLogEntityUuid"] = { type = "match", pattern = [[\<\x\{8}-\x\{4}-\x\{4}-\x\{4}-\x\{12}\>]] },
-        ["CandelaLogEntityMd5"] = { type = "match", pattern = [[\<\x\{32}\>]] },
-        ["CandelaLogEntitySha"] = {
-            type = "match",
-            pattern = [[\<\(\x\{40}\|\x\{56}\|\x\{64}\|\x\{96}\|\x\{128}\)\>]],
-        },
-        ["CandelaLogEntityPath"] = {
-            { type = "match", pattern = [[\(^\|\s\|=\)\zs\(\.\{0,2}\|\~\)\/[^ \t\n\r]\+\ze]] },
-            { type = "match", pattern = [[\(^\|\s\|=\)\zs\a:\\[^ \t\n\r]\+\ze]] },
-            { type = "match", pattern = [[\(^\|\s\|=\)\zs\\\\[^ \t\n\r]\+\ze]] },
-        },
+        -- Time
+        [=[syntax match CandelaLogTime '\d\{2}:\d\{2}:\d\{2}\(\.\d\{2,6}\)\?' skipwhite nextgroup=CandelaLogTimeZone,CandelaLogTimeAMPM,CandelaLogSysColumns]=],
+        [=[syntax match CandelaLogTimeAMPM '\cAM\|\cPM\>' contained skipwhite nextgroup=CandelaLogSysColumns]=],
+        [=[syntax match CandelaLogTimeZone 'Z\|[+-]\d\{2}:\d\{2}\|\a\{3}\>' contained skipwhite nextgroup=CandelaLogSysColumns]=],
+        [=[syntax match CandelaLogTimeDuration '\(\(\(\d\+d\)\?\d\+h\)\?\d\+m\)\?\d\+\(\.\d\+\)\?[mun]\?s\>']=],
 
-        -- Log levels
-        ["CandelaLogLevelFatal"] = { type = "keyword", keywords = { "FATAL", "Fatal", "fatal" } },
-        ["CandelaLogLevelError"] = { type = "keyword", keywords = { "ERROR", "Error", "error", "ERR", "Err", "err" } },
-        ["CandelaLogLevelWarning"] = {
-            type = "keyword",
-            keywords = { "WARN", "Warn", "warn", "WARNING", "Warning", "warning" },
-        },
-        ["CandelaLogLevelInfo"] = { type = "keyword", keywords = { "INFO", "Info", "info" } },
-        ["CandelaLogLevelDebug"] = { type = "keyword", keywords = { "DEBUG", "Debug", "debug", "DBG", "Dbg", "dbg" } },
-        ["CandelaLogLevelTrace"] = { type = "keyword", keywords = { "TRACE", "Trace", "trace" } },
+        -- System info / Columns
+        [=[syntax match CandelaLogSysColumns '\<[[:alnum:]\._-]\+ [[:alnum:]\._-]\+\(\[[[:digit:]:]\+\]\)\?:' contained contains=@CandelaLogLevels,CandelaLogSysProcess]=],
+        [=[syntax match CandelaLogSysProcess '\<[[:alnum:]\._-]\+\(\[[[:digit:]]\+\]\)\?:' contained contains=CandelaLogTypeInt]=],
+
+        -- Objects / Entities
+        [=[syntax match CandelaLogEntityUrl '\<https\?:\/\/\S\+']=],
+        [=[syntax match CandelaLogEntityMac'\<\x\{2}\([:-]\?\x\{2}\)\{5}\>']=],
+        [=[syntax match CandelaLogEntityIpv4 '\<\d\{1,3}\(\.\d\{1,3}\)\{3}\(\/\d\+\)\?\>']=],
+        [=[syntax match CandelaLogEntityIpv6 '\<\x\{1,4}\(:\x\{1,4}\)\{7}\(\/\d\+\)\?\>']=],
+        [=[syntax match CandelaLogEntityUuid '\<\x\{8}-\x\{4}-\x\{4}-\x\{4}-\x\{12}\>']=],
+        [=[syntax match CandelaLogEntityMd5 '\<\x\{32}\>']=],
+        [=[syntax match CandelaLogEntitySha '\<\(\x\{40}\|\x\{56}\|\x\{64}\|\x\{96}\|\x\{128}\)\>']=],
+        [=[syntax match CandelaLogEntityPath '\(^\|\s\|=\)\zs\(\.\{0,2}\|\~\)\/[^ \t\n\r]\+\ze']=],
+        [=[syntax match CandelaLogEntityPath '\(^\|\s\|=\)\zs\a:\\[^ \t\n\r]\+\ze']=],
+        [=[syntax match CandelaLogEntityPath '\(^\|\s\|=\)\zs\\\\[^ \t\n\r]\+\ze']=],
+
+        -- Log Levels
+        [=[syntax keyword CandelaLogLevelFatal FATAL Fatal fatal]=],
+        [=[syntax keyword CandelaLogLevelError E ERR[ORS] Err[ors] err[ors]]=],
+        [=[syntax keyword CandelaLogLevelWarning W WARN[ING] Warn[ing] warn[ing]]=],
+        [=[syntax keyword CandelaLogLevelInfo I INFO Info info]=],
+        [=[syntax keyword CandelaLogLevelDebug D DEBUG Debug debug DBG Dbg dbg]=],
+        [=[syntax keyword CandelaLogLevelTrace TRACE Trace trace]=],
+
+        [=[syntax cluster CandelaLogLevels contains=CandelaLogLevelFatal,CandelaLogLevelError,CandelaLogLevelWarning,CandelaLogLevelInfo,CandelaLogLevelDebug,CandelaLogLevelTrace]=],
     }
 
     local filetypes = {}
     for _, ext in ipairs(opts.file_types) do
         table.insert(filetypes, "*." .. ext)
     end
-    vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
+    vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
         pattern = filetypes,
         callback = function()
-            M.apply()
+            vim.api.nvim_exec2("setlocal nospell", {})
             for name, link in pairs(M.syntax_groups) do
                 vim.cmd(string.format("highlight default link %s %s", name, link))
             end
+            M.apply()
         end,
     })
 end
 
----@class SynKeyword
----@field type "keyword"
----@field keywords string[]
-
----@class SynMatch
----@field type "match"
----@field pattern string
-
----@class SynRegion
----@field type "region"
----@field start string
----@field ["end"] string
----@field skip string
-
----@alias Syn
----| SynKeyword
----| SynMatch
----| SynRegion
-
----@param hl_group string: highlight group
----@param defs Syn|Syn[]
-function M.apply_syntax(hl_group, defs)
-    if type(defs[1]) ~= "table" then
-        defs = { defs }
-    end
-
-    for _, def in pairs(defs) do
-        if def.type == "match" then
-            vim.cmd(string.format("syntax match %s '%s'", hl_group, def.pattern))
-        elseif def.type == "region" then
-            vim.cmd(
-                string.format(
-                    "syntax region %s start=/%s/ end=/%s/ skip=/%s/",
-                    hl_group,
-                    def.start,
-                    def["end"],
-                    def.skip
-                )
-            )
-        elseif def.type == "keyword" then
-            vim.cmd(string.format("syntax keyword %s %s", hl_group, table.concat(def.keywords, " ")))
-        end
-    end
-end
-
 function M.apply()
-    -- Define syntax from table
-    for hl_group, def in pairs(M.syntax) do
-        M.apply_syntax(hl_group, def)
+    for _, cmd in ipairs(M.syntax_commands) do
+        print(cmd)
+        vim.api.nvim_exec2(cmd, {})
     end
 end
 
