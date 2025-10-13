@@ -8,17 +8,17 @@ function M.enable(opts)
 
     M.syntax_groups = {
         -- Dates/Times
-        ["CandelaLogDate"] = "Constant",
-        ["CandelaLogWeekday"] = "Constant",
-        ["CandelaLogTime"] = "Function",
-        ["CandelaLogTimeAMPM"] = "Function",
-        ["CandelaLogTimeZone"] = "Function",
-        ["CandelaLogTimeDuration"] = "Function",
+        ["CandelaLogDate"] = "Function",
+        ["CandelaLogDay"] = "Function",
+        ["CandelaLogTime"] = "Conditional",
+        ["CandelaLogTimeAMPM"] = "Conditional",
+        ["CandelaLogTimeZone"] = "Conditional",
+        ["CandelaLogTimeDuration"] = "Conditional",
 
-        -- Main Sections
-        ["CandelaLogSysColumn"] = "Type",
-        ["CandelaLogSysProcess"] = "Title",
-        ["CandelaLogBody"] = "Normal",
+        -- System info
+        ["CandelaLogHost"] = "Tag",
+        ["CandelaLogFacility"] = "Winbar",
+        ["CandelaLogProcess"] = "Title",
 
         -- Log levels
         ["CandelaLogLevelFatal"] = "ErrorMsg",
@@ -41,6 +41,7 @@ function M.enable(opts)
 
         -- Entities
         ["CandelaLogEntityUrl"] = "Underlined",
+        ["CandelaLogEntityDns"] = "Removed",
         ["CandelaLogEntityUuid"] = "Label",
         ["CandelaLogEntityPath"] = "Directory",
         ["CandelaLogEntityMd5"] = "Label",
@@ -55,33 +56,6 @@ function M.enable(opts)
     }
 
     M.syntax_commands = {
-        -- Symbols / special characters
-        [=[syntax match CandelaLogSymbol '[!@#$%^&*;:?]']=],
-
-        -- Separators
-        [=[syntax match CandelaLogSeparator '-\{3,}\|=\{3,}\|#\{3,}\|\*\{3,}\|<\{3,}\|>\{3,}']=],
-
-        -- Strings
-        [=[syntax region CandelaLogTypeString start=/"/ end=/"/ end=/$/ skip=/\\./]=],
-        [=[syntax region CandelaLogTypeString start=/`/ end=/`/ end=/$/ skip=/\\./]=],
-        [=[syntax region CandelaLogTypeString start=/\(s\)\@<!'\(s \|t \)\@!/ end=/'/ end=/$/ skip=/\\./]=],
-
-        -- Numbers
-        [=[syntax match CandelaLogTypeInt '\<\d\+\>']=],
-        [=[syntax match CandelaLogTypeBin '\<0[bB][01]\+\>']=],
-        [=[syntax match CandelaLogTypeOct '\<0[oO]\o\+\>']=],
-        [=[syntax match CandelaLogTypeHex '\<0[xX]\x\+\>']=],
-        [=[syntax match CandelaLogTypeHex '\<\x\{4,}\>']=],
-        [=[syntax match CandelaLogTypeFloat '\<\d\+\.\d\+\([eE][+-]\?\d\+\)\?\>']=],
-        [=[syntax match CandelaLogTypeInt '\'\d\d\+\>']=],
-        [=[syntax match CandelaLogTypeBin '\'\b[01]\+\>']=],
-        [=[syntax match CandelaLogTypeOct '\'\o\o\+\>']=],
-        [=[syntax match CandelaLogTypeHex '\'\h\x\+\>']=],
-
-        -- Constants
-        [=[syntax keyword CandelaLogTypeBool TRUE True true FALSE False false]=],
-        [=[syntax keyword CandelaLogTypeNull NULL Null null]=],
-
         -- Dates
         [=[syntax match CandelaLogDate '\<\d\{2}[-/]\d\{2}\>']=],
         [=[syntax match CandelaLogDate '\<\d\{4}[-/]\d\{2}[-/]\d\{2}\>']=],
@@ -89,23 +63,37 @@ function M.enable(opts)
         [=[syntax match CandelaLogDate '\<\d\{4}-\d\{2}-\d\{2}T']=],
         [=[syntax match CandelaLogDate '\<\a\{3} \d\{1,2}\(,\? \d\{4}\)\?\>']=],
         [=[syntax match CandelaLogDate '\<\d\{1,2}[- ]\a\{3}[- ]\d\{4}\>']=],
-
         -- Weekdays
-        [=[syntax keyword CandelaLogWeekday Mon Tue Wed Thu Fri Sat Sun]=],
+        [=[syntax keyword CandelaLogDay Mon Tue Wed Thu Fri Sat Sun]=],
 
         -- Time
-        [=[syntax match CandelaLogTime '\d\{2}:\d\{2}:\d\{2}\(\.\d\{2,6}\)\?' skipwhite nextgroup=CandelaLogTimeZone,CandelaLogTimeAMPM,CandelaLogSysColumns]=],
-        [=[syntax match CandelaLogTimeAMPM '\cAM\|\cPM\>' contained skipwhite nextgroup=CandelaLogSysColumns]=],
-        [=[syntax match CandelaLogTimeZone 'Z\|[+-]\d\{2}:\d\{2}\|\a\{3}\>' contained skipwhite nextgroup=CandelaLogSysColumns]=],
+        [=[syntax match CandelaLogTime '\%(^\|\s\)\zs\d\{2}:\d\{2}:\d\{2}\(\.\d\{2,6}\)\?\ze\%(\s\|$\)' contains=CandelaLogTimeZone,CandelaLogTimeAMPM nextgroup=CandelaLogHost skipwhite]=],
+        [=[syntax match CandelaLogTimeAMPM '\cAM\|\cPM\>' contained skipwhite nextgroup=CandelaLogHost]=],
+        [=[syntax match CandelaLogTimeZone 'Z\|[+-]\d\{2}:\d\{2}\|\a\{3}\>' contained skipwhite nextgroup=CandelaLogHost]=],
         [=[syntax match CandelaLogTimeDuration '\(\(\(\d\+d\)\?\d\+h\)\?\d\+m\)\?\d\+\(\.\d\+\)\?[mun]\?s\>']=],
 
-        -- System info / Columns
-        [=[syntax match CandelaLogSysColumns '\<[[:alnum:]\._-]\+ [[:alnum:]\._-]\+\(\[[[:digit:]:]\+\]\)\?:' contained contains=@CandelaLogLevels,CandelaLogSysProcess]=],
-        [=[syntax match CandelaLogSysProcess '\<[[:alnum:]\._-]\+\(\[[[:digit:]]\+\]\)\?:' contained contains=CandelaLogTypeInt]=],
+        -- System info
+        [=[syntax match CandelaLogHost '\<[[:alnum:]\._-]\+\>' contained skipwhite nextgroup=CandelaLogFacility,CandelaLogProcess]=],
+        [=[syntax match CandelaLogFacility '\<[[:alnum:]]\+\.[[:alnum:]]\+\>' contained skipwhite contains=CandelaLogLevels nextgroup=CandelaLogProcess]=],
+        [=[syntax match CandelaLogProcess '\<[[:alnum:]\._-]\+\%(([^)]\+)\)\?\%(\[[[:digit:]]\+\]\)\?:' contained skipwhite contains=CandelaLogTypeInt nextgroup=CandelaLogMessage]=],
+
+        -- Symbols/separators
+        [=[syntax match CandelaLogSymbol '[!@#$%^&*;:?]']=],
+        [=[syntax match CandelaLogSeparator '-\{3,}\|=\{3,}\|#\{3,}\|\*\{3,}\|<\{3,}\|>\{3,}']=],
+
+        -- Log Levels
+        [=[syntax keyword CandelaLogLevelFatal containedin=CandelaLogFacility FATAL Fatal fatal]=],
+        [=[syntax keyword CandelaLogLevelError containedin=CandelaLogFacility E ERR[ORS] Err[ors] err[ors]]=],
+        [=[syntax keyword CandelaLogLevelWarning containedin=CandelaLogFacility W WARN[ING] Warn[ing] warn[ing]]=],
+        [=[syntax keyword CandelaLogLevelInfo containedin=CandelaLogFacility I INFO Info info]=],
+        [=[syntax keyword CandelaLogLevelDebug containedin=CandelaLogFacility D DEBUG Debug debug DBG Dbg dbg]=],
+        [=[syntax keyword CandelaLogLevelTrace containedin=CandelaLogFacility TRACE Trace trace]=],
+        [=[syntax cluster CandelaLogLevels contains=CandelaLogLevelFatal,CandelaLogLevelError,CandelaLogLevelWarning,CandelaLogLevelInfo,CandelaLogLevelDebug,CandelaLogLevelTrace]=],
 
         -- Objects / Entities
         [=[syntax match CandelaLogEntityUrl '\<https\?:\/\/\S\+']=],
-        [=[syntax match CandelaLogEntityMac'\<\x\{2}\([:-]\?\x\{2}\)\{5}\>']=],
+        [=[syntax match CandelaLogEntityDns '\<[a-zA-Z0-9_-]\+\(\.[a-zA-Z0-9_-]\+\)\{1,}\>']=],
+        [=[syntax match CandelaLogEntityMac '\<\x\{2}\([:-]\?\x\{2}\)\{5}\>']=],
         [=[syntax match CandelaLogEntityIpv4 '\<\d\{1,3}\(\.\d\{1,3}\)\{3}\(\/\d\+\)\?\>']=],
         [=[syntax match CandelaLogEntityIpv6 '\<\x\{1,4}\(:\x\{1,4}\)\{7}\(\/\d\+\)\?\>']=],
         [=[syntax match CandelaLogEntityUuid '\<\x\{8}-\x\{4}-\x\{4}-\x\{4}-\x\{12}\>']=],
@@ -115,15 +103,26 @@ function M.enable(opts)
         [=[syntax match CandelaLogEntityPath '\(^\|\s\|=\)\zs\a:\\[^ \t\n\r]\+\ze']=],
         [=[syntax match CandelaLogEntityPath '\(^\|\s\|=\)\zs\\\\[^ \t\n\r]\+\ze']=],
 
-        -- Log Levels
-        [=[syntax keyword CandelaLogLevelFatal FATAL Fatal fatal]=],
-        [=[syntax keyword CandelaLogLevelError E ERR[ORS] Err[ors] err[ors]]=],
-        [=[syntax keyword CandelaLogLevelWarning W WARN[ING] Warn[ing] warn[ing]]=],
-        [=[syntax keyword CandelaLogLevelInfo I INFO Info info]=],
-        [=[syntax keyword CandelaLogLevelDebug D DEBUG Debug debug DBG Dbg dbg]=],
-        [=[syntax keyword CandelaLogLevelTrace TRACE Trace trace]=],
+        -- Strings
+        [=[syntax region CandelaLogTypeString start=/"/ end=/"/ end=/$/ skip=/\\./]=],
+        [=[syntax region CandelaLogTypeString start=/`/ end=/`/ end=/$/ skip=/\\./]=],
+        [=[syntax region CandelaLogTypeString start=/\(s\)\@<!'\(s \|t \)\@!/ end=/'/ end=/$/ skip=/\\./]=],
 
-        [=[syntax cluster CandelaLogLevels contains=CandelaLogLevelFatal,CandelaLogLevelError,CandelaLogLevelWarning,CandelaLogLevelInfo,CandelaLogLevelDebug,CandelaLogLevelTrace]=],
+        -- Numbers
+        [=[syntax match CandelaLogTypeInt '\<\d\+\>' contained]=],
+        [=[syntax match CandelaLogTypeBin '\<0[bB][01]\+\>' contained]=],
+        [=[syntax match CandelaLogTypeOct '\<0[oO]\o\+\>' contained]=],
+        [=[syntax match CandelaLogTypeHex '\<0[xX]\x\+\>' contained]=],
+        [=[syntax match CandelaLogTypeHex '\<\x\{4,}\>' contained]=],
+        [=[syntax match CandelaLogTypeInt '\'\d\d\+\>' contained]=],
+        [=[syntax match CandelaLogTypeBin '\'\b[01]\+\>' contained]=],
+        [=[syntax match CandelaLogTypeOct '\'\o\o\+\>' contained]=],
+        [=[syntax match CandelaLogTypeHex '\'\h\x\+\>' contained]=],
+        [=[syntax match CandelaLogTypeFloat '\<\d\+\.\d\+\([eE][+-]\?\d\+\)\?\>' contained]=],
+
+        -- Constants
+        [=[syntax keyword CandelaLogTypeBool TRUE True true FALSE False false]=],
+        [=[syntax keyword CandelaLogTypeNull NULL Null null]=],
     }
 
     local filetypes = {}
@@ -144,7 +143,6 @@ end
 
 function M.apply()
     for _, cmd in ipairs(M.syntax_commands) do
-        print(cmd)
         vim.api.nvim_exec2(cmd, {})
     end
 end

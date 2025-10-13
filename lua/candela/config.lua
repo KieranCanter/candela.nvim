@@ -8,10 +8,10 @@ M.version = {}
 
 M.defaults = {
     -- Candela syntax highlight
-    syntax_highlighting = {  -- TODO: implement
+    syntax_highlighting = { -- TODO: implement
         enabled = true, -- true | false
         -- file type extensions to activate syntax highlighting for
-        file_types = { "log", "txt" }, -- string
+        file_types = { "log" }, -- string
     },
     -- Use icons in UI, set to nil to disable
     icons = vim.g.have_nerd_font -- Uses nerd font icons if nerd font is installed
@@ -57,7 +57,7 @@ M.defaults = {
         -- minimum width to allocate to the "count" column
         min_count_width = 4, -- unsigned integer
         -- width of the toggle columns
-        toggle_width = 5, -- unsigned integer
+        toggle_width = 6, -- unsigned integer
         -- position of prompt window in relation to patterns window
         prompt_offset = "overlap", -- "overlap" | "border"
     },
@@ -91,10 +91,7 @@ M.defaults = {
         custom_foldtext = nil, -- function()
     },
     -- file types to load Candela for TODO: implement
-    file_types = {
-        ".log",
-        ".txt",
-    },
+    file_types = { "log" },
     palette = {
         -- replace default color palette or add to it
         use = "replace", -- "replace" | "prepend" | "append"
