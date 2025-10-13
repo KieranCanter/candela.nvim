@@ -50,7 +50,7 @@ end
 local function set_size_and_loc()
     local color_width = M.windows.color.config.width or 7 -- 7 space hexcode -- NOTE: may need to change in the future with new color spaces
     local count_width = M.windows.count.config.width or MIN_COUNT_WIDTH
-    local ops_width = TOGGLE_WIDTH -- 1 space letter/symbol, 2 space margin on each side
+    local ops_width = TOGGLE_WIDTH -- width of highlight/lightbox toggles
     local curr_width = math.floor(vim.o.columns * WIDTH_COEFF)
     local max_width = vim.o.columns - MARGIN
     local width = clamp_max(curr_width, max_width)
