@@ -1,10 +1,10 @@
 TODO (before release):
-  * syntax highlighting option
   * file type option
   * implement help function
   * write docs
   * logo
 
 TODO (after release)
-  * support other color spaces rgb, hsv, hsl, lch, oklch
-  * make color picking easier
+  * support other color spaces rgb, hsv, hsl, lch, oklch, etc.
+  * make color picking easier (optional dependency with ccc.nvim)
+  * persistent patterns toggle?
