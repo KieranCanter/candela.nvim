@@ -49,7 +49,9 @@ function M.setup(opts)
     M.patterns = require("candela.pattern_list").setup(M.config)
     M.highlighter = require("candela.highlighter").setup()
     M.lightbox = require("candela.lightbox").setup(M.config)
-    require("candela.syntax").enable(M.config.syntax_highlighting) -- FIX: hide behind user config enabling
+    if M.config.syntax_highlighting.enabled then
+        require("candela.syntax").enable(M.config.syntax_highlighting)
+    end
 end
 
 return M

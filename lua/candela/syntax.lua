@@ -2,23 +2,32 @@
 -- https://github.com/fei6409/log-highlight.nvim
 
 local M = {}
+M.enabled = false
+
+local function apply()
+    for _, cmd in ipairs(M.syntax_commands) do
+        vim.api.nvim_exec2(cmd, {})
+    end
+end
 
 function M.enable(opts)
-    vim.cmd("syntax enable")
+    vim.api.nvim_exec2("syntax enable", {})
 
     M.syntax_groups = {
         -- Dates/Times
-        ["CandelaLogDate"] = "Function",
-        ["CandelaLogDay"] = "Function",
-        ["CandelaLogTime"] = "Conditional",
-        ["CandelaLogTimeAMPM"] = "Conditional",
-        ["CandelaLogTimeZone"] = "Conditional",
-        ["CandelaLogTimeDuration"] = "Conditional",
-
+        ["CandelaLogSysDate"] = "Function",
+        ["CandelaLogSysDay"] = "Function",
+        ["CandelaLogSysTime"] = "Conditional",
+        ["CandelaLogSysTimeAMPM"] = "Conditional",
+        ["CandelaLogSysTimeZone"] = "Conditional",
+        ["CandelaLogSysTimeDuration"] = "Conditional",
         -- System info
-        ["CandelaLogHost"] = "Tag",
-        ["CandelaLogFacility"] = "Winbar",
-        ["CandelaLogProcess"] = "Title",
+        ["CandelaLogSysHost"] = "Tag",
+        ["CandelaLogSysFacility"] = "Winbar",
+        ["CandelaLogSysProcess"] = "Title",
+        -- Special
+        ["CandelaLogSysSeparator"] = "Comment",
+        ["CandelaLogSysSymbol"] = "Operator",
 
         -- Log levels
         ["CandelaLogLevelFatal"] = "ErrorMsg",
@@ -49,45 +58,38 @@ function M.enable(opts)
         ["CandelaLogEntityIpv4"] = "Special",
         ["CandelaLogEntityIpv6"] = "Special",
         ["CandelaLogEntityMac"] = "Special",
-
-        -- Special
-        ["CandelaLogSeparator"] = "Comment",
-        ["CandelaLogSymbol"] = "Operator",
     }
 
     M.syntax_commands = {
         -- Dates
-        [=[syntax match CandelaLogDate '\<\d\{2}[-/]\d\{2}\>']=],
-        [=[syntax match CandelaLogDate '\<\d\{4}[-/]\d\{2}[-/]\d\{2}\>']=],
-        [=[syntax match CandelaLogDate '\<\d\{2}[-/]\d\{2}[-/]\d\{4}\>']=],
-        [=[syntax match CandelaLogDate '\<\d\{4}-\d\{2}-\d\{2}T']=],
-        [=[syntax match CandelaLogDate '\<\a\{3} \d\{1,2}\(,\? \d\{4}\)\?\>']=],
-        [=[syntax match CandelaLogDate '\<\d\{1,2}[- ]\a\{3}[- ]\d\{4}\>']=],
+        [=[syntax match CandelaLogSysDate '\<\d\{2}[-/]\d\{2}\>']=],
+        [=[syntax match CandelaLogSysDate '\<\d\{4}[-/]\d\{2}[-/]\d\{2}\>']=],
+        [=[syntax match CandelaLogSysDate '\<\d\{2}[-/]\d\{2}[-/]\d\{4}\>']=],
+        [=[syntax match CandelaLogSysDate '\<\d\{4}-\d\{2}-\d\{2}T']=],
+        [=[syntax match CandelaLogSysDate '\<\a\{3} \d\{1,2}\(,\? \d\{4}\)\?\>']=],
+        [=[syntax match CandelaLogSysDate '\<\d\{1,2}[- ]\a\{3}[- ]\d\{4}\>']=],
         -- Weekdays
-        [=[syntax keyword CandelaLogDay Mon Tue Wed Thu Fri Sat Sun]=],
-
+        [=[syntax keyword CandelaLogSysDay Mon Tue Wed Thu Fri Sat Sun]=],
         -- Time
-        [=[syntax match CandelaLogTime '\%(^\|\s\)\zs\d\{2}:\d\{2}:\d\{2}\(\.\d\{2,6}\)\?\ze\%(\s\|$\)' contains=CandelaLogTimeZone,CandelaLogTimeAMPM nextgroup=CandelaLogHost skipwhite]=],
-        [=[syntax match CandelaLogTimeAMPM '\cAM\|\cPM\>' contained skipwhite nextgroup=CandelaLogHost]=],
-        [=[syntax match CandelaLogTimeZone 'Z\|[+-]\d\{2}:\d\{2}\|\a\{3}\>' contained skipwhite nextgroup=CandelaLogHost]=],
-        [=[syntax match CandelaLogTimeDuration '\(\(\(\d\+d\)\?\d\+h\)\?\d\+m\)\?\d\+\(\.\d\+\)\?[mun]\?s\>']=],
-
+        [=[syntax match CandelaLogSysTime '\%(^\|\s\)\zs\d\{2}:\d\{2}:\d\{2}\(\.\d\{2,6}\)\?\ze\%(\s\|$\)' contains=CandelaLogSysTimeZone,CandelaLogSysTimeAMPM nextgroup=CandelaLogSysHost skipwhite]=],
+        [=[syntax match CandelaLogSysTimeAMPM '\cAM\|\cPM\>' contained skipwhite nextgroup=CandelaLogSysHost]=],
+        [=[syntax match CandelaLogSysTimeZone 'Z\|[+-]\d\{2}:\d\{2}\|\a\{3}\>' contained skipwhite nextgroup=CandelaLogSysHost]=],
+        [=[syntax match CandelaLogSysTimeDuration '\(\(\(\d\+d\)\?\d\+h\)\?\d\+m\)\?\d\+\(\.\d\+\)\?[mun]\?s\>']=],
         -- System info
-        [=[syntax match CandelaLogHost '\<[[:alnum:]\._-]\+\>' contained skipwhite nextgroup=CandelaLogFacility,CandelaLogProcess]=],
-        [=[syntax match CandelaLogFacility '\<[[:alnum:]]\+\.[[:alnum:]]\+\>' contained skipwhite contains=CandelaLogLevels nextgroup=CandelaLogProcess]=],
-        [=[syntax match CandelaLogProcess '\<[[:alnum:]\._-]\+\%(([^)]\+)\)\?\%(\[[[:digit:]]\+\]\)\?:' contained skipwhite contains=CandelaLogTypeInt nextgroup=CandelaLogMessage]=],
-
+        [=[syntax match CandelaLogSysHost '\<[[:alnum:]\._-]\+\>' contained skipwhite nextgroup=CandelaLogSysFacility,CandelaLogSysProcess]=],
+        [=[syntax match CandelaLogSysFacility '\<[[:alnum:]]\+\.[[:alnum:]]\+\>' contained skipwhite contains=@CandelaLogLevels nextgroup=CandelaLogSysProcess]=],
+        [=[syntax match CandelaLogSysProcess '\<[[:alnum:]\._-]\+\%(([^)]\+)\)\?\%(\[[[:digit:]]\+\]\)\?:' contained skipwhite contains=CandelaLogTypeInt]=],
         -- Symbols/separators
-        [=[syntax match CandelaLogSymbol '[!@#$%^&*;:?]']=],
-        [=[syntax match CandelaLogSeparator '-\{3,}\|=\{3,}\|#\{3,}\|\*\{3,}\|<\{3,}\|>\{3,}']=],
+        [=[syntax match CandelaLogSysSymbol '[!@#$%^&*;:?]']=],
+        [=[syntax match CandelaLogSysSeparator '-\{3,}\|=\{3,}\|#\{3,}\|\*\{3,}\|<\{3,}\|>\{3,}']=],
 
         -- Log Levels
-        [=[syntax keyword CandelaLogLevelFatal containedin=CandelaLogFacility FATAL Fatal fatal]=],
-        [=[syntax keyword CandelaLogLevelError containedin=CandelaLogFacility E ERR[ORS] Err[ors] err[ors]]=],
-        [=[syntax keyword CandelaLogLevelWarning containedin=CandelaLogFacility W WARN[ING] Warn[ing] warn[ing]]=],
-        [=[syntax keyword CandelaLogLevelInfo containedin=CandelaLogFacility I INFO Info info]=],
-        [=[syntax keyword CandelaLogLevelDebug containedin=CandelaLogFacility D DEBUG Debug debug DBG Dbg dbg]=],
-        [=[syntax keyword CandelaLogLevelTrace containedin=CandelaLogFacility TRACE Trace trace]=],
+        [=[syntax keyword CandelaLogLevelFatal containedin=CandelaLogSysFacility FATAL Fatal fatal]=],
+        [=[syntax keyword CandelaLogLevelError containedin=CandelaLogSysFacility E ERR[ORS] Err[ors] err[ors]]=],
+        [=[syntax keyword CandelaLogLevelWarning containedin=CandelaLogSysFacility W WARN[ING] Warn[ing] warn[ing]]=],
+        [=[syntax keyword CandelaLogLevelInfo containedin=CandelaLogSysFacility I INFO Info info]=],
+        [=[syntax keyword CandelaLogLevelDebug containedin=CandelaLogSysFacility D DEBUG Debug debug DBG Dbg dbg]=],
+        [=[syntax keyword CandelaLogLevelTrace containedin=CandelaLogSysFacility TRACE Trace trace]=],
         [=[syntax cluster CandelaLogLevels contains=CandelaLogLevelFatal,CandelaLogLevelError,CandelaLogLevelWarning,CandelaLogLevelInfo,CandelaLogLevelDebug,CandelaLogLevelTrace]=],
 
         -- Objects / Entities
@@ -129,22 +131,18 @@ function M.enable(opts)
     for _, ext in ipairs(opts.file_types) do
         table.insert(filetypes, "*." .. ext)
     end
-    vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+    M.autocmd = vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
         pattern = filetypes,
         callback = function()
             vim.api.nvim_exec2("setlocal nospell", {})
             for name, link in pairs(M.syntax_groups) do
                 vim.cmd(string.format("highlight default link %s %s", name, link))
             end
-            M.apply()
+            apply()
         end,
     })
-end
 
-function M.apply()
-    for _, cmd in ipairs(M.syntax_commands) do
-        vim.api.nvim_exec2(cmd, {})
-    end
+    M.enabled = true
 end
 
 return M
