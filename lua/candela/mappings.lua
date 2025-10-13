@@ -265,4 +265,35 @@ function M.set_prompt_keymaps()
     end
 end
 
+local function yank_unfolded()
+    -- Get start/end of visual selection
+    local start_pos = vim.api.nvim_buf_get_mark(0, '<')[1]
+    local end_pos = vim.api.nvim_buf_get_mark(0, '>')[1]
+
+    -- Collect unfolded lines
+    local unfolded_lines = {}
+    for lnum = start_pos, end_pos do
+        if vim.fn.foldclosed(lnum) == -1 then
+            table.insert(unfolded_lines, vim.api.nvim_buf_get_lines(0, lnum - 1, lnum, false)[1])
+        end
+    end
+
+    if #unfolded_lines == 0 then
+        vim.notify("No unfolded lines in selection", vim.log.levels.WARN)
+        return
+    end
+
+    vim.fn.setreg('"', table.concat(unfolded_lines, "\n"))
+    vim.notify("Yanked " .. #unfolded_lines .. " unfolded lines", vim.log.levels.INFO)
+end
+
+vim.api.nvim_set_keymap("v", "<leader>YU", "", {
+    noremap = true,
+    silent = true,
+    desc = "Yank unfolded lines to register",
+    callback = function()
+        yank_unfolded()
+    end,
+})
+
 return M
