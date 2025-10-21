@@ -144,7 +144,7 @@ function M.setup(opts)
         clear = {
             ---@param subargs table|nil: empty table or nil
             impl = function(subargs)
-                if subargs ~= nil or (subargs ~= nil and #subargs > 0) then
+                if subargs ~= nil and #subargs > 0 then
                     vim.notify(
                         "[Candela] invalid number of arguments.\n" .. "Usage:\n" .. "   Candela clear",
                         vim.log.levels.ERROR
@@ -157,7 +157,7 @@ function M.setup(opts)
         refresh = {
             ---@param subargs table|nil: empty table or nil
             impl = function(subargs)
-                if subargs ~= nil or (subargs ~= nil and #subargs > 0) then
+                if subargs ~= nil and #subargs > 0 then
                     vim.notify(
                         "[Candela] invalid number of arguments.\n" .. "Usage:\n" .. "   Candela refresh",
                         vim.log.levels.ERROR
@@ -286,7 +286,7 @@ function M.setup(opts)
         match_all = {
             ---@param subargs table|nil: empty table or nil
             impl = function(subargs)
-                if subargs ~= nil or (subargs ~= nil and #subargs > 0) then
+                if subargs ~= nil and #subargs > 0 then
                     vim.notify(
                         "[Candela] invalid number of arguments.\n" .. "Usage:\n" .. "   Candela match_all",
                         vim.log.levels.ERROR
@@ -334,7 +334,7 @@ function M.setup(opts)
         find_all = {
             ---@param subargs table|nil: empty table or nil
             impl = function(subargs)
-                if subargs ~= nil or (subargs ~= nil and #subargs > 0) then
+                if subargs ~= nil and #subargs > 0 then
                     vim.notify(
                         "[Candela] invalid number of arguments.\n" .. "Usage:\n" .. "   Candela find_all",
                         vim.log.levels.ERROR
@@ -356,7 +356,7 @@ function M.setup(opts)
         lightbox = {
             ---@param subargs table|nil: empty table or nil
             impl = function(subargs)
-                if subargs ~= nil or (subargs ~= nil and #subargs > 0) then
+                if subargs ~= nil and #subargs > 0 then
                     vim.notify(
                         "[Candela] invalid number of arguments.\n" .. "Usage:\n" .. "   Candela lightbox",
                         vim.log.levels.ERROR
@@ -410,7 +410,7 @@ function M.setup(opts)
         help = {
             ---@param subargs table|nil: empty table or nil
             impl = function(subargs)
-                if subargs ~= nil or (subargs ~= nil and #subargs > 0) then
+                if subargs ~= nil and #subargs > 0 then
                     vim.notify(
                         "[Candela] invalid number of arguments.\n" .. "Usage:\n" .. "   Candela help",
                         vim.log.levels.ERROR
@@ -423,7 +423,7 @@ function M.setup(opts)
         health = {
             ---@param subargs table|nil: empty table or nil
             impl = function(subargs)
-                if subargs ~= nil or (subargs ~= nil and #subargs > 0) then
+                if subargs ~= nil and #subargs > 0 then
                     vim.notify(
                         "[Candela] invalid number of arguments.\n" .. "Usage:\n" .. "   Candela health",
                         vim.log.levels.ERROR
