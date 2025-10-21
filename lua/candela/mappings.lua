@@ -247,59 +247,58 @@ function M.set_patterns_keymaps()
 
     build_help_buf(keymap_info)
 
-    -- NOTE: Only for dev purposes, leave for user to create or maybe use <Plug>
-    local devmaps = {
+    local user_keymaps = {
         {
-            lhs = "<leader>cds",
-            desc = "[Candela] toggle UI",
+            lhs = "<Plug>CandelaUI",
+            desc = "[Candela] toggle UI window",
             callback = function()
                 CandelaUi.toggle()
             end,
         },
         {
-            lhs = "<leader>cda",
+            lhs = "<Plug>CandelaAddPattern",
             desc = "[Candela] add pattern in UI",
             callback = function()
                 CandelaUi.add()
             end,
         },
         {
-            lhs = "<leader>cdR",
+            lhs = "<Plug>CandelaRefresh",
             desc = "[Candela] refresh patterns in current buffer",
             callback = function()
                 CandelaCommands.commands.refresh.impl()
             end,
         },
         {
-            lhs = "<leader>cdD",
+            lhs = "<Plug>CandelaClear",
             desc = "[Candela] clear all patterns",
             callback = function()
                 CandelaCommands.commands.clear.impl()
             end,
         },
         {
-            lhs = "<leader>cdM",
+            lhs = "<Plug>CandelaMatchAll",
             desc = "[Candela] vim match all patterns",
             callback = function()
                 CandelaCommands.commands.match_all.impl()
             end,
         },
         {
-            lhs = "<leader>cdF",
+            lhs = "<Plug>CandelaFindAll",
             desc = "[Candela] find all patterns and send to location list",
             callback = function()
                 CandelaCommands.commands.find_all.impl()
             end,
         },
         {
-            lhs = "<leader>cdL",
-            desc = "[Candela] toggle lightbox",
+            lhs = "<Plug>CandelaLightbox",
+            desc = "[Candela] toggle lightbox window",
             callback = function()
                 CandelaCommands.commands.lightbox.impl()
             end,
         },
         {
-            lhs = "<leader>cd?",
+            lhs = "<Plug>CandelaHelp",
             desc = "[Candela] open help menu",
             callback = function()
                 CandelaCommands.commands.help.impl()
@@ -307,7 +306,7 @@ function M.set_patterns_keymaps()
         },
     }
 
-    for _, keymap in ipairs(devmaps) do
+    for _, keymap in ipairs(user_keymaps) do
         vim.api.nvim_set_keymap("n", keymap.lhs, "", {
             noremap = true,
             silent = true,
