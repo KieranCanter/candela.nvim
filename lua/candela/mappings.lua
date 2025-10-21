@@ -25,63 +25,63 @@ function M.set_patterns_keymaps()
             lhs = "a",
             desc = "[Candela] add pattern",
             callback = function()
-                CandelaCommands.commands.add.impl()
+                CandelaUi.add()
             end,
         },
         {
             lhs = "e",
             desc = "[Candela] edit pattern",
             callback = function()
-                CandelaCommands.commands.edit.impl()
+                CandelaUi.edit()
             end,
         },
         {
             lhs = "c",
             desc = "[Candela] copy pattern",
             callback = function()
-                CandelaCommands.commands.copy.impl()
+                CandelaUi.copy()
             end,
         },
         {
             lhs = "d",
             desc = "[Candela] delete pattern",
             callback = function()
-                CandelaCommands.commands.delete.impl()
+                CandelaUi.delete(require("candela.config").options.matching.delete_confirmation)
             end,
         },
         {
             lhs = "D",
             desc = "[Candela] clear all patterns",
             callback = function()
-                CandelaCommands.commands.clear.impl()
+                CandelaUi.clear(require("candela.config").options.matching.delete_confirmation)
             end,
         },
         {
             lhs = "C",
             desc = "[Candela] change pattern color",
             callback = function()
-                CandelaCommands.commands.change_color.impl()
+                CandelaUi.change_color()
             end,
         },
         {
             lhs = "h",
             desc = "[Candela] toggle pattern highlight",
             callback = function()
-                CandelaCommands.commands.toggle_highlight.impl()
+                CandelaUi.toggle_highlight()
             end,
         },
         {
             lhs = "l",
             desc = "[Candela] toggle pattern lightbox",
             callback = function()
-                CandelaCommands.commands.toggle_lightbox.impl()
+                CandelaUi.toggle_lightbox()
             end,
         },
         {
             lhs = "R",
             desc = "[Candela] refresh patterns for current buffer",
             callback = function()
-                CandelaCommands.commands.refresh.impl()
+                CandelaUi.refresh(true)
             end,
         },
         {
@@ -171,7 +171,7 @@ function M.set_patterns_keymaps()
             lhs = "<leader>cda",
             desc = "[Candela] add pattern in UI",
             callback = function()
-                CandelaCommands.commands.add.impl()
+                CandelaUi.add()
             end,
         },
         {

@@ -66,11 +66,11 @@ end
 ---@param cmd string
 ---@param args string[]
 ---@return number
-function M.highlight_matches(bufnr, id, regex, color, cmd, args)
-    local hash = require("candela.pattern_list").hash_regex(regex)
+function M.highlight_matches(bufnr, id, pattern, cmd, args)
+    local hash = require("candela.pattern_list").hash_regex(pattern.regex)
     local ns = vim.api.nvim_create_namespace("CandelaNs_" .. hash)
     local hl_group = "CandelaHl_" .. hash
-    register_highlight({ bg = color }, ns, hl_group)
+    register_highlight({ bg = pattern.color }, ns, hl_group)
 
     local filepath = vim.api.nvim_buf_get_name(bufnr)
     if filepath == "" then
@@ -83,7 +83,7 @@ function M.highlight_matches(bufnr, id, regex, color, cmd, args)
     for _, arg in ipairs(args) do
         table.insert(command, arg)
     end
-    table.insert(command, regex)
+    table.insert(command, pattern.regex)
     table.insert(command, filepath)
 
     local matches = require("candela.engine").get_matches(command)
@@ -106,6 +106,10 @@ function M.highlight_matches(bufnr, id, regex, color, cmd, args)
             table.insert(M.match_cache[id], { extmark_id = extmark_id, row = row, end_col = string.len(line) })
             require("candela.lightbox").add_to_cache(row, id)
         end
+    end
+
+    if not pattern.highlight then
+        M.toggle_match_highlights(bufnr, id, pattern.regex, false)
     end
 
     return count

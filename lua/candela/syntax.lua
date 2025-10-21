@@ -3,6 +3,7 @@
 
 local M = {}
 M.enabled = false
+local CANDELA_AUGROUP = require("candela.init").CANDELA_AUGROUP
 
 local function apply()
     for _, cmd in ipairs(M.syntax_commands) do
@@ -127,12 +128,42 @@ function M.enable(opts)
         [=[syntax keyword CandelaLogTypeNull NULL Null null]=],
     }
 
-    local filetypes = {}
-    for _, ext in ipairs(opts.file_types) do
-        table.insert(filetypes, "*." .. ext)
+    local extensions = {}
+    local types = {}
+    local ext_regex = "^%.[%w%.]+$" -- matching file extension with one or more parts e.g. .log or .foo.bar
+    local type_regex = "^%w+$" -- matching file type e.g. text or rust
+    for _, filetype in ipairs(opts.file_types) do
+        if filetype:match(ext_regex) ~= nil then
+            table.insert(extensions, "*" .. filetype)
+        elseif filetype:match(type_regex) ~= nil then
+            table.insert(types, filetype)
+        else
+            vim.notify(
+                string.format(
+                    '[Candela] invalid file type "%s" in syntax_highlighting.file_types, must be in the form ".<ext>" or <filetype>',
+                    filetype
+                ),
+                vim.log.levels.WARN
+            )
+        end
     end
-    M.autocmd = vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
-        pattern = filetypes,
+
+    -- Apply based on file extension
+    M.ext_autocmd = vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+        group = CANDELA_AUGROUP,
+        pattern = extensions,
+        callback = function()
+            vim.api.nvim_exec2("setlocal nospell", {})
+            for name, link in pairs(M.syntax_groups) do
+                vim.cmd(string.format("highlight default link %s %s", name, link))
+            end
+            apply()
+        end,
+    })
+
+    M.type_autocmd = vim.api.nvim_create_autocmd("FileType", {
+        group = CANDELA_AUGROUP,
+        pattern = types,
         callback = function()
             vim.api.nvim_exec2("setlocal nospell", {})
             for name, link in pairs(M.syntax_groups) do

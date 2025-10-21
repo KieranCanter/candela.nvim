@@ -7,44 +7,6 @@ local M = {}
 M.version = {}
 
 M.defaults = {
-    -- Candela syntax highlight
-    syntax_highlighting = { -- TODO: implement
-        enabled = true, -- true | false
-        -- file type extensions to activate syntax highlighting for
-        file_types = { "log" }, -- string
-    },
-    -- Use icons in UI, set to nil to disable
-    icons = vim.g.have_nerd_font -- Uses nerd font icons if nerd font is installed
-            and {
-                candela = "\u{f05e2}", -- patterns window title 󰗢
-                color = "\u{e22b}", -- color header 
-                regex = "\u{f069}", -- regex header 
-                highlight = {
-                    header = "\u{ea61}", -- highlight header 
-                    toggle_on = "\u{f1a25}", -- highlight toggle on 󱨥
-                    toggle_off = "\u{f1a26}", -- highlight toggle off 󱨦
-                },
-                lightbox = {
-                    header = "\u{e68f}", -- lightbox header 
-                    toggle_on = "\u{f1a25}", -- highlight toggle on 󱨥
-                    toggle_off = "\u{f1a26}", -- highlight toggle off 󱨦
-                },
-            }
-        or { -- If no nerd font, uses unicode emojis
-            candela = "\u{1F56F}", -- patterns window title 🕯
-            color = "\u{1F3A8}", -- color header 🎨
-            regex = "\u{2728}", -- regex header ✨
-            highlight = {
-                header = "\u{1F4A1}", -- highlight header 💡
-                toggle_on = "\u{25C9}", -- highlight toggle on ◉
-                toggle_off = "\u{25CB}", -- highlight toggle off ○
-            },
-            lightbox = {
-                header = "\u{1F50D}", -- lightbox header 🔍
-                toggle_on = "\u{25C9}", -- highlight toggle on ◉
-                toggle_off = "\u{25CB}", -- highlight toggle off ○
-            },
-        },
     window = {
         -- initial width of the patterns window as percentage of Neovim window width
         width = 0.5, -- number
@@ -90,12 +52,41 @@ M.defaults = {
         -- custom foldtext function, if not nil and a valid function, will override fold_style
         custom_foldtext = nil, -- function()
     },
-    -- file types to load Candela for TODO: implement
-    file_types = { "log" },
+    icons = vim.g.have_nerd_font -- Uses nerd font icons if nerd font is installed
+            and {
+                candela = "\u{f05e2}", -- patterns window title 󰗢
+                color = "\u{e22b}", -- color header 
+                regex = "\u{f069}", -- regex header 
+                highlight = {
+                    header = "\u{ea61}", -- highlight header 
+                    toggle_on = "\u{f1a25}", -- highlight toggle on 󱨥
+                    toggle_off = "\u{f1a26}", -- highlight toggle off 󱨦
+                },
+                lightbox = {
+                    header = "\u{e68f}", -- lightbox header 
+                    toggle_on = "\u{f1a25}", -- highlight toggle on 󱨥
+                    toggle_off = "\u{f1a26}", -- highlight toggle off 󱨦
+                },
+            }
+        or { -- If no nerd font, uses unicode emojis
+            candela = "\u{1F56F}", -- patterns window title 🕯
+            color = "\u{1F3A8}", -- color header 🎨
+            regex = "\u{2728}", -- regex header ✨
+            highlight = {
+                header = "\u{1F4A1}", -- highlight header 💡
+                toggle_on = "\u{25C9}", -- highlight toggle on ◉
+                toggle_off = "\u{25CB}", -- highlight toggle off ○
+            },
+            lightbox = {
+                header = "\u{1F50D}", -- lightbox header 🔍
+                toggle_on = "\u{25C9}", -- highlight toggle on ◉
+                toggle_off = "\u{25CB}", -- highlight toggle off ○
+            },
+        },
     palette = {
         -- replace default color palette or add to it
         use = "replace", -- "replace" | "prepend" | "append"
-        -- replace default color palette or add to it
+        -- method of selecting the next color
         cycle = "constant", -- "constant" | "random"
         -- list of colors to use for dark/light mode
         colors = {
@@ -154,6 +145,12 @@ M.defaults = {
                 PURPLE = "#AAA5FB",
             },
         },
+    },
+    -- Candela syntax highlight
+    syntax_highlighting = {
+        enabled = true, -- true | false
+        -- file extensions/types to activate syntax highlighting for
+        file_types = { ".log", "text" }, -- string
     },
 }
 

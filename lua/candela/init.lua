@@ -1,11 +1,9 @@
 ---@class Candela
----@field ui CandelaUi
----@field patterns CandelaPattern[]
 
 local M = {}
 M.CANDELA_AUGROUP = vim.api.nvim_create_augroup("Candela", { clear = false })
 
-function M.setup(opts)
+local function init()
     local CandelaCommands = require("candela.commands")
     vim.api.nvim_create_user_command("Candela", function(args)
         CandelaCommands.dispatch(args)
@@ -16,11 +14,7 @@ function M.setup(opts)
             -- Get the subcommand.
             local commands = CandelaCommands.commands
             local subcmd_key, subcmd_arg_lead = cmdline:match("^['<,'>]*Candela[!]*%s(%S+)%s(.*)$")
-            if subcmd_key
-                and subcmd_arg_lead
-                and commands[subcmd_key]
-                and commands[subcmd_key].complete
-            then
+            if subcmd_key and subcmd_arg_lead and commands[subcmd_key] and commands[subcmd_key].complete then
                 -- The subcommand has completions. Return them.
                 return commands[subcmd_key].complete(subcmd_arg_lead)
             end
@@ -38,20 +32,25 @@ function M.setup(opts)
         bang = true,
     })
 
-    M.config = require("candela.config").setup(opts)
-    if M.config == nil then
-        package.loaded.candela = nil
-        return
-    end
-    M.commands = require("candela.commands").setup(M.config)
-    M.ui = require("candela.ui").setup(M.config)
+    require("candela.commands").setup(M.config)
+    require("candela.ui").setup(M.config)
     require("candela.finder").setup(M.config)
-    M.patterns = require("candela.pattern_list").setup(M.config)
-    M.highlighter = require("candela.highlighter").setup()
-    M.lightbox = require("candela.lightbox").setup(M.config)
+    require("candela.pattern_list").setup(M.config)
+    require("candela.highlighter").setup()
+    require("candela.lightbox").setup(M.config)
     if M.config.syntax_highlighting.enabled then
         require("candela.syntax").enable(M.config.syntax_highlighting)
     end
+end
+
+function M.setup(opts)
+    M.config = require("candela.config").setup(opts)
+    if M.config == nil then
+        package.loaded.candela = nil
+        return nil
+    end
+
+    init()
 end
 
 return M

@@ -164,13 +164,17 @@ function M.resize_height(delete)
     local new_vert_center = math.floor((vim.o.lines - new_height - prompt_height) / 2)
     M.windows.patterns.config.row = new_vert_center
     M.windows.patterns.config.height = new_height
-    vim.api.nvim_win_set_config(M.windows.patterns.win, M.windows.patterns.config)
+    if vim.api.nvim_win_is_valid(M.windows.patterns.win) then
+        vim.api.nvim_win_set_config(M.windows.patterns.win, M.windows.patterns.config)
+    end
 
     -- Set inner window heights
     for name, win in pairs(M.windows) do
         if name ~= "prompt" and name ~= "patterns" then
             win.config.height = M.windows.patterns.config.height - 2
-            vim.api.nvim_win_set_config(win.win, win.config)
+            if vim.api.nvim_win_is_valid(M.windows.patterns.win) then
+                vim.api.nvim_win_set_config(win.win, win.config)
+            end
         end
     end
 end
@@ -305,7 +309,7 @@ local function refresh_to_curr_buf()
         local CandelaConfig = require("candela.config")
         local cmd = CandelaConfig.options.engine.command --[[@as string]]
         local args = CandelaConfig.options.engine.args
-        local count = CandelaHighlighter.highlight_matches(M.curr_buf, id, pattern.regex, pattern.color, cmd, args)
+        local count = CandelaHighlighter.highlight_matches(M.curr_buf, id, pattern, cmd, args)
         if count == -1 then
             return
         end
@@ -334,7 +338,9 @@ end
 ---@param type "highlight"|"lightbox"
 ---@return string: formatted toggle string
 local function format_toggle(icon, type)
-    if not icon then icon = "Y" end
+    if not icon then
+        icon = "Y"
+    end
 
     local width = 0
     if type == "highlight" then
@@ -342,7 +348,7 @@ local function format_toggle(icon, type)
     elseif type == "lightbox" then
         width = M.windows.lightbox.config.width
     else
-        vim.notify(string.format("[Candela] toggle type \"%s\" not defined", type), vim.log.levels.ERROR)
+        vim.notify(string.format('[Candela] toggle type "%s" not defined', type), vim.log.levels.ERROR)
     end
 
     local spaces = string.rep(" ", (width - vim.fn.strwidth(icon)) / 2)
@@ -656,19 +662,25 @@ local function show_prompt(operation, curr_line)
         end,
     })
 
-    if operation == Operations.ADD or operation == Operations.COPY then
+    if operation == Operations.ADD then
         vim.fn.prompt_setcallback(M.windows.prompt.buf, function(regex)
-            CandelaPatternList.add_pattern(regex)
+            CandelaPatternList.add(regex)
             M.hide_prompt()
         end)
     elseif operation == Operations.EDIT then
         vim.fn.prompt_setcallback(M.windows.prompt.buf, function(new_regex)
-            CandelaPatternList.edit_pattern(curr_line, new_regex)
+            CandelaPatternList.edit(curr_line, new_regex)
+            M.hide_prompt()
+        end)
+    elseif operation == Operations.COPY then
+        vim.fn.prompt_setcallback(M.windows.prompt.buf, function(regex)
+            local _, curr_pattern = CandelaPatternList.get_id_and_pattern_by_index(curr_line) --[[@as CandelaPattern]]
+            CandelaPatternList.add(regex, curr_pattern.color, curr_pattern.highlight, curr_pattern.lightbox)
             M.hide_prompt()
         end)
     elseif operation == Operations.CHANGE_COLOR then
         vim.fn.prompt_setcallback(M.windows.prompt.buf, function(new_color)
-            CandelaPatternList.change_pattern_color(curr_line, new_color)
+            CandelaPatternList.change_color(curr_line, new_color)
             M.hide_prompt()
         end)
     elseif operation == Operations.IMPORT then
@@ -714,7 +726,7 @@ end
 
 function M.edit()
     if vim.api.nvim_get_current_win() ~= M.windows.regex.win then
-        vim.notify("[Candela] must be in patterns window to edit regex", vim.log.levels.ERROR)
+        vim.notify("[Candela] must be in patterns window to run UI commands", vim.log.levels.ERROR)
         return
     end
 
@@ -741,7 +753,7 @@ end
 
 function M.copy()
     if vim.api.nvim_get_current_win() ~= M.windows.regex.win then
-        vim.notify("[Candela] must be in patterns window to copy regex", vim.log.levels.ERROR)
+        vim.notify("[Candela] must be in patterns window to run UI commands", vim.log.levels.ERROR)
         return
     end
 
@@ -768,7 +780,7 @@ end
 ---@param ask boolean: show the confirmation message or not
 function M.delete(ask)
     if vim.api.nvim_get_current_win() ~= M.windows.regex.win then
-        vim.notify("[Candela] must be in patterns window to delete pattern", vim.log.levels.ERROR)
+        vim.notify("[Candela] must be in patterns window to run UI commands", vim.log.levels.ERROR)
         return
     end
 
@@ -794,20 +806,9 @@ function M.delete(ask)
         end
     end
 
-    if not CandelaPatternList.delete_pattern(curr_line) then
+    if not CandelaPatternList.delete(curr_line) then
         return
     end
-
-    if not CandelaHighlighter.remove_match_highlights(M.base_buf, curr_id, curr_pattern.regex) then
-        return
-    end
-
-    if CandelaLightbox.window:is_open() then
-        CandelaLightbox.update_folds()
-    end
-
-    M.update_ui_lines()
-    M.resize_height(true)
 end
 
 ---@param ask boolean: show the confirmation message or not
@@ -825,19 +826,8 @@ function M.clear(ask)
         end
     end
 
-    local order = CandelaPatternList.order
-    local patterns = CandelaPatternList.patterns
-    CandelaPatternList.clear_patterns()
-    for _, id in ipairs(order) do
-        local pattern = patterns[id]
-        if CandelaHighlighter.remove_match_highlights(M.base_buf, id, pattern.regex) then
-            M.update_ui_lines()
-        end
-    end
-    M.resize_height()
-
-    if CandelaLightbox.window:is_open() then
-        CandelaLightbox.update_folds()
+    if not CandelaPatternList.clear() then
+        return
     end
 end
 
@@ -885,7 +875,7 @@ end
 
 function M.toggle_highlight()
     if vim.api.nvim_get_current_win() ~= M.windows.regex.win then
-        vim.notify("[Candela] must be in patterns window to toggle regex highlight", vim.log.levels.ERROR)
+        vim.notify("[Candela] must be in patterns window to run UI commands", vim.log.levels.ERROR)
         return
     end
 
@@ -900,7 +890,7 @@ function M.toggle_highlight()
         return
     end
 
-    local is_highlighted = CandelaPatternList.toggle_pattern_highlight(curr_line)
+    local is_highlighted = CandelaPatternList.toggle_highlight(curr_line)
     if not CandelaHighlighter.toggle_match_highlights(M.base_buf, curr_id, curr_pattern.regex, is_highlighted) then
         return
     end
@@ -910,7 +900,7 @@ end
 
 function M.toggle_lightbox()
     if vim.api.nvim_get_current_win() ~= M.windows.regex.win then
-        vim.notify("[Candela] must be in patterns window to toggle regex lightbox", vim.log.levels.ERROR)
+        vim.notify("[Candela] must be in patterns window to run UI commands", vim.log.levels.ERROR)
         return
     end
 
@@ -921,7 +911,7 @@ function M.toggle_lightbox()
 
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
     local curr_id = CandelaPatternList.order[curr_line]
-    local is_lightboxed = CandelaPatternList.toggle_pattern_lightbox(curr_line)
+    local is_lightboxed = CandelaPatternList.toggle_lightbox(curr_line)
     if is_lightboxed then
         CandelaLightbox.add_many_to_cache(CandelaHighlighter.match_cache[curr_id], curr_id)
     else
@@ -1053,7 +1043,7 @@ end
 function M.regen_colors()
     for i, _ in ipairs(CandelaPatternList.order) do
         local new_color = CandelaPatternList.next_color()
-        CandelaPatternList.change_pattern_color(i, new_color)
+        CandelaPatternList.change_color(i, new_color)
     end
 
     M.refresh(true, true)

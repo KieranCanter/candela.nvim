@@ -57,7 +57,7 @@ function M.import_patterns(path)
             return -- cancel
         end
 
-        pattern_list.clear_patterns()
+        pattern_list.clear()
     end
 
     local ok, imported = pcall(dofile, path)
@@ -67,7 +67,7 @@ function M.import_patterns(path)
     end
 
     for _, pattern in ipairs(imported) do
-        pattern_list.add_pattern(pattern.regex, pattern.color, pattern.highlight, pattern.lightbox)
+        pattern_list.add(pattern.regex, pattern.color, pattern.highlight, pattern.lightbox)
     end
 
     local ui = require("candela.ui")

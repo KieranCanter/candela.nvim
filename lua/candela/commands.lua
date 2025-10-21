@@ -1,35 +1,162 @@
 -- Module for defining user commands
 local M = {}
 
+local function string2bool(val)
+    if val ~= nil then
+        val = val:lower()
+        return val == "true" or val == "1" or val == "yes" or val == "on"
+    end
+    return nil
+end
+
 function M.setup(opts)
     local CandelaUi = require("candela.ui")
+    local CandelaPatternList = require("candela.pattern_list")
 
     M.commands = {
         add = {
-            impl = function()
-                CandelaUi.add()
+            ---@param subargs table<string, string?, string?, string?>: regex, color?, highlight?, lightbox?
+            impl = function(subargs)
+                if #subargs == 0 or #subargs > 4 then
+                    vim.notify(
+                        "[Candela] invalid number of arguments.\n"
+                            .. "Usage:\n"
+                            .. "   Candela add <regex: string> [color: string] [highlight: boolean] [lightbox: boolean]",
+                        vim.log.levels.ERROR
+                    )
+                    return
+                end
+
+                subargs[3] = string2bool(subargs[3])
+                subargs[4] = string2bool(subargs[4])
+                CandelaPatternList.add(unpack(subargs))
             end,
         },
         edit = {
-            impl = function()
-                CandelaUi.edit()
+            ---@param subargs table<string, string>: index_or_regex, new_regex
+            impl = function(subargs)
+                if #subargs ~= 2 then
+                    vim.notify(
+                        "[Candela] invalid number of arguments.\n"
+                            .. "Usage:\n"
+                            .. "   Candela edit <index: integer | regex: string> <new_regex: string>",
+                        vim.log.levels.ERROR
+                    )
+                    return
+                end
+
+                if tonumber(subargs[1]) ~= nil then
+                    subargs[1] = tonumber(subargs[1])
+                end
+                CandelaPatternList.edit(unpack(subargs))
+            end,
+            complete = function(subarg_lead)
+                local regexes = {}
+                for _, pattern in pairs(require("candela.pattern_list").patterns) do
+                    table.insert(regexes, pattern.regex)
+                end
+                return vim.iter(regexes)
+                    :filter(function(regex)
+                        return regex:find(subarg_lead) ~= nil
+                    end)
+                    :totable()
             end,
         },
         copy = {
-            impl = function()
-                CandelaUi.copy()
+            ---@param subargs table<string, string>: index_or_regex, new_regex
+            impl = function(subargs)
+                if #subargs ~= 2 then
+                    vim.notify(
+                        "[Candela] invalid number of arguments.\n"
+                            .. "Usage:\n"
+                            .. "   Candela copy <index: integer | regex: string> <new_regex: string>",
+                        vim.log.levels.ERROR
+                    )
+                    return
+                end
+
+                local pattern = nil
+                if tonumber(subargs[1]) ~= nil then
+                    subargs[1] = tonumber(subargs[1])
+                    _, pattern = CandelaPatternList.get_id_and_pattern_by_index(subargs[1])
+                else
+                    _, pattern = CandelaPatternList.get_id_and_pattern_by_regex(subargs[1])
+                end
+                if pattern == nil then
+                    return
+                end
+                CandelaPatternList.add(subargs[2], pattern.color, pattern.highlight, pattern.lightbox)
+            end,
+            complete = function(subarg_lead)
+                local regexes = {}
+                for _, pattern in pairs(require("candela.pattern_list").patterns) do
+                    table.insert(regexes, pattern.regex)
+                end
+                return vim.iter(regexes)
+                    :filter(function(regex)
+                        return regex:find(subarg_lead) ~= nil
+                    end)
+                    :totable()
             end,
         },
         delete = {
-            impl = function()
-                local ask = opts.matching.delete_confirmation
-                CandelaUi.delete(ask)
+            ---@param subargs table<string, ...>: index, indices...
+            impl = function(subargs)
+                if #subargs == 0 then
+                    vim.notify(
+                        "[Candela] invalid number of arguments.\n"
+                            .. "Usage:\n"
+                            .. "   Candela delete <index: integer> [indices: integer]...",
+                        vim.log.levels.ERROR
+                    )
+                    return
+                end
+
+                local to_delete = {}
+                for _, index in ipairs(subargs) do
+                    if tonumber(index) ~= nil then
+                        table.insert(to_delete, tonumber(index))
+                    else
+                        vim.notify(
+                            "[Candela] invalid argument(s).\n"
+                                .. "Usage:\n"
+                                .. "   Candela delete <index: integer> [indices: integer]...",
+                            vim.log.levels.ERROR
+                        )
+                        return
+                    end
+                end
+                table.sort(to_delete, function(a, b)
+                    return a > b
+                end)
+                for _, index in ipairs(to_delete) do
+                    CandelaPatternList.delete(index)
+                end
+            end,
+            complete = function(subarg_lead)
+                local indices = {}
+                for i, _ in pairs(require("candela.pattern_list").order) do
+                    table.insert(indices, tostring(i))
+                end
+                return vim.iter(indices)
+                    :filter(function(regex)
+                        return regex:find(subarg_lead) ~= nil
+                    end)
+                    :totable()
             end,
         },
         clear = {
-            impl = function()
-                local ask = opts.matching.clear_confirmation
-                CandelaUi.clear(ask)
+            impl = function(subargs)
+                if #subargs > 0 then
+                    vim.notify(
+                        "[Candela] invalid number of arguments.\n"
+                            .. "Usage:\n"
+                            .. "   Candela clear",
+                        vim.log.levels.ERROR
+                    )
+                    return
+                end
+                CandelaPatternList.clear()
             end,
         },
         refresh = {
@@ -38,22 +165,101 @@ function M.setup(opts)
             end,
         },
         change_color = {
-            impl = function()
-                CandelaUi.change_color()
+            ---@param subargs table<string, string>: index_or_regex, new_color
+            impl = function(subargs)
+                if #subargs ~= 2 then
+                    vim.notify(
+                        "[Candela] invalid number of arguments.\n"
+                            .. "Usage:\n"
+                            .. "   Candela change_color <index: integer | regex: string> <new_color: string>",
+                        vim.log.levels.ERROR
+                    )
+                    return
+                end
+
+                if tonumber(subargs[1]) ~= nil then
+                    subargs[1] = tonumber(subargs[1])
+                end
+                CandelaPatternList.change_color(unpack(subargs))
+            end,
+            complete = function(subarg_lead)
+                local regexes = {}
+                for _, pattern in pairs(require("candela.pattern_list").patterns) do
+                    table.insert(regexes, pattern.regex)
+                end
+                return vim.iter(regexes)
+                    :filter(function(regex)
+                        return regex:find(subarg_lead) ~= nil
+                    end)
+                    :totable()
             end,
         },
         toggle_highlight = {
-            impl = function()
-                CandelaUi.toggle_highlight()
+            ---@param subargs table<string, string>: index_or_regex
+            impl = function(subargs)
+                if #subargs ~= 1 then
+                    vim.notify(
+                        "[Candela] invalid number of arguments.\n"
+                            .. "Usage:\n"
+                            .. "   Candela toggle_highlight <index: integer | regex: string>",
+                        vim.log.levels.ERROR
+                    )
+                    return
+                end
+
+                if tonumber(subargs[1]) ~= nil then
+                    subargs[1] = tonumber(subargs[1])
+                end
+                CandelaPatternList.toggle_highlight(subargs[1])
+            end,
+            complete = function(subarg_lead)
+                local regexes = {}
+                for _, pattern in pairs(require("candela.pattern_list").patterns) do
+                    table.insert(regexes, pattern.regex)
+                end
+                return vim.iter(regexes)
+                    :filter(function(regex)
+                        return regex:find(subarg_lead) ~= nil
+                    end)
+                    :totable()
             end,
         },
         toggle_lightbox = {
-            impl = function()
-                CandelaUi.toggle_lightbox()
+            ---@param subargs table<string, string>: index_or_regex
+            impl = function(subargs)
+                if #subargs ~= 1 then
+                    vim.notify(
+                        "[Candela] invalid number of arguments.\n"
+                            .. "Usage:\n"
+                            .. "   Candela toggle_lightbox <index: integer | regex: string>",
+                        vim.log.levels.ERROR
+                    )
+                    return
+                end
+
+                if tonumber(subargs[1]) ~= nil then
+                    subargs[1] = tonumber(subargs[1])
+                end
+                CandelaPatternList.toggle_lightbox(subargs[1])
+            end,
+            complete = function(subarg_lead)
+                local regexes = {}
+                for _, pattern in pairs(require("candela.pattern_list").patterns) do
+                    table.insert(regexes, pattern.regex)
+                end
+                return vim.iter(regexes)
+                    :filter(function(regex)
+                        return regex:find(subarg_lead) ~= nil
+                    end)
+                    :totable()
             end,
         },
         match = {
             impl = function(subargs)
+                if #require("candela.pattern_list").order == 0 then
+                    vim.notify("[Candela] no existing patterns", vim.log.levels.WARN)
+                    return
+                end
                 require("candela.finder").match(subargs)
             end,
             complete = function(subarg_lead)
@@ -70,15 +276,24 @@ function M.setup(opts)
         },
         match_all = {
             impl = function()
+                if #require("candela.pattern_list").order == 0 then
+                    vim.notify("[Candela] no existing patterns", vim.log.levels.WARN)
+                    return
+                end
                 require("candela.finder").match({})
             end,
         },
         find = {
             impl = function(subargs)
+                if #require("candela.pattern_list").order == 0 then
+                    vim.notify("[Candela] no existing patterns", vim.log.levels.WARN)
+                    return
+                end
+
                 local success = require("candela.finder").find(subargs)
                 if success then
-                    vim.api.nvim_cmd({ cmd = "lnext", }, {})
-                    vim.api.nvim_cmd({ cmd = "lopen", }, {})
+                    vim.api.nvim_cmd({ cmd = "lnext" }, {})
+                    vim.api.nvim_cmd({ cmd = "lopen" }, {})
                 end
             end,
             complete = function(subarg_lead)
@@ -95,6 +310,11 @@ function M.setup(opts)
         },
         find_all = {
             impl = function()
+                if #require("candela.pattern_list").order == 0 then
+                    vim.notify("[Candela] no existing patterns", vim.log.levels.WARN)
+                    return
+                end
+
                 local success = require("candela.finder").find({})
                 if success then
                     vim.api.nvim_cmd({ cmd = "lnext" }, {})
@@ -146,7 +366,6 @@ function M.setup(opts)
         },
         help = {
             impl = function()
-                vim.notify("[Candela] help subcommand not implemented yet", vim.log.levels.WARN)
                 CandelaUi.help()
             end,
         },
