@@ -988,7 +988,8 @@ function M.export()
 end
 
 function M.help()
-    vim.notify("[Candela] help subcommand not implemented yet", vim.log.levels.WARN)
+    local help = require("candela.mappings").help
+    help.win = vim.api.nvim_open_win(help.buf, true, help.config)
 end
 
 function M.hide_patterns()
