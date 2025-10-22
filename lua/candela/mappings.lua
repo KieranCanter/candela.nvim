@@ -4,7 +4,7 @@ local CandelaCommands = require("candela.commands")
 M = {}
 M.help = { buf = nil, win = nil, config = nil }
 
-local CANDELA_AUGROUP = require("candela").CANDELA_AUGROUP
+local CANDELA_AUGROUP = require("candela.init").CANDELA_AUGROUP
 
 ---@param keymap_info table
 local function build_help_buf(keymap_info)
@@ -256,7 +256,7 @@ function M.set_patterns_keymaps()
             end,
         },
         {
-            lhs = "<Plug>CandelaAddPattern",
+            lhs = "<Plug>CandelaAdd",
             desc = "[Candela] add pattern in UI",
             callback = function()
                 CandelaUi.add()
@@ -299,7 +299,7 @@ function M.set_patterns_keymaps()
         },
         {
             lhs = "<Plug>CandelaHelp",
-            desc = "[Candela] open help menu",
+            desc = "[Candela] open UI keymaps menu",
             callback = function()
                 CandelaCommands.commands.help.impl()
             end,

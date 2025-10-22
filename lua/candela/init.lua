@@ -32,7 +32,7 @@ local function init()
         bang = true,
     })
 
-    require("candela.commands").setup(M.config)
+    require("candela.commands").setup()
     require("candela.ui").setup(M.config)
     require("candela.finder").setup(M.config)
     require("candela.pattern_list").setup(M.config)

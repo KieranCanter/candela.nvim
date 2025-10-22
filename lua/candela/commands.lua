@@ -9,7 +9,7 @@ local function string2bool(val)
     return nil
 end
 
-function M.setup(opts)
+function M.setup()
     local CandelaUi = require("candela.ui")
     local CandelaPatternList = require("candela.pattern_list")
 

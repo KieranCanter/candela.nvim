@@ -1,0 +1,369 @@
+*candela.txt*                 Regex Highlighter
+*candela* *candela.nvim*
+
+====================================================================================================
+CONTENTS                                                    *candela-contents*
+
+    1. Introduction                                     |candela-introduction|
+    2. Requirements                                     |candela-requirements|
+    3. Installation                                     |candela-installation|
+    4. Configuration                                   |candela-configuration|
+        - Defaults                               |candela-config-defaults|
+        - Options                                 |candela-config-options|
+        - Window                              |candela-config-window|
+        - Engine                              |candela-config-engine|
+        - Matching                          |candela-config-matching|
+        - Lightbox                          |candela-config-lightbox|
+        - Icons                                |candela-config-icons|
+        - Palette                            |candela-config-palette|
+            - Colors                      |candela-config-colors|
+            - Swatches                  |candela-config-swatches|
+        - Syntax Highlighting    |candela-config-syntax-highlighting|
+    5. Keymaps                                               |candela-keymaps|
+    6. Commands                                             |candela-commands|
+    7. API                                                       |candela-api|
+    8. Lightbox                                             |candela-lightbox|
+    9. IO                                                         |candela-io|
+    10. Acknowledgements                            |candela-acknowledgements|
+
+====================================================================================================
+INTRODUCTION                                            *candela-introduction*
+
+regex highlighter. designed for efficient log analysis.
+
+====================================================================================================
+REQUIREMENTS                                            *candela-requirements*
+
+- Regex search tool (ripgrep, ag, ugrep, ack, grep).
+
+That's it.
+
+====================================================================================================
+INSTALLATION                                            *candela-installation*
+
+You probably know how to use your preferred package manager. The GitHub repo
+is `KieranCanter/candela.nvim`. The `lazy.nvim` snippet is: >
+
+    {
+        "KieranCanter/candela.nvim",
+        opts = {},
+    }
+
+====================================================================================================
+CONFIGURATION                                          *candela-configuration*
+
+There's a fair bit of configurable options with Candela, but none of them are
+necessary to explicitly set; the defaults are reasonable imo.
+
+                                                 *candela-config-defaults*
+Defaults ~
+>lua
+    local defaults = {
+        window = {
+            width = 0.5,
+            min_height = 5,
+            max_height = 30,
+            margin = 16,
+            min_count_width = 4,
+            toggle_width = 6,
+            prompt_offset = "overlap",
+        },
+        engine = {
+            command = nil,
+            args = {},
+        },
+        matching = {
+            auto_refresh = false,
+            delete_confirmation = true,
+            clear_confirmation = true,
+            case = "system",
+            hl_eol = false,
+        },
+        lightbox = {
+            view = "system-vsplit",
+            fold_style = "nvim",
+            fillchar = "-",
+            custom_foldtext = nil,
+        },
+        icons = vim.g.have_nerd_font
+                and {
+                    candela = "\u{f05e2}", -- 󰗢
+                    color = "\u{e22b}", -- 
+                    regex = "\u{f069}", -- 
+                    highlight = {
+                        header = "\u{ea61}", -- 
+                        toggle_on = "\u{f1a25}", -- 󱨥
+                        toggle_off = "\u{f1a26}", -- 󱨦
+                    },
+                    lightbox = {
+                        header = "\u{e68f}", -- 
+                        toggle_on = "\u{f1a25}", -- 󱨥
+                        toggle_off = "\u{f1a26}", -- 󱨦
+                    },
+                }
+            or {
+                candela = "\u{1F56F}", -- 🕯
+                color = "\u{1F3A8}", -- 🎨
+                regex = "\u{2728}", -- ✨
+                highlight = {
+                    header = "\u{1F4A1}", -- 💡
+                    toggle_on = "\u{25C9}", -- ◉
+                    toggle_off = "\u{25CB}", -- ○
+                },
+                lightbox = {
+                    header = "\u{1F50D}", -- 🔍
+                    toggle_on = "\u{25C9}", -- ◉
+                    toggle_off = "\u{25CB}", -- ○
+                },
+            },
+        palette = {
+            use = "replace",
+            cycle = "constant",
+            colors = {
+                dark = {
+                    "#9D4564", -- DARK MAUVE
+                    "#A1464C", -- LIGHT MAROON
+                    "#9E4D21", -- SIENNA
+                    "#935800", -- MUD
+                    "#7F6400", -- MUSTARD
+                    "#6C6C00", -- MOSS
+                    "#4C7522", -- LEAF GREEN
+                    "#257A3F", -- JEWEL GREEN
+                    "#007C6A", -- AQUAMARINE
+                    "#007690", -- OCEAN
+                    "#3368AB", -- MUTED BLUE
+                    "#565FAC", -- DUSKY BLUE
+                    "#7156A3", -- DARK LAVENDER
+                    "#805098", -- EGGPLANT
+                    "#94487C", -- ROUGE
+                },
+                light = {
+                    "#F08FAE", -- PINK SHERBET
+                    "#F49093", -- SEA PINK
+                    "#F0986D", -- TANGERINE
+                    "#E2A25D", -- DESERT
+                    "#CBAE5E", -- GOLD
+                    "#B6B75F", -- OLIVE
+                    "#94C16F", -- PISTACHIO
+                    "#75C787", -- MANTIS
+                    "#65C5B1", -- NEPTUNE
+                    "#64BFDB", -- BLUISH CYAN
+                    "#7CB4FD", -- CRYSTAL BLUE
+                    "#9DAAFE", -- PERIWINKLE
+                    "#BBA0F3", -- LILAC
+                    "#CD9AE7", -- BABY PURPLE
+                    "#E592C8", -- LIGHT ORCHID
+                },
+            },
+            swatches = {
+                dark = {
+                    GRAY = "#676767",
+                    RED = "#A1454F",
+                    BLUE = "#016DA6",
+                    YELLOW = "#7B6600",
+                    GREEN = "#2A793C",
+                    ORANGE = "#9A510B",
+                    PURPLE = "#7055A3",
+                },
+                light = {
+                    GRAY = "#B1B1B1",
+                    RED = "#F59282",
+                    BLUE = "#3BC3E5",
+                    YELLOW = "#C6B14D",
+                    GREEN = "#82C57C",
+                    ORANGE = "#EC9C60",
+                    PURPLE = "#AAA5FB",
+                },
+            },
+        },
+        syntax_highlighting = {
+            enabled = true,
+            file_types = { ".log", "text" },
+        },
+    }
+<
+                                                  *candela-config-options*
+Options ~
+
+                                               *candela-config-window*
+{window}
+
+• {width} `number` (0 < n < 1):
+        Initial width of the patterns window as a percentage of your entire
+        Neovim window width.
+• {min_height} `integer` (1 <= n):
+        Minimum height (number of patterns) for the patterns window (initial
+        height).
+• {max_height} `integer` (1 <= n):
+        Maximum height (number of patterns) for the patterns window.
+• {margin} `integer` (0 <= n):
+        Margin space between window and Neovim bounds when Neovim is too small
+        to fit the window.
+• {min_count_width} `integer` (1 <= n):
+        Minimum width to allocate to the "count" column.
+• {toggle_width} `integer` (1 <= n):
+        Width of the (highlight and lightbox) toggle columns.
+• {prompt_offset} `"overlap"` | `"border"`:
+        Position of the prompt window in relation to patterns window.
+
+                                               *candela-config-engine*
+{engine}
+
+• {command} `nil` | `"rg"` | `"ag"` | `"ugrep"` | `"ack"` | `"grep"`:
+        Regex search engine to use for Candela. When set to `nil`, defaults to
+        the first tool found in the list (in order).
+• {args} `string[]`:
+        Extra args to pass to the search engine; refer to your tool's
+        documentaion. Defaults to flags that display line numbers and remove
+        color (exact flags depend on engine used).
+
+                                             *candela-config-matching*
+{matching}
+
+• {auto_refresh} `true` | `false`:
+        Automatically refresh pattern matching/highlighting on buffer change.
+• {delete_confirmation} `true` | `false`:
+        Require user confirmation upon deleting a pattern.
+• {clear_confirmation} `true` | `false`:
+        Require user confirmation upon clearing all patterns.
+• {case} `"system"` | `"sensitive"` | `"ignore"` | `"smart"`
+        Case-sensitivity to use when searching. When set to `"system"` it will
+        sync with your Neovim 'ignorecase' and 'smartcase' options.
+• {hl_eol} `true` | `false`:
+        Highlight entire line (end of line) or only until the last character
+        of a line.
+
+                                             *candela-config-lightbox*
+{lightbox}
+
+• {view} `"tab"` | `"system-split"` | `"system-vsplit"` | 
+         `"split-left"` | `"split-right"` | `"split-above"` | `"split-below"`:
+        Method of breaking out into the Lightbox window. Set to `"system-split"`
+        or `"system-vsplit"` to sync with your Neovim 'splitbelow' or
+        'splitright' option, respectively.
+• {fold_style} `"fillchar"` | `"count"` | `"preview"` | `"detailed"` |
+               `"nvim"`:
+        Style to format the foldtext (see |foldtext|):
+        • `"fillchar"`: display only the fillchar for the entire line.
+        • `"count"`: display the number of folded lines in the form "# lines".
+        • `"preview"`: display the beginning of the first folded line.
+        • `"detailed"`: display the count and preview together.
+        • `"nvim"`: display Neovim's default foldtext.
+• {fillchar} `string`:
+        Fillchar to use for the foldtext (see |fillchar|).
+• {custom_foldtext} `function`:
+        Custom foldtext function. If not `nil` and a valid function, it will
+        override {fold_style}.
+
+                                                *candela-config-icons*
+{icons}
+If the user is using a nerd font, Candela will use nerd font symbols as the
+default icons. Otherwise, Candela will default to unicode emojis.
+
+• {candela} `string`:
+        Title of UI.
+• {color} `string`:
+        Header of Color column.
+• {regex} `string`:
+        Header of Regex column.
+• {highlight} `table`:
+        • {header} `string`:
+                Header of Highlight column.
+        • {toggle_on} `string`:
+                Highlight's on toggle.
+        • {toggle_off} `string`:
+                Highlight's off toggle.
+• {lightbox} `table`:
+        • {header} `string`:
+                Header of Lightbox column.
+        • {toggle_on} `string`:
+                Lightbox's on toggle.
+        • {toggle_off} `string`:
+                Lightbox's off toggle.
+
+                                              *candela-config-palette*
+{palette}
+NOTE: Candela currently only supports hex code format for colors, but taking
+ccc.nvim as an optional dependency is planned for the future to expand support
+for various other color spaces like RGB, HSL, LCH, OKLCH, etc.
+
+• {use} `"replace"` | `"prepend"` | `"append"`:
+        Choose whether to replace the entire default color palette with your
+        own {colors}, or just add to it. The difference between `"prepend"`
+        and `"append"` only matters if {cycle} isn't `"random"`.
+• {cycle} `"constant"` | `"random":
+        Method of selecting the next color in your palette.
+• {colors} `table`:                          *candela-config-colors*
+        The colors defined here will be used by Candela when automatically
+        assigning a color to a new regex pattern. Colors are case-insensitive
+        but must be valid hex codes. The mode is determined by your Neovim
+        'background' option.
+        • {dark} `string[]`:
+                List of colors to use for dark mode.
+        • {light} `string[]`:
+                List of colors to use for light mode.
+• {swatches} `table`:                      *candela-config-swatches*
+        The strings defined here may be used as subtitutes for their hex code
+        equivalents when changing the color of a regex pattern. Swatches are
+        case-insensitive. Colors are case-insensitive but must be valid hex
+        codes. The mode is determined by your Neovim 'background' option.
+        • {dark} `table<string, string>`:
+                Table of swatches to their corresponding hex code.
+        • {light} `table<string, string>`:
+                Table of swatches to their corresponding hex code.
+
+                                  *candela-config-syntax-highlighting*
+{syntax_highlight}
+
+• {enabled} `true` | `false`:
+        Enable or disable syntax highlighting.
+• {file_types} `string[]`:
+        List of file types (e.g. "text" or "rust") and file extensions (e.g.
+        ".log" or ".evt") that syntax highlighting should be activated for.
+
+====================================================================================================
+KEYMAPS                                                      *candela-keymaps*
+
+Candela pre-defines some useful keymaps with <Plug> that you can hook into
+to apply to your own keymap (see |<Plug>|). The |{rhs}| values are displayed
+below along with their corresponding Candela functions:
+
+`<Plug>CandelaUI`: `require("candela.ui").toggle()`
+    Toggle UI window.
+`<Plug>CandelaAdd`: `require("candela.ui").add()`
+    Add pattern in UI.
+`<Plug>CandelaRefresh`: `require("candela.commands").commands.refresh.impl()`
+    Refresh patterns in current buffer.
+`<Plug>CandelaClear`: `require("candela.commands").commands.clear.impl()`
+    Clear all patterns.
+`<Plug>CandelaMatchAll`: `require("candela.commands").commands.match_all.impl()`
+    Vim match all patterns.
+`<Plug>CandelaFindAll`: `require("candela.commands").commands.find_all.impl()`
+    Find all patterns and send to location list.
+`<Plug>CandelaLightbox`: `require("candela.commands").commands.lightbox.impl()`
+    Toggle lightbox window.
+`<Plug>CandelaHelp`: `require("candela.commands").commands.help.impl()`
+    Open UI keymaps menu.
+
+In addition to these presets, you can use any Candela user commands or API
+functions to create your own efficient keymap such as instantly importing
+patterns from a saved file or editing the last added pattern in the UI (see
+|candela-commands| and |candela-api|).
+
+====================================================================================================
+COMMANDS                                                    *candela-commands*
+
+
+====================================================================================================
+API                                                              *candela-api*
+
+====================================================================================================
+LIGHTBOX                                                    *candela-lightbox*
+
+====================================================================================================
+IO                                                                *candela-io*
+
+====================================================================================================
+ACKNOWLEDGEMENTS                                    *candela-acknowledgements*
+
+vim:tw=78:ts=8:et:ft=help:norl:

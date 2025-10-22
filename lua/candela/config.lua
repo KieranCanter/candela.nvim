@@ -8,87 +8,65 @@ M.version = {}
 
 M.defaults = {
     window = {
-        -- initial width of the patterns window as percentage of Neovim window width
-        width = 0.5, -- number
-        -- minimum height (number of patterns) of the patterns window (initial height)
-        min_height = 5, -- unsigned integer
-        -- maximum height (number of patterns) of the patterns window
-        max_height = 30, -- unsigned integer
-        -- margin space between window and Neovim bounds when Neovim is too small to fit the window
-        margin = 16, -- unsigned integer
-        -- minimum width to allocate to the "count" column
-        min_count_width = 4, -- unsigned integer
-        -- width of the toggle columns
-        toggle_width = 6, -- unsigned integer
-        -- position of prompt window in relation to patterns window
-        prompt_offset = "overlap", -- "overlap" | "border"
+        width = 0.5,
+        min_height = 5,
+        max_height = 30,
+        margin = 16,
+        min_count_width = 4,
+        toggle_width = 6,
+        prompt_offset = "overlap",
     },
     engine = {
-        -- regex search engine to use; defaults to first found tool out of the list in order
-        command = nil, -- "rg" | "ag" | "ugrep" | "ack" | "grep"
-        -- extra args to pass to search engine; refer to your tool's manual
-        -- every regex search will be run with a flag to include line numbers and set color off
-        args = {}, -- defaults to flags that display line numbers and remove color (flags depend on tool above)
+        command = nil,
+        args = {},
     },
     matching = {
-        -- automatically refresh pattern matching/highlighting on buffer change
-        auto_refresh = false, -- true | false
-        -- require user confirmation upon deleting a pattern
-        delete_confirmation = true, -- true | false
-        -- require user confirmation upon clearing all patterns
-        clear_confirmation = true, -- true | false
-        -- case-sensitive option for searching
-        case = "system", -- "sensitive" | "ignore" | "smart" | "system"
-        -- highlight entire line (end of line) or end of text
-        hl_eol = false, -- true | false
+        auto_refresh = false,
+        delete_confirmation = true,
+        clear_confirmation = true,
+        case = "system",
+        hl_eol = false,
     },
     lightbox = {
-        -- how you want the lightbox window to break out
-        view = "system-vsplit", -- "tab" | "system-split" | "system-vsplit" | "split-left" | "split-right" | "split-above" | "split-below"
-        -- style to format the foldtext
-        fold_style = "count", -- "fillchar" | "count" | "preview" | "detailed" | "nvim"
-        -- fillchar for the foldtext
+        view = "system-vsplit",
+        fold_style = "nvim",
         fillchar = "-",
-        -- custom foldtext function, if not nil and a valid function, will override fold_style
-        custom_foldtext = nil, -- function()
+        custom_foldtext = nil,
     },
-    icons = vim.g.have_nerd_font -- Uses nerd font icons if nerd font is installed
+    icons = vim.g.have_nerd_font
             and {
-                candela = "\u{f05e2}", -- patterns window title 󰗢
-                color = "\u{e22b}", -- color header 
-                regex = "\u{f069}", -- regex header 
+                candela = "\u{f05e2}", -- 󰗢
+                color = "\u{e22b}", -- 
+                regex = "\u{f069}", -- 
                 highlight = {
-                    header = "\u{ea61}", -- highlight header 
-                    toggle_on = "\u{f1a25}", -- highlight toggle on 󱨥
-                    toggle_off = "\u{f1a26}", -- highlight toggle off 󱨦
+                    header = "\u{ea61}", -- 
+                    toggle_on = "\u{f1a25}", -- 󱨥
+                    toggle_off = "\u{f1a26}", -- 󱨦
                 },
                 lightbox = {
-                    header = "\u{e68f}", -- lightbox header 
-                    toggle_on = "\u{f1a25}", -- highlight toggle on 󱨥
-                    toggle_off = "\u{f1a26}", -- highlight toggle off 󱨦
+                    header = "\u{e68f}", -- 
+                    toggle_on = "\u{f1a25}", -- 󱨥
+                    toggle_off = "\u{f1a26}", -- 󱨦
                 },
             }
-        or { -- If no nerd font, uses unicode emojis
-            candela = "\u{1F56F}", -- patterns window title 🕯
-            color = "\u{1F3A8}", -- color header 🎨
-            regex = "\u{2728}", -- regex header ✨
+        or {
+            candela = "\u{1F56F}", -- 🕯
+            color = "\u{1F3A8}", -- 🎨
+            regex = "\u{2728}", -- ✨
             highlight = {
-                header = "\u{1F4A1}", -- highlight header 💡
-                toggle_on = "\u{25C9}", -- highlight toggle on ◉
-                toggle_off = "\u{25CB}", -- highlight toggle off ○
+                header = "\u{1F4A1}", -- 💡
+                toggle_on = "\u{25C9}", -- ◉
+                toggle_off = "\u{25CB}", -- ○
             },
             lightbox = {
-                header = "\u{1F50D}", -- lightbox header 🔍
-                toggle_on = "\u{25C9}", -- highlight toggle on ◉
-                toggle_off = "\u{25CB}", -- highlight toggle off ○
+                header = "\u{1F50D}", -- 🔍
+                toggle_on = "\u{25C9}", -- ◉
+                toggle_off = "\u{25CB}", -- ○
             },
         },
     palette = {
-        -- replace default color palette or add to it
-        use = "replace", -- "replace" | "prepend" | "append"
-        -- method of selecting the next color
-        cycle = "constant", -- "constant" | "random"
-        -- list of colors to use for dark/light mode
+        use = "replace",
+        cycle = "constant",
         colors = {
             dark = {
                 "#9D4564", -- DARK MAUVE
@@ -146,11 +124,9 @@ M.defaults = {
             },
         },
     },
-    -- Candela syntax highlight
     syntax_highlighting = {
-        enabled = true, -- true | false
-        -- file extensions/types to activate syntax highlighting for
-        file_types = { ".log", "text" }, -- string
+        enabled = true,
+        file_types = { ".log", "text" },
     },
 }
 

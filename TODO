@@ -2,11 +2,30 @@ TODO (before release):
   WRITE DOCS
   Sections:
   * features
+    * regex management
+    * multiple configurable regex engine support
+    * UI
+    * lightbox
+    * colors
+      * palette
+      * swatches
+    * syntax highlighting
+    * cycling through matches
+      * match
+      * find
+    * saving/loading patterns
+      * import
+      * export
   * requirements
   * installation
   * config
   * keymaps
+  * user commands
   * api
+  * acknowledgements
+    * grug far
+    * snacks
+    * log-highlight
 
   * logo
 
