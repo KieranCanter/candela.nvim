@@ -324,9 +324,11 @@ for various other color spaces like RGB, HSL, LCH, OKLCH, etc.
 ====================================================================================================
 KEYMAPS                                                      *candela-keymaps*
 
-Candela pre-defines some useful keymaps with <Plug> that you can hook into
-to apply to your own keymap (see |<Plug>|). The |{rhs}| values are displayed
-below along with their corresponding Candela functions:
+Candela pre-defines some useful keymaps with <Plug> that you can hook into to
+apply to your own keymap (see |<Plug>|). I personally map my Candela keymaps
+to <leader>cd followed by another key for the specific function, but you can
+obviously choose whatever you want. The |{rhs}| values are displayed below
+along with their corresponding Candela functions:
 
 `<Plug>CandelaUI`: `require("candela.ui").toggle()`
     Toggle UI window.
@@ -353,9 +355,235 @@ patterns from a saved file or editing the last added pattern in the UI (see
 ====================================================================================================
 COMMANDS                                                    *candela-commands*
 
+There are a handful of user commands defined (accessible via CLI through the
+{:Candela} command or programmatically via
+`require("candela.commands").commands`) that you may find useful for assigning
+to keymaps or programmatically interacting with Candela. Each command has
+comprehensive completion that ensures the proper type of value(s) populate for
+the proper commands (e.g. `Candela import` will autocomplete with file paths
+and `Candela edit` will complete the first argument with your current list of
+regexes). See the subcommands below:
+
+{add}: add a pattern. Passing 0 arguments will open the UI with the "Add
+Regex" prompt. Passing 1-4 arguments will create a new pattern with the
+specified attributes without interacting with the UI.
+`:Candela add [regex: string] [color: string] [highlight: boolean] [lightbox: boolean]`
+
+{edit}: edit a pattern's regex to a different regex. Passing only 1 argument
+will open the UI with the "Edit Regex" prompt on the pattern at the specified
+index or matching the specified regex. Passing 2 arguments will change the
+regex of the specified pattern to the new regex.
+`:Candela edit <index: integer | regex: string> [new_regex: string]`
+
+{copy}: copy a pattern to an identical pattern with a different regex. Passing
+only 1 argument will open the UI with the "Copy Regex" prompt on the pattern
+at the specified index or matching the specified regex. Passing 2 arguments
+will add a new pattern with the same attributes as the specified pattern, but
+with the new regex.
+`:Candela copy <index: integer | regex: string> [new_regex: string]`
+
+{delete}: delete any number of patterns by index. Pass any number of indices
+to delete one or multiple patterns.
+`:Candela delete <index: integer> [indices: integer]...`
+
+{clear}: clear all patterns.
+`:Candela clear`
+
+{refresh}: refresh patterns matching/highlighting in current buffer.
+`:Candela refresh`
+
+{change_color}: change a pattern's color. Passing only 1 argument will open
+the UI with the "Change Color" prompt on the pattern at the specified index or
+matching the specified regex. Passing 2 arguments will change the color of the
+specified pattern to the new color.
+`:Candela change_color <index: integer | regex: string> [new_color: string]`
+
+{toggle_highlight}: toggle a pattern's highlight. Accepts exactly 1 argument
+containing the index or the regex of the target pattern.
+`:Candela toggle_highlight <index: integer | regex: string>`
+
+{toggle_lightbox}: toggle a pattern's lightbox. Accepts exactly 1 argument
+containing the index or the regex of the target pattern.
+`:Candela toggle_lightbox <index: integer | regex: string>`
+
+{match}: match any number of pattern regexes. Pass any number of regex strings
+from your patterns to Vim match them together.
+`:Candela match <regex: string> [more_regex: string]...`
+
+{match_all}: match all pattern regexes. Vim match all regex strings from your
+patterns at once.
+`:Candela match_all`
+
+{find}: find any number of pattern regexes and send to location list. Pass any
+number of regex strings from your patterns to send all lines containing the
+regex strings to your location list.
+`:Candela find <regex: string> [more_regex: string]...`
+
+{find_all}: find all pattern regexes and send to location list. Send every
+line containing any of your patterns' regex strings to a location list.
+`:Candela find_all`
+
+{lightbox}: toggle the lightbox window. Behavior depends on one of three
+cases:
+* Closed: open and focus the lightbox window
+* Open and unfocused: focus the lightbox window
+* Open and focused: close the lightbox window
+`:Candela lightbox`
+
+{import}: import patterns from a '.lua' file.
+`:Candela import <path/to/import_file.lua>`
+
+{export}: export patterns to a '.lua' file.
+`:Candela export <path/to/export_file.lua>`
+
+{help}: display UI keymaps.
+`:Candela help`
+
+{health}: perform a |:checkhealth| on Candela.
+`:Candela health`
 
 ====================================================================================================
 API                                                              *candela-api*
+The following API definitions will assume you have brought Candela into scope
+with `local candela = require("candela")`.
+                                                              *candela-api-ui*
+UI ~
+The UI methods can be used when wanting to program some action concerning the
+UI and can be accessed through `candela.ui`. The `copy()`, `edit()`, and
+`change_color()` methods expect the user to be in the UI at the time of method
+call. The corresponding CLI commands do this for when called with a single
+{index} or {regex} argument, but if you'd like to directly implement one of
+these three, make sure you call `show_patterns()` first.
+
+get({lang}, {query_name})                         *vim.treesitter.query.get()*
+    Returns the runtime query {query_name} for {lang}.
+
+    Parameters: ~
+      • {lang}        (`string`) Language to use for the query
+      • {query_name}  (`string`) Name of the query (e.g. "highlights")
+
+    Return: ~
+        (`vim.treesitter.Query?`) Parsed query. `nil` if no query files are
+        found. See |vim.treesitter.Query|.
+show_patterns()                                   *candela.ui.show_patterns()*
+
+hide_patterns()                                   *candela.ui.hide_patterns()*
+
+hide_prompt()                                       *candela.ui.hide_prompt()*
+
+toggle()                                                 *candela.ui.toggle()*
+
+toggle_select_pattern()                   *candela.ui.toggle_select_pattern()*
+
+add()                                                       *candela.ui.add()*
+
+edit({index_or_regex})                                     *candela.ui.edit()*
+
+    Parameters: ~
+      • {index_or_regex}  (`string`) Language to use for the query
+
+copy({index_or_regex})                                     *candela.ui.copy()*
+
+    Parameters: ~
+      • {index_or_regex}  (`string`) Language to use for the query
+
+delete({ask})                                            *candela.ui.delete()*
+
+    Parameters: ~
+      • {ask}  (`string`) Language to use for the query
+
+clear({ask})                                              *candela.ui.clear()*
+
+    Parameters: ~
+      • {ask}  (`string`) Language to use for the query
+
+refresh({force}, {keep_base_buffer})                    *candela.ui.refresh()*
+
+    Parameters: ~
+      • {force}             (`string`) Language to use for the query
+      • {keep_base_buffer}  (`string`) Name of the query (e.g. "highlights")
+
+change_color({index_or_regex})                     *candela.ui.change_color()*
+
+    Parameters: ~
+      • {index_or_regex}  (`string`) Language to use for the query
+
+toggle_highlight()                             *candela.ui.toggle_highlight()*
+
+toggle_lightbox()                               *candela.ui.toggle_lightbox()*
+
+locate({all}, {command})                                 *candela.ui.locate()*
+
+    Parameters: ~
+      • {all}      (`string`) Language to use for the query
+      • {command}  (`string`) Name of the query (e.g. "highlights")
+
+import()                                                 *candela.ui.import()*
+
+export()                                                 *candela.ui.export()*
+
+help()                                                     *candela.ui.help()*
+
+                                                        *candela-api-patterns*
+Patterns ~
+The Patterns methods are used for directly modifying the state of Candela's
+patterns and can be accessed through `candela.patterns`. These methods
+completely disconnect the user from the UI; however, they still maintain the
+UI's state with the state of the patterns data, ensuring synchronicity between
+the two so you will never modify your patterns data without seeing it
+represented in the UI.
+
+add({regex}, {color}, {highlight}, {lightbox})        *candela.patterns.add()*
+
+    Parameters: ~
+      • {regex}      (`string`) Language to use for the query
+      • {color}      (`string`) Name of the query (e.g. "highlights")
+      • {highlight}  (`string`) Name of the query (e.g. "highlights")
+      • {lightbox}   (`string`) Name of the query (e.g. "highlights")
+
+edit({index_or_regex}, {new_regex})                  *candela.patterns.edit()*
+
+    Parameters: ~
+      • {index_or_regex}  (`string`) Language to use for the query
+      • {new_regex}       (`string`) Name of the query (e.g. "highlights")
+
+delete({index_or_regex})                           *candela.patterns.delete()*
+
+    Parameters: ~
+      • {index_or_regex}  (`string`) Language to use for the query
+
+    Return: ~
+        (`bool`) Boolean `true` on success, `false` if the item was not
+        deleted for whatever reason.
+
+clear()                                             *candela.patterns.clear()*
+
+    Return: ~
+        (`bool`) Boolean `true` on success, `false` if the item was not
+        deleted for whatever reason.
+
+change_color({index_or_regex}, {new_color})  *candela.patterns.change_color()*
+
+    Parameters: ~
+      • {index_or_regex}  (`string`) Language to use for the query
+      • {new_color}       (`string`) Name of the query (e.g. "highlights")
+
+toggle_highlight({index_or_regex})       *candela.patterns.toggle_highlight()*
+
+    Parameters: ~
+      • {index_or_regex}  (`string`) Language to use for the query
+
+    Return: ~
+        (`bool`) New state of the highlight toggle (on or off).
+
+toggle_lightbox({index_or_regex})         *candela.patterns.toggle_lightbox()*
+
+    Parameters: ~
+      • {index_or_regex}  (`string`) Language to use for the query
+
+    Return: ~
+        (`bool`) New state of the lightbox toggle (on or off).
+
 
 ====================================================================================================
 LIGHTBOX                                                    *candela-lightbox*
