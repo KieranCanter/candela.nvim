@@ -260,37 +260,41 @@ See the "candela-api" section in the vimdoc `doc/candela.txt` for more details o
 The following definitions will assume you have brought Candela into scope with `local candela =
 require("candela")`.
 
-| **`candela.ui.<function>`**                          |
-|------------------------------------------------------|
-| `show_patterns()`                                    |
-| `hide_patterns()`                                    |
-| `hide_prompt()`                                      |
-| `toggle()`                                           |
-| `toggle_select_pattern({index_or_regex})`            |
-| `locate()`                                           |
-| `add()`                                              |
-| `edit()`                                             |
-| `copy()`                                             |
-| `delete({ask})`                                      |
-| `clear({ask})`                                       |
-| `refresh({force?}, {keep_base_buffer?})`             |
-| `change_color()`                                     |
-| `toggle_highlight()`                                 |
-| `toggle_lightbox()`                                  |
-| `locate({all}, {command})`                           |
-| `import()`                                           |
-| `export()`                                           |
-| `help()`                                             |
+#### `candela.ui.<function>`
 
-| **`candela.patterns.<function>`**                    |
-|------------------------------------------------------|
-| `add({regex}, {color?}, {highlight?}, {lightbox?})`  |
-| `edit({index_or_regex}, {new_regex})`                |
-| `delete({index_or_regex})`                           |
-| `clear()`                                            |
-| `change_color({index_or_regex}, {new_color})`        |
-| `toggle_highlight({index_or_regex})`                 |
-| `toggle_lightbox({index_or_regex})`                  |
+```Lua
+candela.ui.show_patterns()
+candela.ui.hide_patterns()
+candela.ui.hide_prompt()
+candela.ui.toggle()
+candela.ui.toggle_select_pattern({index_or_regex})
+candela.ui.locate()
+candela.ui.add()
+candela.ui.edit()
+candela.ui.copy()
+candela.ui.delete({ask})
+candela.ui.clear({ask})
+candela.ui.refresh({force?}, {keep_base_buffer?})
+candela.ui.change_color()
+candela.ui.toggle_highlight()
+candela.ui.toggle_lightbox()
+candela.ui.locate({all}, {command})
+candela.ui.import()
+candela.ui.export()
+candela.ui.help()
+```
+
+#### `candela.patterns.<function>`
+
+```Lua
+candela.patterns.add({regex}, {color?}, {highlight?}, {lightbox?})
+candela.patterns.edit({index_or_regex}, {new_regex})
+candela.patterns.delete({index_or_regex})
+candela.patterns.clear()
+candela.patterns.change_color({index_or_regex}, {new_color})
+candela.patterns.toggle_highlight({index_or_regex})
+candela.patterns.toggle_lightbox({index_or_regex})
+```
 
 ## features
 
