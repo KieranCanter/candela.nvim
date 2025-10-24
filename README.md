@@ -29,8 +29,8 @@ is `KieranCanter/candela.nvim`. The `lazy.nvim` snippet is:
 
 ## config
 
-See the "candela-config" section in the vimdoc `doc/candela.txt` for more info on what each option
-is used for and valid values. I will leave you with the defaults here:
+See the "candela-config-options" section in the vimdoc `doc/candela.txt` for more info on what each
+option is used for and valid values. I will leave you with the defaults here:
 
 ```Lua
 local defaults = {
