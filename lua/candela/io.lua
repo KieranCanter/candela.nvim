@@ -31,7 +31,7 @@ local function unique_path(path)
     return new_path
 end
 
-function M.import_patterns(path)
+function M.import(path)
     if not path:match("%.lua$") then
         vim.notify(
             string.format("[Candela] path must be a `.lua` file to be imported, got: `%s`", path),
@@ -52,7 +52,7 @@ function M.import_patterns(path)
                 "",
                 "file"
             )
-            M.export_patterns(export_path)
+            M.export(export_path)
         elseif choice == 3 then
             return -- cancel
         end
@@ -78,7 +78,7 @@ end
 
 -- Export patterns to lua table in file
 ---@param path? string: file path to export patterns to
-function M.export_patterns(path)
+function M.export(path)
     if not path or path == "" then
         ensure_dir(data_dir)
         path = data_dir .. "/" .. default_filename

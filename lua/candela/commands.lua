@@ -342,7 +342,6 @@ function M.setup()
 
                 local success = require("candela.finder").find(subargs)
                 if success then
-                    vim.api.nvim_cmd({ cmd = "lnext" }, {})
                     vim.api.nvim_cmd({ cmd = "lopen" }, {})
                 end
             end,
@@ -368,7 +367,6 @@ function M.setup()
 
                 local success = require("candela.finder").find({})
                 if success then
-                    vim.api.nvim_cmd({ cmd = "lnext" }, {})
                     vim.api.nvim_cmd({ cmd = "lopen" }, {})
                 end
             end,
@@ -401,7 +399,7 @@ function M.setup()
                 end
 
                 local path = subargs[1]
-                require("candela.io").import_patterns(path)
+                require("candela.io").import(path)
             end,
             complete = function(sub_arglead)
                 return vim.fn.getcompletion(sub_arglead, "file")
@@ -421,7 +419,7 @@ function M.setup()
                 end
 
                 local path = subargs[1]
-                require("candela.io").export_patterns(path)
+                require("candela.io").export(path)
             end,
             complete = function(sub_arglead)
                 return vim.fn.getcompletion(sub_arglead, "file")

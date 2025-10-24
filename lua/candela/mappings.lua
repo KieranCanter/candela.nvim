@@ -182,28 +182,28 @@ function M.set_patterns_keymaps()
             lhs = "m",
             desc = "[Candela] vim match selected patterns",
             callback = function()
-                CandelaUi.locate(false, require("candela.finder").match)
+                CandelaUi.locate(false, "match")
             end,
         },
         {
             lhs = "M",
             desc = "[Candela] vim match all patterns",
             callback = function()
-                CandelaUi.locate(true, require("candela.finder").match)
+                CandelaUi.locate(true, "match")
             end,
         },
         {
             lhs = "f",
             desc = "[Candela] find selected patterns and send to location list",
             callback = function()
-                CandelaUi.locate(false, require("candela.finder").find)
+                CandelaUi.locate(false, "find")
             end,
         },
         {
             lhs = "F",
             desc = "[Candela] find all patterns and send to location list",
             callback = function()
-                CandelaUi.locate(true, require("candela.finder").find)
+                CandelaUi.locate(true, "find")
             end,
         },
         {
