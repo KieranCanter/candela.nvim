@@ -289,7 +289,7 @@ function M.edit(index_or_regex, new_regex)
 end
 
 ---@param index_or_regex integer|string: index or regex of pattern to edit
----@return boolean
+---@return boolean: success or failure
 function M.delete(index_or_regex)
     local old_id, pattern, index = get_id_pattern_index(index_or_regex)
     if old_id == nil or pattern == nil or index == nil then
@@ -320,7 +320,7 @@ function M.delete(index_or_regex)
     return true
 end
 
----@return boolean
+---@return boolean: success or failure
 function M.clear()
     if #M.order == 0 then
         vim.notify("[Candela] cannot clear an empty patterns list", vim.log.levels.INFO)
@@ -382,7 +382,7 @@ function M.change_color(index_or_regex, new_color)
 end
 
 ---@param index_or_regex integer|string: index or regex of pattern to toggle highlight on
----@return boolean
+---@return boolean: new state of highlight
 function M.toggle_highlight(index_or_regex)
     local id, pattern, index = get_id_pattern_index(index_or_regex)
     if id == nil or pattern == nil or index == nil then
@@ -408,7 +408,7 @@ function M.toggle_highlight(index_or_regex)
 end
 
 ---@param index_or_regex integer|string: index or regex of pattern to toggle lightbox on
----@return boolean
+---@return boolean: new state of lightbox
 function M.toggle_lightbox(index_or_regex)
     local id, pattern, index = get_id_pattern_index(index_or_regex)
     if id == nil or pattern == nil or index == nil then

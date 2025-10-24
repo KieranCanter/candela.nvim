@@ -1003,7 +1003,6 @@ end
 
 ---@param all boolean: whether to match selected patterns or all
 ---@param command fun(regexes: string[]): boolean match() or find() function from finder
----@return boolean: lets the caller know to open location list or not
 function M.locate(all, command)
     if #CandelaPatternList.order == 0 then
         vim.notify("[Candela] no patterns to match", vim.log.levels.ERROR)
@@ -1035,7 +1034,6 @@ function M.locate(all, command)
         vim.api.nvim_cmd({ cmd = "lopen" }, {})
         vim.api.nvim_cmd({ cmd = "lnext" }, {})
     end
-    return success
 end
 
 function M.import()
