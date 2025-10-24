@@ -33,9 +33,9 @@ local function init()
     })
 
     require("candela.commands").setup()
-    require("candela.ui").setup(M.config)
+    M.ui = require("candela.ui").setup(M.config)
     require("candela.finder").setup(M.config)
-    require("candela.pattern_list").setup(M.config)
+    M.patterns = require("candela.pattern_list").setup(M.config)
     require("candela.highlighter").setup()
     require("candela.lightbox").setup(M.config)
     if M.config.syntax_highlighting.enabled then

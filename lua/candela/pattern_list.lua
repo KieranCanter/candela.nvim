@@ -84,6 +84,17 @@ function M.setup(opts)
 
     -- Set type of cycler
     M.next_color = make_cycler(opts.palette.cycle, defaults.palette.cycle)
+
+    -- Return the functions designed to be part of public API via require("candela").patterns
+    return {
+        M.add,
+        M.edit,
+        M.delete,
+        M.clear,
+        M.change_color,
+        M.toggle_highlight,
+        M.toggle_lightbox,
+    }
 end
 
 ---@param index integer
@@ -135,6 +146,40 @@ local function get_id_pattern_index(index_or_regex)
     end
 
     return id, pattern, index
+end
+
+---@param index integer: index to search for
+---@return string|nil
+function M.get_regex_from_index(index)
+    if index < 1 or index > #M.order then
+        return nil
+    else
+        local id = M.order[index]
+        return M.patterns[id].regex
+    end
+end
+
+---@param index integer: index to search for
+---@return string|nil
+function M.get_color_from_index(index)
+    if index < 1 or index > #M.order then
+        return nil
+    else
+        local id = M.order[index]
+        return M.patterns[id].color
+    end
+end
+
+---@param regex string: regex to search for
+---@return integer|nil
+function M.get_index_from_regex(regex)
+    local target_id = M.hash_regex(regex)
+    for i, id in ipairs(M.order) do
+        if target_id == id then
+            return i
+        end
+    end
+    return nil
 end
 
 ---@return table<string>

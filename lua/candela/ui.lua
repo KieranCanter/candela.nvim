@@ -574,7 +574,27 @@ function M.setup(opts)
         end,
     })
 
-    return M.windows
+    -- Return the functions designed to be part of public API via require("candela").ui
+    return {
+        M.show_patterns,
+        M.hide_patterns,
+        M.hide_prompt,
+        M.toggle,
+        M.toggle_select_pattern,
+        M.add,
+        M.edit,
+        M.copy,
+        M.delete,
+        M.clear,
+        M.refresh,
+        M.change_color,
+        M.toggle_highlight,
+        M.toggle_lightbox,
+        M.locate,
+        M.import,
+        M.export,
+        M.help,
+    }
 end
 
 -- Open patterns window
@@ -626,10 +646,8 @@ function M.show_patterns()
 end
 
 ---@param operation operations: type of operation to conduct
----@param curr_line number?: index of currently selected line at time of operation
-local function show_prompt(operation, curr_line)
-    ---@cast curr_line number
-
+---@param index number?: index of currently selected line at time of operation
+local function show_prompt(operation, index)
     M.windows.prompt:ensure_buffer()
     M.windows.prompt:attach_to(M.windows.patterns)
     vim.fn.prompt_setprompt(M.windows.prompt.buf, " > ")
@@ -669,18 +687,18 @@ local function show_prompt(operation, curr_line)
         end)
     elseif operation == Operations.EDIT then
         vim.fn.prompt_setcallback(M.windows.prompt.buf, function(new_regex)
-            CandelaPatternList.edit(curr_line, new_regex)
+            CandelaPatternList.edit(index, new_regex)
             M.hide_prompt()
         end)
     elseif operation == Operations.COPY then
         vim.fn.prompt_setcallback(M.windows.prompt.buf, function(regex)
-            local _, curr_pattern = CandelaPatternList.get_id_and_pattern_by_index(curr_line) --[[@as CandelaPattern]]
+            local _, curr_pattern = CandelaPatternList.get_id_and_pattern_by_index(index) --[[@as CandelaPattern]]
             CandelaPatternList.add(regex, curr_pattern.color, curr_pattern.highlight, curr_pattern.lightbox)
             M.hide_prompt()
         end)
     elseif operation == Operations.CHANGE_COLOR then
         vim.fn.prompt_setcallback(M.windows.prompt.buf, function(new_color)
-            CandelaPatternList.change_color(curr_line, new_color)
+            CandelaPatternList.change_color(index, new_color)
             M.hide_prompt()
         end)
     elseif operation == Operations.IMPORT then
@@ -716,6 +734,44 @@ local function show_prompt(operation, curr_line)
     vim.api.nvim_win_set_config(M.windows.prompt.win, M.windows.prompt.config)
 end
 
+---@param index_or_regex integer|string?
+---@return integer|nil, string|nil
+local function get_index_and_regex(index_or_regex)
+    local index
+    local regex
+    if not index_or_regex then
+        index = vim.api.nvim_win_get_cursor(0)[1]
+        regex = CandelaPatternList.get_regex_from_index(index)
+    elseif type(index_or_regex) == "number" then
+        index = index_or_regex
+        regex = CandelaPatternList.get_regex_from_index(index)
+    else
+        regex = index_or_regex --[[@as string]]
+        index = CandelaPatternList.get_index_from_regex(regex)
+    end
+    return index, regex
+end
+
+---@param index_or_regex integer|string?
+---@return integer|nil, string|nil
+local function get_index_and_color(index_or_regex)
+    local index
+    local color
+    if not index_or_regex then
+        index = vim.api.nvim_win_get_cursor(0)[1]
+        color = CandelaPatternList.get_color_from_index(index)
+    elseif type(index_or_regex) == "number" then
+        index = index_or_regex
+        color = CandelaPatternList.get_color_from_index(index)
+    else
+        index = CandelaPatternList.get_index_from_regex(index_or_regex --[[@as string]])
+        if index then
+            color = CandelaPatternList.get_color_from_index(index)
+        end
+    end
+    return index, color
+end
+
 function M.add()
     M.show_patterns()
     M.windows.prompt.config.title = " Add Regex "
@@ -724,7 +780,8 @@ function M.add()
     vim.api.nvim_set_option_value("completefunc", "", { buf = M.windows.prompt.buf })
 end
 
-function M.edit()
+---@param index_or_regex integer|string?: index or regex to edit, defaults to current line
+function M.edit(index_or_regex)
     if vim.api.nvim_get_current_win() ~= M.windows.regex.win then
         vim.notify("[Candela] must be in patterns window to run UI commands", vim.log.levels.ERROR)
         return
@@ -735,23 +792,29 @@ function M.edit()
         return
     end
 
-    M.windows.prompt.config.title = " Edit Regex "
-
-    local curr_line = vim.api.nvim_win_get_cursor(0)[1]
-    local _, curr_pattern = CandelaPatternList.get_id_and_pattern_by_index(curr_line)
-    if curr_pattern == nil then
-        return
+    local index, regex = get_index_and_regex(index_or_regex)
+    if index == nil or regex == nil then
+        if type(index_or_regex) == "number" then
+            vim.notify(string.format("[Candela] pattern does not exist at index %d", index_or_regex), vim.log.levels.ERROR)
+            return
+        else
+            vim.notify(string.format('[Candela] pattern does not exist with regex "%s"', index_or_regex), vim.log.levels.ERROR)
+            return
+        end
     end
 
+    M.windows.prompt.config.title = " Edit Regex "
+
     vim.schedule(function()
-        vim.api.nvim_paste(curr_pattern.regex, false, -1)
+        vim.api.nvim_paste(regex --[[@as string]], false, -1)
     end)
 
-    show_prompt(Operations.EDIT, curr_line)
+    show_prompt(Operations.EDIT, index)
     vim.api.nvim_set_option_value("completefunc", "", { buf = M.windows.prompt.buf })
 end
 
-function M.copy()
+---@param index_or_regex integer|string?: index or regex to copy, defaults to current line
+function M.copy(index_or_regex)
     if vim.api.nvim_get_current_win() ~= M.windows.regex.win then
         vim.notify("[Candela] must be in patterns window to run UI commands", vim.log.levels.ERROR)
         return
@@ -764,16 +827,22 @@ function M.copy()
 
     M.windows.prompt.config.title = " Copy Regex "
 
-    local curr_line = vim.api.nvim_win_get_cursor(0)[1]
-    local _, curr_pattern = CandelaPatternList.get_id_and_pattern_by_index(curr_line)
-    if curr_pattern == nil then
-        return
+    local index, regex = get_index_and_regex(index_or_regex)
+    if index == nil or regex == nil then
+        if type(index_or_regex) == "number" then
+            vim.notify(string.format("[Candela] pattern does not exist at index %d", index_or_regex), vim.log.levels.ERROR)
+            return
+        else
+            vim.notify(string.format('[Candela] pattern does not exist with regex "%s"', index_or_regex), vim.log.levels.ERROR)
+            return
+        end
     end
+
     vim.schedule(function()
-        vim.api.nvim_paste(curr_pattern.regex, false, -1)
+        vim.api.nvim_paste(regex --[[@as string]], false, -1)
     end)
 
-    show_prompt(Operations.COPY, curr_line)
+    show_prompt(Operations.COPY, index)
     vim.api.nvim_set_option_value("completefunc", "", { buf = M.windows.prompt.buf })
 end
 
@@ -790,7 +859,7 @@ function M.delete(ask)
     end
 
     local curr_line = vim.api.nvim_win_get_cursor(0)[1]
-    local curr_id, curr_pattern = CandelaPatternList.get_id_and_pattern_by_index(curr_line)
+    local _, curr_pattern = CandelaPatternList.get_id_and_pattern_by_index(curr_line)
     if curr_pattern == nil then
         return
     end
@@ -846,7 +915,8 @@ function M.refresh(force, keep_base_buffer)
     CandelaLightbox.refresh()
 end
 
-function M.change_color()
+---@param index_or_regex integer|string?: index or regex to change color of, defaults to current line
+function M.change_color(index_or_regex)
     if vim.api.nvim_get_current_win() ~= M.windows.regex.win then
         vim.notify("[Candela] must be in patterns window to run UI commands", vim.log.levels.ERROR)
         return
@@ -859,17 +929,22 @@ function M.change_color()
 
     M.windows.prompt.config.title = " Change Color "
 
-    local curr_line = vim.api.nvim_win_get_cursor(0)[1]
-    local _, curr_pattern = CandelaPatternList.get_id_and_pattern_by_index(curr_line)
-    if curr_pattern == nil then
-        return
+    local index, color = get_index_and_color(index_or_regex)
+    if index == nil or color == nil then
+        if type(index_or_regex) == "number" then
+            vim.notify(string.format("[Candela] pattern does not exist at index %d", index_or_regex), vim.log.levels.ERROR)
+            return
+        else
+            vim.notify(string.format('[Candela] pattern does not exist with regex "%s"', index_or_regex), vim.log.levels.ERROR)
+            return
+        end
     end
 
     vim.schedule(function()
-        vim.api.nvim_paste(curr_pattern.color, false, -1)
+        vim.api.nvim_paste(color --[[@as string]], false, -1)
     end)
 
-    show_prompt(Operations.CHANGE_COLOR, curr_line)
+    show_prompt(Operations.CHANGE_COLOR, index)
     vim.api.nvim_set_option_value("completefunc", "", { buf = M.windows.prompt.buf })
 end
 
