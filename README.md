@@ -31,8 +31,9 @@ is `KieranCanter/candela.nvim`. The `lazy.nvim` snippet is:
 
 ## config
 
-See ["candela-config-options" in `doc/candela.txt`](https://github.com/KieranCanter/candela.nvim/blob/main/doc/candela.txt#L187) for more info on what each
-option is used for and valid values. I will leave you with the defaults here:
+See ["candela-config-options" in
+`doc/candela.txt`](https://github.com/KieranCanter/candela.nvim/blob/main/doc/candela.txt#L187) for
+more info on what each option is used for and valid values. I will leave you with the defaults here:
 
 ```Lua
 local defaults = {
@@ -233,7 +234,9 @@ end
 
 ## commands
 
-See ["candela-commands" in `doc/candela.txt`](https://github.com/KieranCanter/candela.nvim/blob/main/doc/candela.txt#L349) for more details on each command.
+See ["candela-commands" in
+`doc/candela.txt`](https://github.com/KieranCanter/candela.nvim/blob/main/doc/candela.txt#L349) for
+more details on each command.
 
 
 | **User Command**                                                                        |
@@ -258,9 +261,10 @@ See ["candela-commands" in `doc/candela.txt`](https://github.com/KieranCanter/ca
 
 ## api
 
-See ["candela-api" in `doc/candela.txt`](https://github.com/KieranCanter/candela.nvim/blob/main/doc/candela.txt#L438) for more details on each API function.
-The following definitions will assume you have brought Candela into scope with `local candela =
-require("candela")`.
+See ["candela-api" in
+`doc/candela.txt`](https://github.com/KieranCanter/candela.nvim/blob/main/doc/candela.txt#L438) for
+more details on each API function. The following definitions will assume you have brought Candela
+into scope with `local candela = require("candela")`.
 
 #### `candela.ui.<function>`
 
