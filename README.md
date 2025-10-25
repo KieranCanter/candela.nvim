@@ -7,6 +7,8 @@ Analysis](https://marketplace.visualstudio.com/items?itemName=XinyaYang0506.log-
 extension. Couldn't find any plugins for tracking and highlighting lines based on multiple regexes
 so I made this.
 
+https://github.com/user-attachments/assets/064e7a87-c728-4a63-a9a6-c76a6cebe935
+
 ## requirements:
 
 * regex search tool ([ripgrep](https://github.com/BurntSushi/ripgrep),
@@ -29,7 +31,7 @@ is `KieranCanter/candela.nvim`. The `lazy.nvim` snippet is:
 
 ## config
 
-See the "candela-config-options" section in the vimdoc `doc/candela.txt` for more info on what each
+See ["candela-config-options" in `doc/candela.txt`](https://github.com/KieranCanter/candela.nvim/blob/main/doc/candela.txt#L187) for more info on what each
 option is used for and valid values. I will leave you with the defaults here:
 
 ```Lua
@@ -231,7 +233,7 @@ end
 
 ## commands
 
-See the "candela-commands" section in the vimdoc `doc/candela.txt` for more details on each command.
+See ["candela-commands" in `doc/candela.txt`](https://github.com/KieranCanter/candela.nvim/blob/main/doc/candela.txt#L349) for more details on each command.
 
 
 | **User Command**                                                                        |
@@ -256,7 +258,7 @@ See the "candela-commands" section in the vimdoc `doc/candela.txt` for more deta
 
 ## api
 
-See the "candela-api" section in the vimdoc `doc/candela.txt` for more details on each API function.
+See ["candela-api" in `doc/candela.txt`](https://github.com/KieranCanter/candela.nvim/blob/main/doc/candela.txt#L438) for more details on each API function.
 The following definitions will assume you have brought Candela into scope with `local candela =
 require("candela")`.
 
