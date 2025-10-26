@@ -1,9 +1,10 @@
 <div align="center">
 
 # Candela
+
 #### regex highlighter. designed for efficient log analysis.
 
-</div>
+<div>
 
 ---
 
@@ -13,6 +14,15 @@ extension. I couldn't find any plugins for tracking and highlighting lines based
 so I made this.
 
 https://github.com/user-attachments/assets/064e7a87-c728-4a63-a9a6-c76a6cebe935
+
+* [requirements](#requirements)
+* [installation](#installation)
+* [config](#config)
+* [keymaps](#keymaps)
+* [commands](#commands)
+* [api](#api)
+* [features](#features)
+* [acknowledgements](#acknowledgements)
 
 ## requirements:
 
