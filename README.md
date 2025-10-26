@@ -32,8 +32,6 @@ https://github.com/user-attachments/assets/064e7a87-c728-4a63-a9a6-c76a6cebe935
 
 that's it.
 
-
-
 ## installation
 
 You probably know how to use your preferred package manager. The GitHub repo
