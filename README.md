@@ -1,10 +1,15 @@
-# Candela
+<div align="center">
 
-regex highlighter. designed for efficient log analysis.
+# Candela
+#### regex highlighter. designed for efficient log analysis.
+
+</div>
+
+---
 
 Inspired by the [Log
 Analysis](https://marketplace.visualstudio.com/items?itemName=XinyaYang0506.log-analysis) VSCode
-extension. Couldn't find any plugins for tracking and highlighting lines based on multiple regexes
+extension. I couldn't find any plugins for tracking and highlighting lines based on multiple regexes
 so I made this.
 
 https://github.com/user-attachments/assets/064e7a87-c728-4a63-a9a6-c76a6cebe935
@@ -16,6 +21,8 @@ https://github.com/user-attachments/assets/064e7a87-c728-4a63-a9a6-c76a6cebe935
 [ack](https://beyondgrep.com/install/), grep)
 
 that's it.
+
+
 
 ## installation
 
