@@ -4,6 +4,8 @@
 
 #### regex highlighter. designed for efficient log analysis.
 
+<img alt="Candela Logo" height="200" src="/assets/candela-logo.png" />
+
 </div>
 
 ---
@@ -281,7 +283,7 @@ See ["candela-api" in
 more details on each API function. The following definitions will assume you have brought Candela
 into scope with `local candela = require("candela")`.
 
-#### `candela.ui.<function>`
+#### ui
 
 ```Lua
 candela.ui.show_patterns()
@@ -305,7 +307,7 @@ candela.ui.export()
 candela.ui.help()
 ```
 
-#### `candela.patterns.<function>`
+#### patterns
 
 ```Lua
 candela.patterns.add({regex}, {color?}, {highlight?}, {lightbox?})
