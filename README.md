@@ -4,7 +4,7 @@
 
 #### regex highlighter. designed for efficient log analysis.
 
-<div>
+</div>
 
 ---
 
