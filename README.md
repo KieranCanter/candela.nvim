@@ -2,9 +2,9 @@
 
 # Candela
 
-#### regex highlighter. designed for efficient log analysis.
-
 <img alt="Candela Logo" height="200" src="/assets/candela-logo.png" />
+
+#### regex highlighter. designed for efficient log analysis.
 
 </div>
 
