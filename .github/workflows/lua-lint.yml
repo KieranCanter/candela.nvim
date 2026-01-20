@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  lint:
+  lua-lint:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,15 +25,15 @@ jobs:
 
       - name: Run Selene
         run: |
-          echo "\nRunning selene\n"
+          printf "\nRunning selene\n"
           selene --display-style=quiet .
 
       - name: Run StyLua Lint
         run: |
-          echo "\nRunning stylua\n"
+          printf "\nRunning stylua\n"
           stylua --check --output-format=summary .
 
       - name: Run StyLua Format
         run: |
-          echo "\nFormatting with stylua\n"
+          printf "\nFormatting with stylua\n"
           stylua .
