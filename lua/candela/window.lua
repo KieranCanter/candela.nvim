@@ -17,7 +17,7 @@ function M.new(opts)
     local instance = {
         buf = nil,
         win = nil,
-        config = vim.tbl_extend("force", {}, opts or {})
+        config = vim.tbl_extend("force", {}, opts or {}),
     }
 
     setmetatable(instance, { __index = M })
@@ -31,8 +31,13 @@ function M:attach_to(parent_window)
         vim.notify(
             string.format(
                 "Cannot attach base window (win=%s, buf=%s) to parent window (win=%s, buf=%s) because it is not open",
-                self.win, self.buf, parent_window.win, parent_window.buf),
-            vim.log.levels.ERROR)
+                self.win,
+                self.buf,
+                parent_window.win,
+                parent_window.buf
+            ),
+            vim.log.levels.ERROR
+        )
         return
     end
 

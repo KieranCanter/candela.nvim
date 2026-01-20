@@ -1,7 +1,7 @@
 local CandelaUi = require("candela.ui")
 local CandelaCommands = require("candela.commands")
 
-M = {}
+local M = {}
 M.help = { buf = nil, win = nil, config = nil }
 
 local CANDELA_AUGROUP = require("candela.init").CANDELA_AUGROUP
@@ -18,6 +18,7 @@ local function build_help_buf(keymap_info)
     for _, keymap in ipairs(keymap_info) do
         local desc = keymap.desc:gsub("%[Candela%]%s*", "")
         desc = desc:sub(1, 1):upper() .. desc:sub(2)
+        -- selene: allow(bad_string_escape)
         local line = string.format("%-5s \u{25b8} %s", keymap.lhs, desc)
         table.insert(lines, line)
         widest = math.max(widest, line:len()) -- track longest line for width

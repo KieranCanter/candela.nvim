@@ -1,3 +1,5 @@
+--# selene: allow(bad_string_escape)
+
 ---@class CandelaConfig
 ---@field defaults table<string, any>
 ---@field options table<string, any>

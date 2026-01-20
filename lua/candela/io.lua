@@ -1,4 +1,4 @@
-M = {}
+local M = {}
 local uv = vim.uv
 
 -- Default paths

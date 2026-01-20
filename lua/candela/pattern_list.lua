@@ -131,8 +131,8 @@ local function get_id_pattern_index(index_or_regex)
         index = index_or_regex
     elseif type(index_or_regex) == "string" then
         id, pattern = M.get_id_and_pattern_by_regex(index_or_regex)
-        for i, id in ipairs(M.order) do
-            if id == id then
+        for i, order_id in ipairs(M.order) do
+            if order_id == id then
                 index = i
             end
         end
@@ -395,7 +395,9 @@ function M.toggle_highlight(index_or_regex)
     pattern:toggle_highlight()
 
     local ui = require("candela.ui")
-    if not require("candela.highlighter").toggle_match_highlights(ui.base_buf, id, pattern.regex, pattern.highlight) then
+    if
+        not require("candela.highlighter").toggle_match_highlights(ui.base_buf, id, pattern.regex, pattern.highlight)
+    then
         return false
     end
 

@@ -196,9 +196,17 @@ function M.display(is_open)
         local config = require("candela.config").options.lightbox
         vim.api.nvim_set_option_value("fillchars", "fold:" .. config.fillchar, { win = M.window.win })
         if config.custom_foldtext ~= nil and type(config.custom_foldtext) == "function" then
-            vim.api.nvim_set_option_value("foldtext", "v:lua.require'candela.lightbox'.custom_foldtext()", { win = M.window.win })
+            vim.api.nvim_set_option_value(
+                "foldtext",
+                "v:lua.require'candela.lightbox'.custom_foldtext()",
+                { win = M.window.win }
+            )
         else
-            vim.api.nvim_set_option_value("foldtext", "v:lua.require'candela.lightbox'.generate_foldtext()", { win = M.window.win })
+            vim.api.nvim_set_option_value(
+                "foldtext",
+                "v:lua.require'candela.lightbox'.generate_foldtext()",
+                { win = M.window.win }
+            )
         end
 
         M.update_folds()

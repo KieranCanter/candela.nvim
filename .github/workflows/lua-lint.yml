@@ -1,0 +1,39 @@
+name: Lua Lint
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint:
+  runs-on: ubuntu-latest
+
+  steps:
+    - uses: actions/checkout@v6
+
+    - name: Install Selene
+      run: |
+        cargo install selene --no-default-features
+
+    - name: Install StyLua
+      run: |
+        cargo install stylua
+
+    - name: Run Selene
+      run: |
+        echo "\nRunning selene\n"
+        selene --display-style=quiet .
+
+    - name: Run StyLua Lint
+      run: |
+        echo "\nRunning stylua\n"
+        stylua --check --output-format=summary .
+
+    - name: Run StyLua Format
+      run: |
+        echo "\nFormatting with stylua\n"
+        stylua .

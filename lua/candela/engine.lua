@@ -28,5 +28,4 @@ function M.get_matches(cmd)
     return matches
 end
 
-
 return M

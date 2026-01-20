@@ -1,4 +1,4 @@
-CandelaConfig = require("candela.config")
+local CandelaConfig = require("candela.config")
 
 local M = {}
 

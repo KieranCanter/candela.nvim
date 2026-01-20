@@ -758,26 +758,6 @@ local function show_prompt(operation, index)
     vim.api.nvim_win_set_config(M.windows.prompt.win, M.windows.prompt.config)
 end
 
----@param index_or_regex integer|string?
----@return integer|nil, string|nil
-local function get_index_and_color(index_or_regex)
-    local index
-    local color
-    if not index_or_regex then
-        index = vim.api.nvim_win_get_cursor(0)[1]
-        color = CandelaPatternList.get_color_from_index(index)
-    elseif type(index_or_regex) == "number" then
-        index = index_or_regex
-        color = CandelaPatternList.get_color_from_index(index)
-    else
-        index = CandelaPatternList.get_index_from_regex(index_or_regex --[[@as string]])
-        if index then
-            color = CandelaPatternList.get_color_from_index(index)
-        end
-    end
-    return index, color
-end
-
 function M.add()
     M.show_patterns()
     M.windows.prompt.config.title = " Add Regex "
