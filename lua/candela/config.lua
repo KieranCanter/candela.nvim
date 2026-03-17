@@ -35,37 +35,35 @@ M.defaults = {
         fillchar = "-",
         custom_foldtext = nil,
     },
-    icons = vim.g.have_nerd_font
-            and {
-                candela = "\u{f05e2}", -- 󰗢
-                color = "\u{e22b}", -- 
-                regex = "\u{f069}", -- 
-                highlight = {
-                    header = "\u{ea61}", -- 
-                    toggle_on = "\u{f1a25}", -- 󱨥
-                    toggle_off = "\u{f1a26}", -- 󱨦
-                },
-                lightbox = {
-                    header = "\u{e68f}", -- 
-                    toggle_on = "\u{f1a25}", -- 󱨥
-                    toggle_off = "\u{f1a26}", -- 󱨦
-                },
-            }
-        or {
-            candela = "\u{1F56F}", -- 🕯
-            color = "\u{1F3A8}", -- 🎨
-            regex = "\u{2728}", -- ✨
-            highlight = {
-                header = "\u{1F4A1}", -- 💡
-                toggle_on = "\u{25C9}", -- ◉
-                toggle_off = "\u{25CB}", -- ○
-            },
-            lightbox = {
-                header = "\u{1F50D}", -- 🔍
-                toggle_on = "\u{25C9}", -- ◉
-                toggle_off = "\u{25CB}", -- ○
-            },
+    icons = vim.g.have_nerd_font and {
+        candela = "\u{f05e2}", -- 󰗢
+        color = "\u{e22b}", -- 
+        regex = "\u{f069}", -- 
+        highlight = {
+            header = "\u{ea61}", -- 
+            toggle_on = "\u{f1a25}", -- 󱨥
+            toggle_off = "\u{f1a26}", -- 󱨦
         },
+        lightbox = {
+            header = "\u{e68f}", -- 
+            toggle_on = "\u{f1a25}", -- 󱨥
+            toggle_off = "\u{f1a26}", -- 󱨦
+        },
+    } or {
+        candela = "\u{1F56F}", -- 🕯
+        color = "\u{1F3A8}", -- 🎨
+        regex = "\u{2728}", -- ✨
+        highlight = {
+            header = "\u{1F4A1}", -- 💡
+            toggle_on = "\u{25C9}", -- ◉
+            toggle_off = "\u{25CB}", -- ○
+        },
+        lightbox = {
+            header = "\u{1F50D}", -- 🔍
+            toggle_on = "\u{25C9}", -- ◉
+            toggle_off = "\u{25CB}", -- ○
+        },
+    },
     palette = {
         use = "replace",
         cycle = "constant",
