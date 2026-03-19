@@ -1,9 +1,6 @@
--- Derived from log-highlight.nvim by Fei Shao (fei6409 on GitHub)
--- https://github.com/fei6409/log-highlight.nvim
-
 local M = {}
 M.enabled = false
-local CANDELA_AUGROUP = require("candela.init").CANDELA_AUGROUP
+local augroup = require("candela.init").augroup
 
 local function apply()
     for _, cmd in ipairs(M.syntax_commands) do
@@ -150,7 +147,7 @@ function M.enable(opts)
 
     -- Apply based on file extension
     M.ext_autocmd = vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
-        group = CANDELA_AUGROUP,
+        group = augroup,
         pattern = extensions,
         callback = function()
             vim.api.nvim_exec2("setlocal nospell", {})
@@ -162,7 +159,7 @@ function M.enable(opts)
     })
 
     M.type_autocmd = vim.api.nvim_create_autocmd("FileType", {
-        group = CANDELA_AUGROUP,
+        group = augroup,
         pattern = types,
         callback = function()
             vim.api.nvim_exec2("setlocal nospell", {})

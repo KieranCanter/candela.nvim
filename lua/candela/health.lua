@@ -3,11 +3,16 @@ local CandelaConfig = require("candela.config")
 local M = {}
 
 local function get_version()
+    local semver_fmt = "%d.%d.%d"
+    if CandelaConfig.version.pre then
+        semver_fmt = semver_fmt .. "-%s"
+    end
     return string.format(
-        "%d.%d.%d",
+        semver_fmt,
         CandelaConfig.version.major,
         CandelaConfig.version.minor,
-        CandelaConfig.version.patch
+        CandelaConfig.version.patch,
+        CandelaConfig.version.pre
     )
 end
 

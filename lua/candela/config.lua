@@ -1,12 +1,9 @@
 --# selene: allow(bad_string_escape)
 
----@class CandelaConfig
----@field defaults table<string, any>
----@field options table<string, any>
----@field version { major: integer, minor: integer, patch: integer }
-
 local M = {}
-M.version = {}
+
+M.version = { major = 2, minor = 0, patch = 0, pre = "alpha.1" }
+M.options = nil
 
 M.defaults = {
     window = {
@@ -16,7 +13,6 @@ M.defaults = {
         margin = 16,
         min_count_width = 4,
         toggle_width = 6,
-        prompt_offset = "overlap",
     },
     engine = {
         command = nil,
@@ -130,7 +126,6 @@ M.defaults = {
     },
 }
 
----@return table<table>
 function M.get_engine_versions()
     local pattern = "%d+%.%d+%.*%d*"
     local engines = {
@@ -140,28 +135,29 @@ function M.get_engine_versions()
         { ack = "ack" },
         { grep = "grep" },
     }
-    local available = {}
 
+    local available = {}
     for _, engine in ipairs(engines) do
-        local version = vim.fn.system(next(engine) .. " --version"):match(pattern)
-        if version ~= nil then
-            table.insert(available, { [next(engine)] = { engine[next(engine)], version } })
+        local name = next(engine)
+        local version = vim.fn.system(name .. " --version"):match(pattern)
+        if version then
+            table.insert(available, { [name] = { engine[name], version } })
         end
     end
+
     return available
 end
 
----@param available table
----@return string?
-local function get_default_engine(available)
+local function detect_engine(available)
     for _, engine in ipairs(available) do
-        if engine[next(engine)] ~= nil then
+        if engine[next(engine)] then
             return next(engine)
         end
     end
-
-    vim.notify("[Candela] no regex search tool found... how do you not at least have grep?", vim.log.levels.ERROR)
-    vim.notify("[Candela] will not be loaded", vim.log.levels.ERROR)
+    vim.notify(
+        "[Candela] no regex search tool found... how do you not at least have grep? Aborting.",
+        vim.log.levels.ERROR
+    )
     return nil
 end
 
@@ -182,11 +178,7 @@ local function build_search_args(command, case_option)
 
     if case_option == "smart" or (case_option == "system" and ignorecase and smartcase) then
         if command == "grep" then
-            vim.notify(
-                "grep does not support smart-case. Consider installing a faster regex search engine or modifying"
-                    .. "`case` in your user config to turn smart-case off. Proceeding with the case-sensitive args.",
-                vim.log.levels.WARN
-            )
+            vim.notify("[Candela] grep does not support smart-case, using case-sensitive", vim.log.levels.WARN)
         else
             table.insert(args, "--smart-case")
         end
@@ -203,71 +195,52 @@ local function build_search_args(command, case_option)
     return args
 end
 
----@param opts table
----@return string[]
-local function get_default_args(opts)
-    local args = {}
-    local command = opts.engine.command
-
-    if
-        opts.matching.case ~= "sensitive"
-        and opts.matching.case ~= "ignore"
-        and opts.matching.case ~= "smart"
-        and opts.matching.case ~= "system"
-    then
-        vim.notify(
-            string.format(
-                '"%s" is not a valid option value for `case`, using "sensitive" as default.'
-                    .. ' Valid values: "sensitive", "ignore", "smart", "system".',
-                opts.matching.case
-            ),
-            vim.log.levels.WARN
-        )
-        opts.matching.case = M.defaults.case
+function M.rebuild_args()
+    if M.options then
+        M.options.engine.args = build_search_args(M.options.engine.command, M.options.matching.case)
     end
-
-    args = build_search_args(command, opts.matching.case)
-    return args
 end
 
----@return CandelaConfig?
 function M.setup(opts)
-    M.version["major"] = 1
-    M.version["minor"] = 0
-    M.version["patch"] = 0
-
     M.options = vim.tbl_deep_extend("force", vim.deepcopy(M.defaults), opts or {})
-    local available = M.get_engine_versions()
-    if M.options.engine.command == nil then
-        M.options.engine.command = get_default_engine(available)
+
+    if not M.options.engine.command then
+        M.options.engine.command = detect_engine(M.get_engine_versions())
     end
-    if M.options.engine.command == nil then -- if engine command is still nil, no engine found
+    if not M.options.engine.command then
+        M.options = nil
         return nil
     end
-    vim.defer_fn(function() -- defer to get proper neovim user options
-        M.options.engine.args = get_default_args(M.options)
+
+    vim.defer_fn(function()
+        M.options.engine.args = build_search_args(M.options.engine.command, M.options.matching.case)
     end, 0)
 
+    local augroup = require("candela").augroup
+
     vim.api.nvim_create_autocmd("OptionSet", {
-        group = require("candela.init").CANDELA_AUGROUP,
+        group = augroup,
         pattern = { "ignorecase", "smartcase" },
         desc = "Update case-sensitivity globals when user changes system options",
         callback = function()
             if M.options.matching.case == "system" then
-                M.options.engine.args = {}
-                M.options.engine.args = build_search_args(M.options.engine.command, M.options.matching.case)
-                require("candela.finder").set_candela_case()
+                M.rebuild_args()
+                require("candela.locator").set_candela_case()
             end
         end,
     })
+
     vim.api.nvim_create_autocmd("ColorScheme", {
-        group = require("candela.init").CANDELA_AUGROUP,
+        group = augroup,
         desc = "Refresh Candela when color scheme changes",
         callback = function()
-            require("candela.pattern_list").setup(M.options)
-            require("candela.ui").regen_colors()
+            require("candela.patterns").regen_colors()
         end,
     })
+
+    if M.options.syntax_highlighting.enabled then
+        require("candela.syntax").enable(M.options.syntax_highlighting)
+    end
 
     return M.options
 end
