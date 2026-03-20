@@ -8,7 +8,10 @@ describe("candela.locator", function()
         package.loaded["candela.config"] = nil
         package.loaded["candela"] = nil
 
-        package.loaded["candela"] = { augroup = vim.api.nvim_create_augroup("CandelaTest", { clear = true }) }
+        package.loaded["candela"] = {
+            augroup = vim.api.nvim_create_augroup("CandelaTest", { clear = true }),
+            set_ui_keymaps = function() end,
+        }
         package.loaded["candela.config"] = {
             defaults = { palette = { colors = { dark = {}, light = {} }, cycle = "constant" } },
             options = {
@@ -49,50 +52,44 @@ describe("candela.locator", function()
         locator = require("candela.locator")
     end)
 
-    describe("match", function()
+    describe("vimmatch", function()
         it("returns true when matches found", function()
-            assert.is_true(locator.match({ "ERROR" }))
+            assert.is_true(locator.vimmatch({ "ERROR" }))
         end)
 
         it("returns false when no matches", function()
-            assert.is_false(locator.match({ "ZZZZNOTFOUND" }))
+            assert.is_false(locator.vimmatch({ "ZZZZNOTFOUND" }))
+        end)
+
+        it("accepts multiple regexes", function()
+            assert.is_true(locator.vimmatch({ "ERROR", "WARN" }))
         end)
     end)
 
-    describe("match_all", function()
-        it("matches all patterns", function()
-            assert.is_true(locator.match_all())
-        end)
-    end)
-
-    describe("find", function()
+    describe("loclist", function()
         it("populates location list", function()
-            local ok = locator.find({ "ERROR" })
+            local ok = locator.loclist({ "ERROR" })
             assert.is_true(ok)
             local loclist = vim.fn.getloclist(0)
             assert.is_true(#loclist > 0)
         end)
 
         it("returns false when no matches", function()
-            assert.is_false(locator.find({ "ZZZZNOTFOUND" }))
+            assert.is_false(locator.loclist({ "ZZZZNOTFOUND" }))
         end)
-    end)
 
-    describe("find_all", function()
-        it("finds all patterns", function()
-            assert.is_true(locator.find_all())
+        it("accepts multiple regexes", function()
+            assert.is_true(locator.loclist({ "ERROR", "WARN" }))
         end)
     end)
 
     describe("init", function()
         it("sets case from config", function()
             locator.init()
-            -- Should not error
         end)
 
         it("set_candela_case reads vim options", function()
             locator.set_candela_case()
-            -- Should not error
         end)
     end)
 end)

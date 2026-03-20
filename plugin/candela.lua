@@ -43,20 +43,6 @@ local plugs = {
         end,
     },
     {
-        "<Plug>CandelaMatchAll",
-        function()
-            require("candela.locator").match_all()
-        end,
-    },
-    {
-        "<Plug>CandelaFindAll",
-        function()
-            if require("candela.locator").find_all() then
-                vim.cmd("lopen")
-            end
-        end,
-    },
-    {
         "<Plug>CandelaLightbox",
         function()
             require("candela.lightbox").toggle()

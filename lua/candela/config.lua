@@ -41,6 +41,10 @@ M.defaults = {
             toggle_on = "\u{f1a25}", -- 󱨥
             toggle_off = "\u{f1a26}", -- 󱨦
         },
+        selection = {
+            toggle_on = "\u{ea71}", -- 
+            toggle_off = "\u{eabc}", -- 
+        },
     } or {
         candela = "\u{1F56F}", -- 🕯
         color = "\u{1F3A8}", -- 🎨
@@ -52,6 +56,10 @@ M.defaults = {
         },
         lightbox = {
             header = "\u{1F50D}", -- 🔍
+            toggle_on = "\u{25C9}", -- ◉
+            toggle_off = "\u{25CB}", -- ○
+        },
+        selection = {
             toggle_on = "\u{25C9}", -- ◉
             toggle_off = "\u{25CB}", -- ○
         },

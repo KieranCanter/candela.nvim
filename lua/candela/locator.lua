@@ -61,7 +61,7 @@ end
 --- Set vim search register and jump to first match.
 ---@param regexes string[] empty = use all patterns
 ---@return boolean success
-function M.match(regexes)
+function M.vimmatch(regexes)
     M.init()
     regexes = collect_regexes(regexes)
     if #regexes == 0 then
@@ -76,6 +76,7 @@ function M.match(regexes)
     local search = table.concat(parts, "|")
     local case = get_match_case(search)
 
+    require("candela.ui").close()
     vim.fn.setreg("/", "\\v" .. case .. search)
     local ok = pcall(vim.api.nvim_exec2, "normal! n", {})
     if not ok then
@@ -85,15 +86,10 @@ function M.match(regexes)
     return true
 end
 
----@return boolean success
-function M.match_all()
-    return M.match({})
-end
-
 --- Run engine search and populate location list.
 ---@param regexes string[] empty = use all patterns
 ---@return boolean success
-function M.find(regexes)
+function M.loclist(regexes)
     M.init()
     regexes = collect_regexes(regexes)
     if #regexes == 0 then
@@ -137,11 +133,6 @@ function M.find(regexes)
         title = "[Candela] " .. kind:sub(1, 1):upper() .. kind:sub(2) .. " Pattern(s)",
     })
     return true
-end
-
----@return boolean success
-function M.find_all()
-    return M.find({})
 end
 
 return M
