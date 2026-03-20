@@ -66,9 +66,10 @@ local function ensure_init()
 
     local icons = require("candela.config").options.icons
     local regex_header = icons.regex .. " Regex"
+    local count_width = 3
     M.columns = {
         regex = { width = vim.fn.strdisplaywidth(regex_header) + 2, header = regex_header }, -- add 2 for padding
-        count = { width = 3, header = string.rep("─", 3) },
+        count = { width = count_width, header = string.rep("─", count_width) },
         color = { width = 11, header = icons.color .. " Color" },
         highlight = { width = 7, header = icons.highlight.header .. " HL" },
         lightbox = { width = 7, header = icons.lightbox.header .. " LB" },
@@ -152,32 +153,47 @@ local function build_title()
     local border_char = "─"
     local textoff = 3
 
-    local meta_width = textoff
+    local meta_width = textoff + 2 -- add 2 for padding between color, hl, and lb columns
     for _, col in pairs(M.columns) do
         meta_width = meta_width + col.width
     end
     local regex_fill = math.max(M.winconfig.width - meta_width, 0)
 
-    -- Create fill chars for spacing, subtract 2 from each to account for one space padding
-    local pre_color_fill = (M.columns.color.width - vim.fn.strdisplaywidth(M.columns.color.header) - 2) / 2
-    local color_hl_fill = ((M.columns.color.width - vim.fn.strdisplaywidth(M.columns.color.header) - 2) / 2)
-        + ((M.columns.highlight.width - vim.fn.strdisplaywidth(M.columns.highlight.header) - 2) / 2)
-    local hl_lb_fill = ((M.columns.highlight.width - vim.fn.strdisplaywidth(M.columns.highlight.header) - 2) / 2)
-        + ((M.columns.lightbox.width - vim.fn.strdisplaywidth(M.columns.lightbox.header) - 2) / 2)
-    local post_lb_fill = (M.columns.lightbox.width - vim.fn.strdisplaywidth(M.columns.lightbox.header) - 2) / 2
+    -- Create fill chars for spacing
+    -- * header_padding accounts for the combined padding on the left and right side
+    -- * column_padding accounts for the padding in between columns (i.e. between color, hl, and lb columns)
+    local header_padding = 2
+    local column_padding = 1
+
+    -- These represent the padding for one side of each column header
+    local color_fill_one_side = (
+        M.columns.color.width
+        - vim.fn.strdisplaywidth(M.columns.color.header)
+        - header_padding
+    ) / 2
+    local hl_fill_one_side = (
+        M.columns.highlight.width
+        - vim.fn.strdisplaywidth(M.columns.highlight.header)
+        - header_padding
+    ) / 2
+    local lb_fill_one_side = (
+        M.columns.lightbox.width
+        - vim.fn.strdisplaywidth(M.columns.lightbox.header)
+        - header_padding
+    ) / 2
 
     M.winconfig.title = {
         { string.rep(border_char, textoff), "FloatBorder" },
         { " " .. M.columns.regex.header .. " ", "Winbar" },
         { string.rep(border_char, regex_fill), "FloatBorder" },
         { M.columns.count.header, "FloatBorder" },
-        { string.rep(border_char, pre_color_fill), "FloatBorder" },
+        { string.rep(border_char, color_fill_one_side), "FloatBorder" },
         { " " .. M.columns.color.header .. " ", "Winbar" },
-        { string.rep(" ", color_hl_fill), "FloatBorder" },
+        { string.rep(" ", color_fill_one_side + hl_fill_one_side + column_padding), "FloatBorder" },
         { " " .. M.columns.highlight.header .. " ", "Winbar" },
-        { string.rep(" ", hl_lb_fill), "FloatBorder" },
+        { string.rep(" ", hl_fill_one_side + lb_fill_one_side + column_padding), "FloatBorder" },
         { " " .. M.columns.lightbox.header .. " ", "Winbar" },
-        { string.rep(border_char, post_lb_fill), "FloatBorder" },
+        { string.rep(border_char, lb_fill_one_side), "FloatBorder" },
     }
 end
 
@@ -256,9 +272,9 @@ function M.render(entries)
     vim.api.nvim_buf_clear_namespace(M.buf, M.ns, 0, -1)
 
     -- Dynamic count width
-    M.columns.count.width = 3
     for _, e in ipairs(entries) do
-        M.columns.count.width = math.max(M.columns.count.width, #tostring(e.count))
+        M.columns.count.width = math.max(M.columns.count.width, #tostring(e.count) + 2)
+        M.columns.count.header = string.rep("─", M.columns.count.width)
     end
 
     -- Apply decorations per line
@@ -269,7 +285,7 @@ function M.render(entries)
         local hl_hlgroup = e.highlight and e.hl_group or "Normal"
         local lb_hlgroup = e.lightbox and e.hl_group or "Normal"
 
-        local count_dec = center(tostring(e.count), M.columns.count.width)
+        local count_dec = string.format(" %" .. M.columns.count.width - 2 .. "d ", e.count)
         local color_dec = center(e.color, M.columns.color.width)
         local hl_dec = center(hl_icon, M.columns.highlight.width)
         local lb_dec = center(lb_icon, M.columns.lightbox.width)
@@ -279,7 +295,9 @@ function M.render(entries)
             virt_text = {
                 { count_dec, "Comment" }, -- Count
                 { color_dec, e.hl_group }, -- Color
+                { " ", "Normal" },
                 { hl_dec, hl_hlgroup }, -- Highlight
+                { " ", "Normal" },
                 { lb_dec, lb_hlgroup }, -- Lightbox
             },
             virt_text_pos = "right_align",
