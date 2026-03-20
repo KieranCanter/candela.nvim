@@ -25,7 +25,10 @@ describe("candela.ui", function()
                 window = { width = 0.5, min_height = 5, max_height = 30, margin = 16 },
             },
         }
-        package.loaded["candela"] = { augroup = vim.api.nvim_create_augroup("CandelaTest", { clear = true }) }
+        package.loaded["candela"] = {
+            augroup = vim.api.nvim_create_augroup("CandelaTest", { clear = true }),
+            set_ui_keymaps = function() end,
+        }
         package.loaded["candela.highlighter"] = { refresh_ui = function() end }
 
         ui = require("candela.ui")

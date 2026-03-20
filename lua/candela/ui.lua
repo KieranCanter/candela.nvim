@@ -122,13 +122,7 @@ local function ensure_init()
         end,
     })
 
-    vim.api.nvim_buf_set_keymap(M.buf, "n", "<ESC>", "", {
-        noremap = true,
-        silent = true,
-        callback = function()
-            M.close()
-        end,
-    })
+    require("candela").set_ui_keymaps(M.buf)
 end
 
 local function set_window_options()
@@ -323,16 +317,6 @@ function M.render(entries)
     -- Resize window
     local h = recalculate_height()
     M.resize(nil, h)
-end
-
-function M.set_keymap(mode, lhs, callback, desc)
-    ensure_init()
-    vim.api.nvim_buf_set_keymap(M.buf, mode, lhs, "", {
-        noremap = true,
-        silent = true,
-        desc = desc,
-        callback = callback,
-    })
 end
 
 return M

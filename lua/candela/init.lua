@@ -5,7 +5,98 @@ M.augroup = vim.api.nvim_create_augroup("Candela", { clear = false })
 local initialized = false
 local D = vim.log.levels.DEBUG
 
-local function ensure_init()
+function M.set_ui_keymaps(buf)
+    local function map(lhs, desc, callback)
+        vim.api.nvim_buf_set_keymap(buf, "n", lhs, "", {
+            noremap = true,
+            silent = true,
+            callback = callback,
+            desc = desc,
+        })
+    end
+
+    -- Close UI
+    map("<ESC>", "[Candela] close UI", function()
+        require("candela.ui").close()
+    end)
+
+    -- Toggle Highlight
+    map("<C-h>", "[Candela] toggle highlight", function()
+        local row = vim.api.nvim_win_get_cursor(0)[1]
+        local regex = require("candela.patterns").resolve(row)
+        if not regex then
+            return
+        end
+        local toggle = require("candela.patterns").toggle_highlight(regex)
+        if toggle ~= nil then
+            require("candela.highlighter").toggle_highlights(regex, toggle)
+            require("candela.highlighter").refresh_ui()
+        end
+    end)
+
+    -- Toggle Lightbox
+    map("<C-l>", "[Candela] toggle lightbox", function()
+        local row = vim.api.nvim_win_get_cursor(0)[1]
+        local regex = require("candela.patterns").resolve(row)
+        if not regex then
+            return
+        end
+        require("candela.patterns").toggle_lightbox(regex)
+        require("candela.lightbox").update_folds()
+        require("candela.highlighter").refresh_ui()
+    end)
+
+    -- Change color
+    map("<C-c>", "[Candela] change color", function()
+        local row = vim.api.nvim_win_get_cursor(0)[1]
+        local regex = require("candela.patterns").resolve(row)
+        if not regex then
+            return
+        end
+        local color = vim.fn.input({ prompt = "New color (name or #hex): " })
+        if color == "" then
+            return
+        end
+        local p = require("candela.patterns").change_color(regex, color)
+        if p then
+            require("candela.highlighter").update_color(regex)
+            require("candela.highlighter").refresh_ui()
+        end
+    end)
+
+    -- Refresh
+    map("<C-r>", "[Candela] refresh", function()
+        require("candela.highlighter").refresh()
+        require("candela.highlighter").refresh_ui()
+    end)
+
+    -- Import
+    map("<C-i>", "[Candela] import", function()
+        vim.ui.input({ prompt = "Import patterns from file: ", completion = "file" }, function(path)
+            if path then
+                require("candela.io").import(path)
+            end
+        end)
+    end)
+
+    -- Export
+    map("<C-e>", "[Candela] export", function()
+        local cd_io = require("candela.io")
+        local default_path = cd_io.data_dir .. "/" .. cd_io.default_export_filename
+        vim.ui.input(
+            { prompt = "Export patterns to file: ", default = default_path, completion = "file" },
+            function(path)
+                if path then
+                    require("candela.io").export(path)
+                end
+            end
+        )
+    end)
+end
+
+--- Trigger lazy initialization. Safe to call multiple times.
+---@return boolean success
+function M.ensure_init()
     if initialized then
         return true
     end
@@ -58,53 +149,6 @@ local function ensure_init()
         hl.refresh_ui()
     end
 
-    -- Buffer keymaps for data actions on the UI buffer
-    ui.set_keymap("n", "<C-h>", function()
-        local row = vim.api.nvim_win_get_cursor(0)[1]
-        local regex = require("candela.patterns").resolve(row)
-        if not regex then
-            return
-        end
-        local toggle = require("candela.patterns").toggle_highlight(regex)
-        if toggle ~= nil then
-            require("candela.highlighter").toggle_highlights(regex, toggle)
-            require("candela.highlighter").refresh_ui()
-        end
-    end, "[Candela] toggle highlight")
-
-    ui.set_keymap("n", "<C-l>", function()
-        local row = vim.api.nvim_win_get_cursor(0)[1]
-        local regex = require("candela.patterns").resolve(row)
-        if not regex then
-            return
-        end
-        require("candela.patterns").toggle_lightbox(regex)
-        require("candela.lightbox").update_folds()
-        require("candela.highlighter").refresh_ui()
-    end, "[Candela] toggle lightbox")
-
-    ui.set_keymap("n", "<C-c>", function()
-        local row = vim.api.nvim_win_get_cursor(0)[1]
-        local regex = require("candela.patterns").resolve(row)
-        if not regex then
-            return
-        end
-        local color = vim.fn.input({ prompt = "New color (name or #hex): " })
-        if color == "" then
-            return
-        end
-        local p = require("candela.patterns").change_color(regex, color)
-        if p then
-            require("candela.highlighter").update_color(regex)
-            require("candela.highlighter").refresh_ui()
-        end
-    end, "[Candela] change color")
-
-    ui.set_keymap("n", "<C-r>", function()
-        require("candela.highlighter").refresh()
-        require("candela.highlighter").refresh_ui()
-    end, "[Candela] refresh")
-
     -- Set base_buf to current buffer at init time
     local cur = vim.api.nvim_get_current_buf()
     local cur_bt = vim.api.nvim_get_option_value("buftype", { buf = cur })
@@ -141,12 +185,6 @@ local function ensure_init()
     return true
 end
 
---- Trigger lazy initialization. Safe to call multiple times.
----@return boolean success
-function M.ensure_init()
-    return ensure_init()
-end
-
 --- Optional. Call to override defaults before first use.
 ---@param opts? table user config overrides
 function M.setup(opts)
@@ -155,7 +193,7 @@ end
 
 ---@param args table vim command args from nvim_create_user_command
 function M.cmd(args)
-    if not ensure_init() then
+    if not M.ensure_init() then
         return
     end
     require("candela.commands").dispatch(args)
@@ -166,7 +204,7 @@ end
 ---@param cursorpos integer
 ---@return string[]
 function M.complete(arglead, cmdline, cursorpos)
-    if not ensure_init() then
+    if not M.ensure_init() then
         return {}
     end
     return require("candela.commands").complete(arglead, cmdline, cursorpos)

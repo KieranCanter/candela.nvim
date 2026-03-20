@@ -18,8 +18,6 @@ M.defaults = {
     },
     matching = {
         auto_refresh = false,
-        delete_confirmation = true,
-        clear_confirmation = true,
         case = "system",
         hl_eol = false,
     },

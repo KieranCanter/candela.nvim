@@ -7,7 +7,10 @@ describe("candela.patterns.resolve", function()
         package.loaded["candela.ui"] = nil
         package.loaded["candela"] = nil
 
-        package.loaded["candela"] = { augroup = vim.api.nvim_create_augroup("CandelaTest", { clear = true }) }
+        package.loaded["candela"] = {
+            augroup = vim.api.nvim_create_augroup("CandelaTest", { clear = true }),
+            set_ui_keymaps = function() end,
+        }
         package.loaded["candela.config"] = {
             defaults = { palette = { colors = { dark = {}, light = {} }, cycle = "constant" } },
             options = {
