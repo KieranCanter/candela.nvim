@@ -1,188 +1,195 @@
+--- Highlighter: manages highlights on the base buffer.
+
+---@class MatchEntry
+---@field extmark_id integer
+---@field row integer 1-indexed line number
+---@field end_col integer byte length of matched line
+
 local M = {}
+M.match_cache = {} ---@type table<string, MatchEntry[]>
+M.base_buf = nil ---@type integer|nil
 
-function M.setup()
-    M.match_cache = {}
-    return M
-end
-
----@param colors table
----@param ns integer
----@param hl_group string
-local function register_highlight(colors, ns, hl_group)
-    vim.api.nvim_set_hl_ns(ns)
-    colors.force = true
-    vim.api.nvim_set_hl(0, hl_group, colors)
-end
-
----@param windows { color: CandelaWindow, regex: CandelaWindow, highlight: CandelaWindow, lightbox: CandelaWindow }
----@param patterns CandelaPattern[]
-function M.highlight_ui(windows, patterns)
-    local ns = vim.api.nvim_create_namespace("CandelaUi")
-    if #patterns == 0 then
-        vim.api.nvim_buf_clear_namespace(windows.color.buf, ns, 0, -1)
-        vim.api.nvim_buf_clear_namespace(windows.regex.buf, ns, 0, -1)
-        vim.api.nvim_buf_clear_namespace(windows.highlight.buf, ns, 0, -1)
-        vim.api.nvim_buf_clear_namespace(windows.lightbox.buf, ns, 0, -1)
-        return
-    end
-
-    for i, pattern in ipairs(patterns) do
-        local hl_group = "CandelaHl_" .. require("candela.pattern_list").hash_regex(pattern.regex)
-        register_highlight({ bg = pattern.color }, ns, hl_group)
-        vim.api.nvim_buf_set_extmark(windows.color.buf, ns, i - 1, 0, { line_hl_group = hl_group })
-        M.highlight_ui_toggle(windows.highlight, "highlight", i, pattern)
-        M.highlight_ui_toggle(windows.lightbox, "lightbox", i, pattern)
-    end
-end
-
-function M.highlight_selected(window, row, toggled)
-    local ns = vim.api.nvim_create_namespace("CandelaUi")
-    local hl_group = "Visual"
-    if not toggled then
-        hl_group = "Normal"
-    end
-
-    vim.api.nvim_buf_set_extmark(window.buf, ns, row - 1, 0, { line_hl_group = hl_group })
-end
-
-function M.highlight_ui_toggle(window, kind, row, pattern)
-    local ns = vim.api.nvim_create_namespace("CandelaUi")
-
-    if pattern[kind] == true then
-        vim.api.nvim_buf_set_extmark(
-            window.buf,
-            ns,
-            row - 1,
-            0,
-            { line_hl_group = "CandelaHl_" .. require("candela.pattern_list").hash_regex(pattern.regex) }
-        )
-    end
-end
-
----@param bufnr number
----@param id string
 ---@param regex string
----@param color string
----@param cmd string
----@param args string[]
----@return number
-function M.highlight_matches(bufnr, id, pattern, cmd, args)
-    local hash = require("candela.pattern_list").hash_regex(pattern.regex)
-    local ns = vim.api.nvim_create_namespace("CandelaNs_" .. hash)
-    local hl_group = "CandelaHl_" .. hash
-    register_highlight({ bg = pattern.color }, ns, hl_group)
+---@return integer namespace id
+local function get_ns(regex)
+    return vim.api.nvim_create_namespace("CandelaNs_" .. require("candela.patterns").hash(regex))
+end
 
-    local filepath = vim.api.nvim_buf_get_name(bufnr)
-    if filepath == "" then
-        vim.notify("[Candela] cannot search file with no file name", vim.log.levels.ERROR)
+---@param regex string
+---@return string highlight group name
+local function get_hl_group(regex)
+    return "CandelaHl_" .. require("candela.patterns").hash(regex):sub(1, 8)
+end
+
+--- Run engine on a single pattern, apply highlights to base buffer.
+---@param regex string
+---@return integer count of matches, -1 on error
+function M.highlight(regex)
+    local patterns = require("candela.patterns")
+    local p = patterns.get(regex)
+    if not p then
+        return -1
+    end
+    if not M.base_buf then
+        vim.notify("[Candela] no base buffer set", vim.log.levels.WARN)
         return -1
     end
 
-    -- construct shell command from regex search engine
-    local command = { cmd }
-    for _, arg in ipairs(args) do
-        table.insert(command, arg)
+    local ns = get_ns(regex)
+    local hl = get_hl_group(regex)
+    vim.api.nvim_set_hl(0, hl, { bg = p.color, force = true })
+
+    local filepath = vim.api.nvim_buf_get_name(M.base_buf)
+    if filepath == "" then
+        vim.notify("[Candela] cannot search file with no name", vim.log.levels.ERROR)
+        return -1
     end
-    table.insert(command, pattern.regex)
+
+    local cfg = require("candela.config").options
+    local command = { cfg.engine.command }
+    vim.list_extend(command, cfg.engine.args)
+    table.insert(command, regex)
     table.insert(command, filepath)
 
     local matches = require("candela.engine").get_matches(command)
-    M.match_cache[id] = {}
-    local col = 0
+    M.match_cache[regex] = {}
     local count = 0
+
     for _, entry in ipairs(matches) do
-        local row, line = entry.lineno, entry.line
-        if row ~= nil and type(row) == "number" and line ~= nil and type(line) == "string" then
-            local extmark_opts = {}
-            if require("candela.config").options.matching.hl_eol then
-                extmark_opts = { line_hl_group = hl_group, priority = 100 }
-            else
-                extmark_opts = { end_col = string.len(line), hl_group = hl_group, strict = false, priority = 100 }
-            end
+        if entry.lineno and entry.line then
+            local opts = cfg.matching.hl_eol and { line_hl_group = hl, priority = 100 }
+                or { end_col = #entry.line, hl_group = hl, strict = false, priority = 100 }
 
-            local extmark_id = vim.api.nvim_buf_set_extmark(bufnr, ns, row - 1, col, extmark_opts)
+            local eid = vim.api.nvim_buf_set_extmark(M.base_buf, ns, entry.lineno - 1, 0, opts)
             count = count + 1
-
-            table.insert(M.match_cache[id], { extmark_id = extmark_id, row = row, end_col = string.len(line) })
-            require("candela.lightbox").add_to_cache(row, id)
+            table.insert(M.match_cache[regex], { extmark_id = eid, row = entry.lineno, end_col = #entry.line })
+            require("candela.lightbox").add_to_cache(entry.lineno, regex)
         end
     end
 
-    if not pattern.highlight then
-        M.toggle_match_highlights(bufnr, id, pattern.regex, false)
+    if not p.highlight then
+        M.toggle_highlights(regex, false)
     end
 
+    p.count = count
+    if vim.g.candela_debug then
+        vim.notify(string.format("[Candela] highlighted /%s/: %d matches", regex, count), vim.log.levels.DEBUG)
+    end
     return count
 end
 
----@return boolean
-function M.toggle_match_highlights(bufnr, id, regex, toggle)
-    if not M.match_cache[id] then
-        return true
+--- Remove all highlights for a pattern from the base buffer.
+---@param regex string
+function M.remove(regex)
+    if vim.g.candela_debug then
+        vim.notify(string.format("[Candela] removing highlights for /%s/", regex), vim.log.levels.DEBUG)
+    end
+    local ns = get_ns(regex)
+    if M.base_buf and vim.api.nvim_buf_is_valid(M.base_buf) then
+        vim.api.nvim_buf_clear_namespace(M.base_buf, ns, 0, -1)
+    end
+    if M.match_cache[regex] then
+        require("candela.lightbox").remove_from_cache(M.match_cache[regex], regex)
+        M.match_cache[regex] = nil
+    end
+end
+
+--- Remove all highlights for all patterns.
+function M.remove_all()
+    for regex, _ in pairs(M.match_cache) do
+        M.remove(regex)
+    end
+end
+
+--- Toggle highlight visibility for a pattern's matches.
+---@param regex string
+---@param toggle boolean true to show highlights, false to hide
+function M.toggle_highlights(regex, toggle)
+    local cache = M.match_cache[regex]
+    if not cache or not M.base_buf then
+        return
     end
 
-    local hash = require("candela.pattern_list").hash_regex(regex)
-    local ns = vim.api.nvim_create_namespace("CandelaNs_" .. hash)
-    if ns == nil then
-        vim.notify(string.format("[Candela] namespace does not exist: CandelaNs_%s", hash), vim.log.levels.ERROR)
-        return false
-    end
+    local ns = get_ns(regex)
+    local hl = toggle and get_hl_group(regex) or "Normal"
+    local hl_eol = require("candela.config").options.matching.hl_eol
 
-    local hl_group = ""
-    if toggle then
-        hl_group = "CandelaHl_" .. hash
-    else
-        hl_group = "Normal"
-    end
-
-    for _, match in ipairs(M.match_cache[id]) do
-        local extmark_opts = {}
-        if require("candela.config").options.matching.hl_eol then
-            extmark_opts = { id = match.extmark_id, line_hl_group = hl_group, priority = 100 }
-        else
-            local line = vim.api.nvim_buf_get_lines(bufnr, match.row - 1, match.row, false)[1]
-            extmark_opts = {
+    for _, match in ipairs(cache) do
+        local opts = hl_eol and { id = match.extmark_id, line_hl_group = hl, priority = 100 }
+            or {
                 id = match.extmark_id,
-                end_col = string.len(line),
-                hl_group = hl_group,
+                end_col = match.end_col,
+                hl_group = hl,
                 strict = false,
                 priority = 100,
             }
+        vim.api.nvim_buf_set_extmark(M.base_buf, ns, match.row - 1, 0, opts)
+    end
+end
+
+--- Update the highlight group color for a pattern.
+---@param regex string
+function M.update_color(regex)
+    local p = require("candela.patterns").get(regex)
+    if not p then
+        return
+    end
+    vim.api.nvim_set_hl(0, get_hl_group(regex), { bg = p.color, force = true })
+end
+
+--- Re-run engine on all patterns for current base buffer.
+function M.refresh()
+    if vim.g.candela_debug then
+        vim.notify("[Candela] refreshing all highlights", vim.log.levels.DEBUG)
+    end
+    M.remove_all()
+    for regex, _ in pairs(require("candela.patterns").patterns) do
+        M.highlight(regex)
+    end
+end
+
+--- Collect ordered pattern entries and pass to UI for rendering.
+--- Preserves existing buffer order, appends new patterns at the end.
+function M.refresh_ui()
+    local ui = require("candela.ui")
+    local patterns = require("candela.patterns")
+
+    local entries = {}
+    local seen = {}
+
+    -- Preserve buffer order
+    for _, regex in ipairs(ui.get_lines()) do
+        local p = patterns.get(regex)
+        if not seen[regex] and p then
+            table.insert(entries, {
+                regex = regex,
+                color = p.color,
+                count = p.count or 0,
+                highlight = p.highlight,
+                lightbox = p.lightbox,
+                hl_group = get_hl_group(regex),
+            })
+            vim.api.nvim_set_hl(0, get_hl_group(regex), { bg = p.color, force = true })
+            seen[regex] = true
         end
-
-        vim.api.nvim_buf_set_extmark(bufnr, ns, match.row - 1, 0, extmark_opts)
     end
 
-    return true
-end
-
----@return boolean
-function M.remove_match_highlights(bufnr, id, regex)
-    local hash = require("candela.pattern_list").hash_regex(regex)
-    local ns = vim.api.nvim_create_namespace("CandelaNs_" .. hash)
-    if ns == nil then
-        vim.notify(string.format("[Candela] namespace does not exist: CandelaNs_%s", hash), vim.log.levels.ERROR)
-        return false
+    -- Append new patterns
+    for regex, p in pairs(patterns.patterns) do
+        if not seen[regex] then
+            table.insert(entries, {
+                regex = regex,
+                color = p.color,
+                count = p.count or 0,
+                highlight = p.highlight,
+                lightbox = p.lightbox,
+                hl_group = get_hl_group(regex),
+            })
+            vim.api.nvim_set_hl(0, get_hl_group(regex), { bg = p.color, force = true })
+        end
     end
 
-    vim.api.nvim_buf_clear_namespace(bufnr, ns, 0, -1)
-    require("candela.lightbox").remove_from_cache(M.match_cache[id], id)
-    M.match_cache[id] = nil
-    return true
-end
-
----@return boolean
-function M.change_highlight_color(regex, new_color)
-    local hash = require("candela.pattern_list").hash_regex(regex)
-    local ns = vim.api.nvim_create_namespace("CandelaNs_" .. hash)
-    if ns == nil then
-        vim.notify(string.format("[Candela] namespace does not exist: CandelaNs_%s", hash), vim.log.levels.ERROR)
-        return false
-    end
-
-    local hl_group = "CandelaHl_" .. hash
-    register_highlight({ bg = new_color }, ns, hl_group)
-    return true
+    ui.render(entries)
 end
 
 return M
