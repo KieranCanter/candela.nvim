@@ -82,10 +82,10 @@ describe("candela.highlighter", function()
     end)
 
     describe("refresh_ui", function()
-        it("calls ui.render with pattern regexes", function()
-            local rendered_lines
-            package.loaded["candela.ui"].render = function(lines)
-                rendered_lines = lines
+        it("calls ui.render with pattern entries", function()
+            local rendered
+            package.loaded["candela.ui"].render = function(entries)
+                rendered = entries
             end
             package.loaded["candela.ui"].get_lines = function()
                 return {}
@@ -95,21 +95,20 @@ describe("candela.highlighter", function()
             patterns.add("ERROR")
             highlighter.refresh_ui()
 
-            assert.is_not_nil(rendered_lines)
-            assert.equals(2, #rendered_lines)
-            -- Both patterns present (order doesn't matter)
+            assert.is_not_nil(rendered)
+            assert.equals(2, #rendered)
             local set = {}
-            for _, l in ipairs(rendered_lines) do
-                set[l] = true
+            for _, e in ipairs(rendered) do
+                set[e.regex] = true
             end
             assert.is_true(set["ERROR"])
             assert.is_true(set["WARN"])
         end)
 
         it("preserves buffer order and appends new", function()
-            local rendered_lines
-            package.loaded["candela.ui"].render = function(lines)
-                rendered_lines = lines
+            local rendered
+            package.loaded["candela.ui"].render = function(entries)
+                rendered = entries
             end
             package.loaded["candela.ui"].get_lines = function()
                 return { "WARN", "ERROR" }
@@ -120,15 +119,15 @@ describe("candela.highlighter", function()
             patterns.add("FATAL")
             highlighter.refresh_ui()
 
-            assert.equals("WARN", rendered_lines[1])
-            assert.equals("ERROR", rendered_lines[2])
-            assert.equals("FATAL", rendered_lines[3])
+            assert.equals("WARN", rendered[1].regex)
+            assert.equals("ERROR", rendered[2].regex)
+            assert.equals("FATAL", rendered[3].regex)
         end)
 
         it("removes deleted patterns from buffer", function()
-            local rendered_lines
-            package.loaded["candela.ui"].render = function(lines)
-                rendered_lines = lines
+            local rendered
+            package.loaded["candela.ui"].render = function(entries)
+                rendered = entries
             end
             package.loaded["candela.ui"].get_lines = function()
                 return { "ERROR", "WARN" }
@@ -138,14 +137,14 @@ describe("candela.highlighter", function()
             -- WARN not in patterns, should be dropped
             highlighter.refresh_ui()
 
-            assert.equals(1, #rendered_lines)
-            assert.equals("ERROR", rendered_lines[1])
+            assert.equals(1, #rendered)
+            assert.equals("ERROR", rendered[1].regex)
         end)
 
         it("deduplicates buffer lines", function()
-            local rendered_lines
-            package.loaded["candela.ui"].render = function(lines)
-                rendered_lines = lines
+            local rendered
+            package.loaded["candela.ui"].render = function(entries)
+                rendered = entries
             end
             package.loaded["candela.ui"].get_lines = function()
                 return { "ERROR", "ERROR" }
@@ -154,7 +153,7 @@ describe("candela.highlighter", function()
             patterns.add("ERROR")
             highlighter.refresh_ui()
 
-            assert.equals(1, #rendered_lines)
+            assert.equals(1, #rendered)
         end)
     end)
 end)

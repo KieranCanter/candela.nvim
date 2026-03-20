@@ -13,8 +13,14 @@ describe("candela.init on_write", function()
             options = {
                 engine = { command = "rg", args = {} },
                 matching = { auto_refresh = false, hl_eol = false },
-                icons = { highlight = {}, lightbox = {} },
-                window = { toggle_width = 4 },
+                icons = {
+                    candela = "C",
+                    color = "C",
+                    regex = "R",
+                    highlight = { header = "H", toggle_on = "Y", toggle_off = "N" },
+                    lightbox = { header = "L", toggle_on = "Y", toggle_off = "N" },
+                },
+                window = { width = 0.5, min_height = 5, max_height = 30, margin = 16 },
                 palette = {
                     use = "replace",
                     cycle = "constant",

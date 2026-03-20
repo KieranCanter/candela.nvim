@@ -2,7 +2,7 @@
 
 local M = {}
 
-M.version = { major = 2, minor = 0, patch = 0, pre = "alpha.1" }
+M.version = { major = 2, minor = 0, patch = 0, pre = "alpha.2" }
 M.options = nil
 
 M.defaults = {
@@ -11,8 +11,6 @@ M.defaults = {
         min_height = 5,
         max_height = 30,
         margin = 16,
-        min_count_width = 4,
-        toggle_width = 6,
     },
     engine = {
         command = nil,
