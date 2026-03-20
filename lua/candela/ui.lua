@@ -6,6 +6,9 @@ M.winconfig = nil
 M.ns = vim.api.nvim_create_namespace("candela.ui")
 M.on_write = nil
 
+---@type table<integer, integer>: row (1-index) -> extmark id
+M.select_extmark_ids = {}
+
 ---@class Column
 ---@field width integer display width of the column
 ---@field header string title text for the window border
@@ -247,8 +250,16 @@ function M.get_lines()
     return result
 end
 
+---@class UiEntry
+---@field regex string
+---@field color string
+---@field count string
+---@field highlight string
+---@field lightbox string
+---@field hl_group string
+
 --- Render pattern entries: builds buffer lines, decorations, title from data.
----@param entries {regex: string, color: string, count: integer, highlight: boolean, lightbox: boolean, hl_group: string}[]
+---@param entries UiEntry[]
 function M.render(entries)
     ensure_init()
     local icons = require("candela.config").options.icons
@@ -272,6 +283,7 @@ function M.render(entries)
     end
 
     -- Apply decorations per line
+    M.select_extmark_ids = {}
     for i, e in ipairs(entries) do
         local row = i - 1
         local hl_icon = e.highlight and icons.highlight.toggle_on or icons.highlight.toggle_off
@@ -287,14 +299,22 @@ function M.render(entries)
         -- Right-aligned: count, color, toggles
         vim.api.nvim_buf_set_extmark(M.buf, M.ns, row, 0, {
             virt_text = {
-                { count_dec, "Comment" }, -- Count
-                { color_dec, e.hl_group }, -- Color
+                { count_dec, "Comment" }, -- count
+                { color_dec, e.hl_group }, -- color
                 { " ", "Normal" },
-                { hl_dec, hl_hlgroup }, -- Highlight
+                { hl_dec, hl_hlgroup }, -- highlight
                 { " ", "Normal" },
-                { lb_dec, lb_hlgroup }, -- Lightbox
+                { lb_dec, lb_hlgroup }, -- lightbox
             },
             virt_text_pos = "right_align",
+            invalidate = true,
+        })
+
+        -- Selection placeholder (empty, updated by toggle_selection)
+        M.select_extmark_ids[i] = vim.api.nvim_buf_set_extmark(M.buf, M.ns, row, 0, {
+            virt_text = {},
+            virt_text_pos = "inline",
+            right_gravity = false,
             invalidate = true,
         })
 
@@ -317,6 +337,54 @@ function M.render(entries)
     -- Resize window
     local h = recalculate_height()
     M.resize(nil, h)
+end
+
+--- Render selection icons for all rows.
+--- If selected_set is empty, clears all selection extmarks.
+---@param selected_set table<string, boolean>
+function M.render_selection(selected_set)
+    if vim.tbl_isempty(selected_set) then
+        M.clear_selection()
+        return
+    end
+    local lines = vim.api.nvim_buf_get_lines(M.buf, 0, -1, false)
+    for i, line in ipairs(lines) do
+        M.toggle_selection(i, selected_set[line] or false)
+    end
+end
+
+--- Update selection icon on a single row via stored extmark ID.
+---@param row integer 1-indexed line number
+---@param selected boolean
+function M.toggle_selection(row, selected)
+    local id = M.select_extmark_ids[row]
+    if not id then
+        return
+    end
+    local icons = require("candela.config").options.icons.selection
+    local icon = selected and icons.toggle_on or icons.toggle_off
+    icon = center(icon, vim.fn.strdisplaywidth(icon) + 2)
+    local hl = selected and "Winbar" or "Comment"
+    vim.api.nvim_buf_set_extmark(M.buf, M.ns, row - 1, 0, {
+        id = id,
+        virt_text = { { icon, hl } },
+        virt_text_pos = "inline",
+        right_gravity = false,
+        invalidate = true,
+    })
+end
+
+--- Clear all selection icons back to empty.
+function M.clear_selection()
+    for row, id in pairs(M.select_extmark_ids) do
+        vim.api.nvim_buf_set_extmark(M.buf, M.ns, row - 1, 0, {
+            id = id,
+            virt_text = {},
+            virt_text_pos = "inline",
+            right_gravity = false,
+            invalidate = true,
+        })
+    end
 end
 
 return M

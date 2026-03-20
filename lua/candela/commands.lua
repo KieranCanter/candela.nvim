@@ -183,42 +183,30 @@ M.commands = {
             return filter(complete_patterns(), lead)
         end,
     },
-    match = {
+    vimmatch = {
         impl = function(subargs)
             if #subargs == 0 then
                 vim.notify("[Candela] Usage: Candela match <regex> [more...]", vim.log.levels.ERROR)
                 return
             end
-            require("candela.locator").match(subargs)
+            require("candela.locator").vimmatch(subargs)
         end,
         complete = function()
             return complete_patterns()
         end,
     },
-    match_all = {
-        impl = function()
-            require("candela.locator").match_all()
-        end,
-    },
-    find = {
+    loclist = {
         impl = function(subargs)
             if #subargs == 0 then
                 vim.notify("[Candela] Usage: Candela find <regex> [more...]", vim.log.levels.ERROR)
                 return
             end
-            if require("candela.locator").find(subargs) then
+            if require("candela.locator").loclist(subargs) then
                 vim.cmd("lopen")
             end
         end,
         complete = function()
             return complete_patterns()
-        end,
-    },
-    find_all = {
-        impl = function()
-            if require("candela.locator").find_all() then
-                vim.cmd("lopen")
-            end
         end,
     },
     lightbox = {

@@ -2,8 +2,15 @@
 --- Order is owned by the UI buffer, not this module.
 
 local M = {}
-M.patterns = {} ---@type table<string, CandelaPattern>
-M.next_color = nil ---@type fun(): string|nil
+
+---@type table<string, CandelaPattern>
+M.patterns = {}
+
+---@type table<string, boolean>
+M.selected = {}
+
+---@type fun(): string
+M.next_color = nil
 M.palette = nil
 
 ---@param t string[]
@@ -191,6 +198,7 @@ function M.delete(regex)
         return false
     end
     M.patterns[regex] = nil
+    M.selected[regex] = nil
     if vim.g.candela_debug then
         vim.notify(string.format("[Candela] pattern deleted: /%s/", regex), vim.log.levels.DEBUG)
     end
@@ -203,6 +211,7 @@ function M.clear()
         return false
     end
     M.patterns = {}
+    M.selected = {}
     return true
 end
 
@@ -214,14 +223,14 @@ function M.change_color(regex, new_color)
     if not p then
         return nil
     end
-    new_color = require("candela.pattern").convert_color_string(new_color)
-    if not new_color then
+    local color_str = require("candela.pattern").convert_color_string(new_color)
+    if not color_str then
         return nil
     end
-    if string.upper(p.color) == string.upper(new_color) then
+    if string.upper(p.color) == string.upper(color_str) then
         return p
     end
-    p:change_color(new_color)
+    p:change_color(color_str)
     return p
 end
 
@@ -253,6 +262,30 @@ function M.regen_colors()
     for regex, _ in pairs(M.patterns) do
         M.change_color(regex, M.next_color())
     end
+end
+
+---@param regex string
+function M.add_to_selected(regex)
+    M.selected[regex] = true
+end
+
+---@param regex string
+function M.remove_from_selected(regex)
+    M.selected[regex] = nil
+end
+
+function M.add_all_to_selected()
+    for _, pattern in pairs(M.patterns) do
+        M.selected[pattern.regex] = true
+    end
+end
+
+function M.clear_selected()
+    M.selected = {}
+end
+
+function M.get_selected()
+    return M.selected
 end
 
 return M

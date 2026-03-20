@@ -17,6 +17,7 @@ function M.set_ui_keymaps(buf)
 
     -- Close UI
     map("<ESC>", "[Candela] close UI", function()
+        require("candela.patterns").clear_selected()
         require("candela.ui").close()
     end)
 
@@ -92,6 +93,134 @@ function M.set_ui_keymaps(buf)
             end
         )
     end)
+
+    -- Select and Next
+    map("<Tab>", "[Candela] select and next", function()
+        local patterns = require("candela.patterns")
+        local ui = require("candela.ui")
+        local row = vim.api.nvim_win_get_cursor(0)[1]
+        local regex = patterns.resolve(row)
+        if not regex then
+            return
+        end
+
+        local was_any = not vim.tbl_isempty(patterns.selected)
+        if patterns.selected[regex] then
+            patterns.remove_from_selected(regex)
+        else
+            patterns.add_to_selected(regex)
+        end
+        local is_any = not vim.tbl_isempty(patterns.selected)
+
+        if was_any ~= is_any then
+            ui.render_selection(patterns.selected)
+        else
+            ui.toggle_selection(row, patterns.selected[regex] or false)
+        end
+
+        -- Move cursor down
+        local line_count = vim.api.nvim_buf_line_count(ui.buf)
+        if row < line_count then
+            vim.api.nvim_win_set_cursor(0, { row + 1, 0 })
+        else
+            vim.api.nvim_win_set_cursor(0, { 1, 0 })
+        end
+    end)
+
+    -- Select and Prev
+    map("<S-Tab>", "[Candela] select and prev", function()
+        local patterns = require("candela.patterns")
+        local ui = require("candela.ui")
+        local row = vim.api.nvim_win_get_cursor(0)[1]
+        local regex = patterns.resolve(row)
+        if not regex then
+            return
+        end
+
+        local was_any = not vim.tbl_isempty(patterns.selected)
+        if patterns.selected[regex] then
+            patterns.remove_from_selected(regex)
+        else
+            patterns.add_to_selected(regex)
+        end
+        local is_any = not vim.tbl_isempty(patterns.selected)
+
+        if was_any ~= is_any then
+            ui.render_selection(patterns.selected)
+        else
+            ui.toggle_selection(row, patterns.selected[regex] or false)
+        end
+
+        -- Move cursor up
+        local line_count = vim.api.nvim_buf_line_count(ui.buf)
+        if row > 1 then
+            vim.api.nvim_win_set_cursor(0, { row - 1, 0 })
+        else
+            vim.api.nvim_win_set_cursor(0, { line_count, 0 })
+        end
+    end)
+
+    -- Select All (toggle: if all selected, deselect all)
+    map("<C-a>", "[Candela] select all", function()
+        local patterns = require("candela.patterns")
+        local ui = require("candela.ui")
+
+        if vim.tbl_count(patterns.selected) == vim.tbl_count(patterns.patterns) then
+            patterns.clear_selected()
+        else
+            patterns.add_all_to_selected()
+        end
+        ui.render_selection(patterns.selected)
+    end)
+
+    -- Vim Match
+    map("<C-/>", "[Candela] vim match", function()
+        local patterns = require("candela.patterns")
+        local locator = require("candela.locator")
+        local selected = patterns.get_selected()
+
+        local regexes
+        if not vim.tbl_isempty(selected) then
+            regexes = vim.tbl_keys(selected)
+        else
+            local row = vim.api.nvim_win_get_cursor(0)[1]
+            local regex = patterns.resolve(row)
+            if not regex then
+                return
+            end
+            regexes = { regex }
+        end
+
+        patterns.clear_selected()
+        require("candela.ui").close()
+
+        locator.vimmatch(regexes)
+    end)
+
+    -- Location List
+    map("<C-q>", "[Candela] send to location list", function()
+        local patterns = require("candela.patterns")
+        local locator = require("candela.locator")
+        local selected = patterns.get_selected()
+
+        local regexes
+        if not vim.tbl_isempty(selected) then
+            regexes = vim.tbl_keys(selected)
+        else
+            local row = vim.api.nvim_win_get_cursor(0)[1]
+            local regex = patterns.resolve(row)
+            if not regex then
+                return
+            end
+            regexes = { regex }
+        end
+
+        patterns.clear_selected()
+        require("candela.ui").close()
+        if locator.loclist(regexes) then
+            vim.api.nvim_exec2("lopen", {})
+        end
+    end)
 end
 
 --- Trigger lazy initialization. Safe to call multiple times.
@@ -147,6 +276,7 @@ function M.ensure_init()
         end
 
         hl.refresh_ui()
+        patterns.clear_selected()
     end
 
     -- Set base_buf to current buffer at init time
