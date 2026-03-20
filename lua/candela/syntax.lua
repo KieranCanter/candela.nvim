@@ -1,6 +1,6 @@
 local M = {}
 M.enabled = false
-local augroup = require("candela.init").augroup
+local augroup = require("candela").augroup
 
 local function apply()
     for _, cmd in ipairs(M.syntax_commands) do

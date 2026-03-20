@@ -1,17 +1,17 @@
 local M = {}
 local uv = vim.uv
 
-local data_dir = vim.fn.stdpath("data") .. "/candela"
-local default_filename = "patterns_export.lua"
+M.data_dir = vim.fn.stdpath("data") .. "/candela"
+M.default_export_filename = "patterns_export.lua"
 
 function M.ensure_data_dir()
-    if not uv.fs_stat(data_dir) then
-        uv.fs_mkdir(data_dir, 448)
+    if not uv.fs_stat(M.data_dir) then
+        uv.fs_mkdir(M.data_dir, 448)
     end
 end
 
 local function unique_path(path)
-    if path ~= data_dir .. "/" .. default_filename and not uv.fs_stat(path) then
+    if path ~= M.data_dir .. "/" .. M.default_export_filename and not uv.fs_stat(path) then
         return path
     end
     local base, ext = path:match("^(.*)%.(.-)$")
@@ -61,11 +61,7 @@ end
 function M.export(path)
     if not path or path == "" then
         M.ensure_data_dir()
-        path = data_dir .. "/" .. default_filename
-    end
-
-    if not path:match("%.lua$") then
-        vim.notify("[Candela] export path doesn't end in .lua — won't be importable", vim.log.levels.WARN)
+        path = M.data_dir .. "/" .. M.default_export_filename
     end
 
     if uv.fs_stat(path) then
@@ -95,30 +91,39 @@ function M.export(path)
 
     file:write("return " .. vim.inspect(exported))
     file:close()
-    vim.notify(string.format("[Candela] exported to %s", path), vim.log.levels.INFO)
+
+    local msg = "[Candela] exported patterns to " .. path
+    if not path:match("%.lua$") then
+        vim.api.nvim_echo({
+            { msg .. "\n", "DiagnosticOk" },
+            { "Export path doesn't end in .lua, won't be importable", "DiagnosticWarn" },
+        }, true, {})
+    else
+        vim.api.nvim_echo({ { msg, "DiagnosticOk" } }, true, {})
+    end
 end
 
 --- Delete all exported pattern files from the default data directory.
 function M.clear()
-    if not uv.fs_stat(data_dir) then
+    if not uv.fs_stat(M.data_dir) then
         return
     end
-    local handle = uv.fs_scandir(data_dir)
+    local handle = uv.fs_scandir(M.data_dir)
     if not handle then
         return
     end
 
-    local stem = default_filename:match("(.*)%.lua$")
+    local stem = M.default_export_filename:match("(.*)%.lua$")
     while true do
         local name, type = uv.fs_scandir_next(handle)
         if not name then
             break
         end
         if type == "file" and name:match("^" .. stem .. ".*%.lua$") then
-            uv.fs_unlink(data_dir .. "/" .. name)
+            uv.fs_unlink(M.data_dir .. "/" .. name)
         end
     end
-    vim.notify(string.format("[Candela] cleared exports from %s", data_dir), vim.log.levels.INFO)
+    vim.api.nvim_echo({ { string.format("[Candela] cleared exports from %s", M.data_dir), "DiagnosticOk" } }, true, {})
 end
 
 return M

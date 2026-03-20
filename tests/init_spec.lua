@@ -54,8 +54,9 @@ describe("candela.init on_write", function()
         end
 
         -- Trigger ensure_init to wire on_write
-        candela.ensure_init()
         ui = require("candela.ui")
+        ui.get_lines() -- ensure ui.buf is created
+        candela.ensure_init()
     end)
 
     it("adds patterns from buffer that aren't in memory", function()
