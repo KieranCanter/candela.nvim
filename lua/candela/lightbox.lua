@@ -65,7 +65,7 @@ function M.add_to_cache(row, regex)
     M.lightbox_cache[row][regex] = true
 end
 
----@param matches CandelaMatchEntry[]|nil
+---@param matches MatchEntry[]|nil
 ---@param regex string
 function M.add_many_to_cache(matches, regex)
     if not matches then
@@ -76,7 +76,7 @@ function M.add_many_to_cache(matches, regex)
     end
 end
 
----@param matches CandelaMatchEntry[]|nil
+---@param matches MatchEntry[]|nil
 ---@param regex string
 function M.remove_from_cache(matches, regex)
     if not matches then

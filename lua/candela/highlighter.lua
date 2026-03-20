@@ -1,10 +1,12 @@
----@class CandelaMatchEntry
+--- Highlighter: manages highlights on the base buffer.
+
+---@class MatchEntry
 ---@field extmark_id integer
 ---@field row integer 1-indexed line number
 ---@field end_col integer byte length of matched line
 
 local M = {}
-M.match_cache = {} ---@type table<string, CandelaMatchEntry[]>
+M.match_cache = {} ---@type table<string, MatchEntry[]>
 M.base_buf = nil ---@type integer|nil
 
 ---@param regex string
@@ -29,7 +31,7 @@ function M.highlight(regex)
         return -1
     end
     if not M.base_buf then
-        vim.notify("[Candela] no base buffer set, run :Candela refresh or open a file first", vim.log.levels.WARN)
+        vim.notify("[Candela] no base buffer set", vim.log.levels.WARN)
         return -1
     end
 
@@ -146,31 +148,48 @@ function M.refresh()
     end
 end
 
---- Build lines from pattern data and push to UI.
---- M.patterns is the source of truth. Buffer is just a view.
+--- Collect ordered pattern entries and pass to UI for rendering.
 --- Preserves existing buffer order, appends new patterns at the end.
 function M.refresh_ui()
     local ui = require("candela.ui")
     local patterns = require("candela.patterns")
 
-    -- Start with current buffer order, skip duplicates and deleted patterns
-    local lines = {}
+    local entries = {}
     local seen = {}
+
+    -- Preserve buffer order
     for _, regex in ipairs(ui.get_lines()) do
-        if not seen[regex] and patterns.get(regex) then
-            table.insert(lines, regex)
+        local p = patterns.get(regex)
+        if not seen[regex] and p then
+            table.insert(entries, {
+                regex = regex,
+                color = p.color,
+                count = p.count or 0,
+                highlight = p.highlight,
+                lightbox = p.lightbox,
+                hl_group = get_hl_group(regex),
+            })
+            vim.api.nvim_set_hl(0, get_hl_group(regex), { bg = p.color, force = true })
             seen[regex] = true
         end
     end
 
-    -- Append any patterns not already in the buffer
-    for regex, _ in pairs(patterns.patterns) do
+    -- Append new patterns
+    for regex, p in pairs(patterns.patterns) do
         if not seen[regex] then
-            table.insert(lines, regex)
+            table.insert(entries, {
+                regex = regex,
+                color = p.color,
+                count = p.count or 0,
+                highlight = p.highlight,
+                lightbox = p.lightbox,
+                hl_group = get_hl_group(regex),
+            })
+            vim.api.nvim_set_hl(0, get_hl_group(regex), { bg = p.color, force = true })
         end
     end
 
-    ui.render(lines)
+    ui.render(entries)
 end
 
 return M
