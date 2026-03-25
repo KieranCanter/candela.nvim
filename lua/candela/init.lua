@@ -20,9 +20,18 @@ function M.set_ui_keymaps(buf)
         require("candela.patterns").clear_selected()
         require("candela.ui").close()
     end)
+    map("<C-C>", "[Candela] close UI", function()
+        require("candela.patterns").clear_selected()
+        require("candela.ui").close()
+    end)
+
+    -- Help
+    map("g?", "[Candela] toggle help", function()
+        require("candela.ui").help()
+    end)
 
     -- Toggle Highlight
-    map("<C-h>", "[Candela] toggle highlight", function()
+    map("<C-H>", "[Candela] toggle highlight", function()
         local row = vim.api.nvim_win_get_cursor(0)[1]
         local regex = require("candela.patterns").resolve(row)
         if not regex then
@@ -36,7 +45,7 @@ function M.set_ui_keymaps(buf)
     end)
 
     -- Toggle Lightbox
-    map("<C-l>", "[Candela] toggle lightbox", function()
+    map("<C-L>", "[Candela] toggle lightbox", function()
         local row = vim.api.nvim_win_get_cursor(0)[1]
         local regex = require("candela.patterns").resolve(row)
         if not regex then
@@ -47,14 +56,24 @@ function M.set_ui_keymaps(buf)
         require("candela.highlighter").refresh_ui()
     end)
 
+    -- Open Lightbox
+    map("<M-l>", "[Candela] open lightbox", function()
+        local view = require("candela.config").options.lightbox.default_view
+        require("candela.ui").close()
+        require("candela.lightbox").toggle(view)
+    end)
+
     -- Change color
-    map("<C-c>", "[Candela] change color", function()
+    map("<M-c>", "[Candela] change color", function()
         local row = vim.api.nvim_win_get_cursor(0)[1]
         local regex = require("candela.patterns").resolve(row)
         if not regex then
             return
         end
-        local color = vim.fn.input({ prompt = "New color (name or #hex): " })
+        local color = vim.fn.input({
+            prompt = "New color (name or #hex): ",
+            completion = "customlist,v:lua.require'candela.pattern'.complete_colors",
+        })
         if color == "" then
             return
         end
@@ -66,13 +85,13 @@ function M.set_ui_keymaps(buf)
     end)
 
     -- Refresh
-    map("<C-r>", "[Candela] refresh", function()
+    map("<C-R>", "[Candela] refresh", function()
         require("candela.highlighter").refresh()
         require("candela.highlighter").refresh_ui()
     end)
 
     -- Import
-    map("<C-i>", "[Candela] import", function()
+    map("<C-I>", "[Candela] import", function()
         vim.ui.input({ prompt = "Import patterns from file: ", completion = "file" }, function(path)
             if path then
                 require("candela.io").import(path)
@@ -81,7 +100,7 @@ function M.set_ui_keymaps(buf)
     end)
 
     -- Export
-    map("<C-e>", "[Candela] export", function()
+    map("<C-E>", "[Candela] export", function()
         local cd_io = require("candela.io")
         local default_path = cd_io.data_dir .. "/" .. cd_io.default_export_filename
         vim.ui.input(
@@ -161,7 +180,7 @@ function M.set_ui_keymaps(buf)
     end)
 
     -- Select All (toggle: if all selected, deselect all)
-    map("<C-a>", "[Candela] select all", function()
+    map("<C-A>", "[Candela] select all", function()
         local patterns = require("candela.patterns")
         local ui = require("candela.ui")
 
@@ -198,7 +217,7 @@ function M.set_ui_keymaps(buf)
     end)
 
     -- Location List
-    map("<C-q>", "[Candela] send to location list", function()
+    map("<C-Q>", "[Candela] send to location list", function()
         local patterns = require("candela.patterns")
         local locator = require("candela.locator")
         local selected = patterns.get_selected()
@@ -316,7 +335,7 @@ function M.ensure_init()
 end
 
 --- Optional. Call to override defaults before first use.
----@param opts? table user config overrides
+---@param opts? Candela.Config user config overrides
 function M.setup(opts)
     require("candela.config").setup(opts or {})
 end

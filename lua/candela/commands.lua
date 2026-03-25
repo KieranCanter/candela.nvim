@@ -210,8 +210,12 @@ M.commands = {
         end,
     },
     lightbox = {
-        impl = function()
-            require("candela.lightbox").toggle()
+        impl = function(subargs)
+            local view = subargs[1] or nil
+            require("candela.lightbox").toggle(view)
+        end,
+        complete = function()
+            return { "split-left", "split-right", "split-above", "split-below", "system-split", "system-vsplit", "tab" }
         end,
     },
     import = {

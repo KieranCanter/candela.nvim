@@ -1,4 +1,4 @@
----@class CandelaMatch
+---@class Candela.Match
 ---@field lineno integer
 ---@field line string
 
@@ -12,11 +12,11 @@ function M.run_search(cmd)
 end
 
 ---@param cmd string[]: command to feed the engine
----@return CandelaMatch[]: array of maps
+---@return Candela.Match[]: array of maps
 function M.get_matches(cmd)
     local output = M.run_search(cmd)
 
-    ---@type CandelaMatch[]
+    ---@type Candela.Match[]
     local matches = {}
 
     for _, line in ipairs(output) do

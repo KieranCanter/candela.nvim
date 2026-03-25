@@ -1,12 +1,12 @@
 --- Highlighter: manages highlights on the base buffer.
 
----@class MatchEntry
+---@class Candela.Highlight
 ---@field extmark_id integer
 ---@field row integer 1-indexed line number
 ---@field end_col integer byte length of matched line
 
 local M = {}
-M.match_cache = {} ---@type table<string, MatchEntry[]>
+M.match_cache = {} ---@type table<string, Candela.Highlight[]>
 M.base_buf = nil ---@type integer|nil
 
 ---@param regex string
