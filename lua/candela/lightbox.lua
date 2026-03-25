@@ -1,11 +1,8 @@
----@alias CandelaFoldStyle "nvim"|"fillchar"|"count"|"preview"|"detailed"
-
 local M = {}
 M.lightbox_cache = {} ---@type table<integer, table<string, boolean>>
 M.folds_cache = {} ---@type integer[][]
 M.win = nil
 M.buf = nil
-M.win_config = nil
 
 ---@return boolean
 local function is_open()
@@ -15,7 +12,7 @@ end
 ---@param start_line integer
 ---@return string
 local function get_foldtext_preview(start_line)
-    return (vim.fn.getline(start_line) or ""):gsub("\t", "    "):gsub("^%s+", "")
+    return ((vim.fn.getline(start_line) or ""):gsub("\t", "    "):gsub("^%s+", ""))
 end
 
 ---@return string
@@ -38,26 +35,6 @@ function M.generate_foldtext()
     end
 end
 
---- Initialize window config from user options. Idempotent.
-function M.init()
-    if M.win_config then
-        return
-    end
-    local opts = require("candela.config").options.lightbox
-
-    local split_dir = opts.view:match("split%-(%a+)")
-    local system_split = opts.view:match("system%-(%a+)")
-    local tab_split = opts.view:match("tab") and "tab split"
-
-    if split_dir then
-        M.win_config = { win = 0, split = split_dir }
-        M.open_command = nil
-    else
-        M.win_config = {}
-        M.open_command = system_split or tab_split
-    end
-end
-
 ---@param row integer 1-indexed line number
 ---@param regex string pattern key
 function M.add_to_cache(row, regex)
@@ -65,7 +42,7 @@ function M.add_to_cache(row, regex)
     M.lightbox_cache[row][regex] = true
 end
 
----@param matches MatchEntry[]|nil
+---@param matches Candela.Highlight[]|nil
 ---@param regex string
 function M.add_many_to_cache(matches, regex)
     if not matches then
@@ -76,7 +53,7 @@ function M.add_many_to_cache(matches, regex)
     end
 end
 
----@param matches MatchEntry[]|nil
+---@param matches Candela.Highlight[]|nil
 ---@param regex string
 function M.remove_from_cache(matches, regex)
     if not matches then
@@ -147,23 +124,25 @@ function M.update_folds()
     vim.api.nvim_win_set_cursor(M.win, cursor)
 end
 
----@param currently_open boolean
-function M.display(currently_open)
-    M.init()
-    if currently_open then
-        vim.api.nvim_set_current_win(M.win)
-        return
+--- Parse a view string into a win_config or vim command.
+---@param view Candela.LightboxConfig.View
+---@return vim.api.keyset.win_config|string
+local function parse_view(view)
+    local split_dir = view:match("split%-(%a+)")
+    if split_dir then
+        return { win = 0, split = split_dir }
     end
-
-    if M.open_command then
-        vim.cmd(M.open_command)
-        M.win = vim.api.nvim_get_current_win()
-        vim.api.nvim_win_set_buf(M.win, M.buf)
-    else
-        M.win = vim.api.nvim_open_win(M.buf, true, M.win_config)
+    local system_split = view:match("system%-(%a+)")
+    if system_split then
+        return system_split
     end
+    if view:match("tab") then
+        return "tab split"
+    end
+    return "vsplit"
+end
 
-    local win = M.win
+local function apply_window_options(win)
     vim.api.nvim_set_option_value("foldmethod", "manual", { win = win })
     vim.api.nvim_set_option_value("foldenable", true, { win = win })
     vim.api.nvim_set_option_value("foldlevel", 0, { win = win })
@@ -173,8 +152,50 @@ function M.display(currently_open)
     local foldtext = config.custom_foldtext and "v:lua.require'candela.lightbox'.custom_foldtext()"
         or "v:lua.require'candela.lightbox'.generate_foldtext()"
     vim.api.nvim_set_option_value("foldtext", foldtext, { win = win })
+end
 
+--- Open the lightbox in the given view.
+---@param view Candela.LightboxConfig.View
+function M.open(view)
+    local base = require("candela.highlighter").base_buf
+    if not base then
+        base = vim.api.nvim_get_current_buf()
+        require("candela.highlighter").base_buf = base
+    end
+    M.buf = base
+
+    local result = parse_view(view)
+    if type(result) == "string" then
+        vim.cmd(result)
+        M.win = vim.api.nvim_get_current_win()
+        vim.api.nvim_win_set_buf(M.win, M.buf)
+    else
+        M.win = vim.api.nvim_open_win(M.buf, true, result)
+    end
+
+    apply_window_options(M.win)
     M.update_folds()
+end
+
+function M.close()
+    if is_open() then
+        vim.api.nvim_win_close(M.win, true)
+        M.win = nil
+    end
+end
+
+--- Toggle lightbox window. Opens with given view, closes if already open and focused.
+---@param view? Candela.LightboxConfig.View defaults to "system-vsplit"
+function M.toggle(view)
+    view = view or "system-vsplit"
+
+    if is_open() and M.win == vim.api.nvim_get_current_win() then
+        M.close()
+    elseif is_open() then
+        vim.api.nvim_set_current_win(M.win)
+    else
+        M.open(view)
+    end
 end
 
 --- Refresh lightbox buffer to match current base buffer.
@@ -185,29 +206,9 @@ function M.refresh()
     end
     M.buf = base
     if is_open() then
-        vim.api.nvim_win_close(M.win, true)
-        M.display(false)
-    end
-end
-
---- Toggle lightbox window open/closed.
-function M.toggle()
-    M.init()
-    local base = require("candela.highlighter").base_buf
-    if not base then
-        base = vim.api.nvim_get_current_buf()
-        require("candela.highlighter").base_buf = base
-    end
-
-    if is_open() and M.win == vim.api.nvim_get_current_win() then
-        vim.api.nvim_win_close(M.win, true)
-        M.win = nil
-    elseif is_open() then
-        M.buf = base
-        M.display(true)
-    else
-        M.buf = base
-        M.display(false)
+        local view = "system-vsplit" -- re-open with default
+        M.close()
+        M.open(view)
     end
 end
 

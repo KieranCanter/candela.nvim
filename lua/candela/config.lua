@@ -1,9 +1,159 @@
 --# selene: allow(bad_string_escape)
 
+--- @class (exact) Candela.WindowConfig
+--- @field width number
+--- @field min_height integer
+--- @field max_height integer
+--- @field margin integer
+
+--- @class (exact) Candela.EngineConfig
+--- @field command? string
+--- @field args [string]
+
+--- @class (exact) Candela.MatchingConfig
+--- @field auto_refresh boolean
+--- @field case Candela.MatchingConfig.Case
+--- @field hl_eol boolean
+---
+--- @alias Candela.MatchingConfig.Case
+--- |'"system"'
+--- |'"sensitive"'
+--- |'"ignore"'
+--- |'"smart"'
+
+--- @class (exact) Candela.LightboxConfig
+--- @field default_view Candela.LightboxConfig.View
+--- @field auto_refresh boolean
+--- @field fold_style Candela.LightboxConfig.FoldStyle
+--- @field fillchar string
+--- @field custom_foldtext? fun(): (string | string[])
+---
+--- @alias Candela.LightboxConfig.View
+--- |'"split-left"'
+--- |'"split-right"'
+--- |'"split-above"'
+--- |'"split-below"'
+--- |'"system-split"'
+--- |'"system-vsplit"'
+--- |'"tab"'
+---
+--- @alias Candela.LightboxConfig.FoldStyle
+--- |'"nvim"'
+--- |'"fillchar"'
+--- |'"count"'
+--- |'"preview"'
+--- |'"detailed"'
+
+--- @class (exact) Candela.IconsConfig
+--- @field nerd_font boolean
+--- @field candela string
+--- @field color string
+--- @field regex string
+--- @field highlight Candela.IconsConfig.Highlight
+--- @field lightbox Candela.IconsConfig.Lightbox
+--- @field selection Candela.IconsConfig.Selection
+---
+--- @class Candela.IconsConfig.Highlight
+--- @field header string
+--- @field toggle_on string
+--- @field toggle_off string
+---
+--- @class Candela.IconsConfig.Lightbox
+--- @field header string
+--- @field toggle_on string
+--- @field toggle_off string
+---
+--- @class Candela.IconsConfig.Selection
+--- @field toggle_on string
+--- @field toggle_off string
+
+--- @class Candela.PaletteConfig
+--- @field use Candela.PaletteConfig.Use
+--- @field cycle Candela.PaletteConfig.Cycle
+--- @field colors Candela.PaletteConfig.Colors
+--- @field swatches Candela.PaletteConfig.Swatches
+---
+--- @alias Candela.PaletteConfig.Use
+--- | "replace"
+--- | "prepend"
+--- | "append"
+---
+--- @alias Candela.PaletteConfig.Cycle
+--- | "constant"
+--- | "random"
+---
+--- @class Candela.PaletteConfig.Colors
+--- @field dark string[]
+--- @field light string[]
+---
+--- @class Candela.PaletteConfig.Swatches
+--- @field dark table<string, string>
+--- @field light table<string, string>
+
+--- @class Candela.SyntaxHighlightingConfig
+--- @field enabled boolean
+--- @field file_types string[]
+
+--- @class (exact) Candela.ConfigStrict
+--- @field window Candela.WindowConfig
+--- @field engine Candela.EngineConfig
+--- @field matching Candela.MatchingConfig
+--- @field lightbox Candela.LightboxConfig
+--- @field icons Candela.IconsConfig
+--- @field palette Candela.PaletteConfig
+--- @field syntax_highlighting Candela.SyntaxHighlightingConfig
+
 local M = {}
 
-M.version = { major = 2, minor = 0, patch = 0, pre = "alpha.2" }
+M.version = { major = 2, minor = 0, patch = 0, pre = "alpha.5" }
 M.options = nil
+
+---@param nerd_font boolean
+---@return Candela.IconsConfig
+local function default_icons(nerd_font)
+    if nerd_font then
+        return {
+            nerd_font = true,
+            candela = "\u{f05e2}", -- 󰗢
+            color = "\u{e22b}", --
+            regex = "\u{f069}", --
+            highlight = {
+                header = "\u{ea61}", --
+                toggle_on = "\u{f1a25}", -- 󱨥
+                toggle_off = "\u{f1a26}", -- 󱨦
+            },
+            lightbox = {
+                header = "\u{e68f}", --
+                toggle_on = "\u{f1a25}", -- 󱨥
+                toggle_off = "\u{f1a26}", -- 󱨦
+            },
+            selection = {
+                toggle_on = "\u{ea71}", --
+                toggle_off = "\u{eabc}", --
+            },
+        }
+    end
+    return {
+        nerd_font = false,
+        candela = "\u{1F56F}", -- 🕯
+        color = "\u{1F3A8}", -- 🎨
+        regex = "\u{2728}", -- ✨
+        highlight = {
+            header = "\u{1F4A1}", -- 💡
+            toggle_on = "\u{25C9}", -- ◉
+            toggle_off = "\u{25CB}", -- ○
+        },
+        lightbox = {
+            header = "\u{1F50D}", -- 🔍
+            toggle_on = "\u{25C9}", -- ◉
+            toggle_off = "\u{25CB}", -- ○
+        },
+        selection = {
+            toggle_on = "\u{25C9}", -- ◉
+            toggle_off = "\u{25CB}", -- ○
+        },
+    }
+end
 
 M.defaults = {
     window = {
@@ -22,48 +172,12 @@ M.defaults = {
         hl_eol = false,
     },
     lightbox = {
-        view = "system-vsplit",
+        default_view = "system-vsplit",
         fold_style = "nvim",
         fillchar = "-",
         custom_foldtext = nil,
     },
-    icons = vim.g.have_nerd_font and {
-        candela = "\u{f05e2}", -- 󰗢
-        color = "\u{e22b}", -- 
-        regex = "\u{f069}", -- 
-        highlight = {
-            header = "\u{ea61}", -- 
-            toggle_on = "\u{f1a25}", -- 󱨥
-            toggle_off = "\u{f1a26}", -- 󱨦
-        },
-        lightbox = {
-            header = "\u{e68f}", -- 
-            toggle_on = "\u{f1a25}", -- 󱨥
-            toggle_off = "\u{f1a26}", -- 󱨦
-        },
-        selection = {
-            toggle_on = "\u{ea71}", -- 
-            toggle_off = "\u{eabc}", -- 
-        },
-    } or {
-        candela = "\u{1F56F}", -- 🕯
-        color = "\u{1F3A8}", -- 🎨
-        regex = "\u{2728}", -- ✨
-        highlight = {
-            header = "\u{1F4A1}", -- 💡
-            toggle_on = "\u{25C9}", -- ◉
-            toggle_off = "\u{25CB}", -- ○
-        },
-        lightbox = {
-            header = "\u{1F50D}", -- 🔍
-            toggle_on = "\u{25C9}", -- ◉
-            toggle_off = "\u{25CB}", -- ○
-        },
-        selection = {
-            toggle_on = "\u{25C9}", -- ◉
-            toggle_off = "\u{25CB}", -- ○
-        },
-    },
+    icons = default_icons(false),
     palette = {
         use = "replace",
         cycle = "constant",
@@ -205,8 +319,16 @@ function M.rebuild_args()
     end
 end
 
+---@param opts Candela.Config
+---@return Candela.ConfigStrict
 function M.setup(opts)
-    M.options = vim.tbl_deep_extend("force", vim.deepcopy(M.defaults), opts or {})
+    -- Resolve nerd_font: user opt > vim.g.have_nerd_font > false
+    local nerd_font = (opts and opts.icons and opts.icons.nerd_font) or false
+
+    local defaults = vim.deepcopy(M.defaults)
+    defaults.icons = default_icons(nerd_font)
+
+    M.options = vim.tbl_deep_extend("force", defaults, opts or {})
 
     if not M.options.engine.command then
         M.options.engine.command = detect_engine(M.get_engine_versions())

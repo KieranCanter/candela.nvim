@@ -6,20 +6,31 @@ M.winconfig = nil
 M.ns = vim.api.nvim_create_namespace("candela.ui")
 M.on_write = nil
 
+M.help_buf = nil
+M.help_win = nil
+
 ---@type table<integer, integer>: row (1-index) -> extmark id
 M.select_extmark_ids = {}
 
----@class Column
+---@class Candela.Ui.Column
 ---@field width integer display width of the column
 ---@field header string title text for the window border
 
----@class ColumnInfo
----@field regex Column
----@field count Column
----@field color Column
----@field highlight Column
----@field lightbox Column
+---@class Candela.Ui.ColumnInfo
+---@field regex Candela.Ui.Column
+---@field count Candela.Ui.Column
+---@field color Candela.Ui.Column
+---@field highlight Candela.Ui.Column
+---@field lightbox Candela.Ui.Column
 M.columns = nil
+
+---@class Candela.Ui.Entry
+---@field regex string
+---@field color string
+---@field count string
+---@field highlight string
+---@field lightbox string
+---@field hl_group string
 
 local INITIALIZED = false
 local USER_RELATIVENUMBER = vim.o.relativenumber
@@ -162,35 +173,34 @@ local function build_title()
     local header_padding = 2
     local column_padding = 1
 
-    -- These represent the padding for one side of each column header
-    local color_fill_one_side = (
-        M.columns.color.width
-        - vim.fn.strdisplaywidth(M.columns.color.header)
-        - header_padding
-    ) / 2
-    local hl_fill_one_side = (
-        M.columns.highlight.width
-        - vim.fn.strdisplaywidth(M.columns.highlight.header)
-        - header_padding
-    ) / 2
-    local lb_fill_one_side = (
-        M.columns.lightbox.width
-        - vim.fn.strdisplaywidth(M.columns.lightbox.header)
-        - header_padding
-    ) / 2
+    -- Left/right fill for each column header (handles odd remainders)
+    local function header_fills(col)
+        local total = col.width - vim.fn.strdisplaywidth(col.header) - header_padding
+        local left = math.floor(total / 2)
+        return left, total - left
+    end
+
+    local color_left, color_right = header_fills(M.columns.color)
+    local hl_left, hl_right = header_fills(M.columns.highlight)
+    local lb_left, lb_right = header_fills(M.columns.lightbox)
+
+    local count_str = M.columns.count.header
+    local color_str = " " .. M.columns.color.header .. " " .. string.rep(" ", color_right)
+    local hl_str = string.rep(" ", hl_left) .. " " .. M.columns.highlight.header .. " " .. string.rep(" ", hl_right)
+    local lb_str = string.rep(" ", lb_left) .. " " .. M.columns.lightbox.header .. " "
 
     M.winconfig.title = {
         { string.rep(border_char, textoff), "FloatBorder" },
         { " " .. M.columns.regex.header .. " ", "Winbar" },
         { string.rep(border_char, regex_fill), "FloatBorder" },
-        { M.columns.count.header, "FloatBorder" },
-        { string.rep(border_char, color_fill_one_side), "FloatBorder" },
-        { " " .. M.columns.color.header .. " ", "Winbar" },
-        { string.rep(" ", color_fill_one_side + hl_fill_one_side + column_padding), "FloatBorder" },
-        { " " .. M.columns.highlight.header .. " ", "Winbar" },
-        { string.rep(" ", hl_fill_one_side + lb_fill_one_side + column_padding), "FloatBorder" },
-        { " " .. M.columns.lightbox.header .. " ", "Winbar" },
-        { string.rep(border_char, lb_fill_one_side), "FloatBorder" },
+        { count_str, "FloatBorder" },
+        { string.rep(border_char, color_left), "FloatBorder" },
+        { color_str, "Winbar" },
+        { string.rep(" ", column_padding), "FloatBorder" },
+        { hl_str, "Winbar" },
+        { string.rep(" ", column_padding), "FloatBorder" },
+        { lb_str, "Winbar" },
+        { string.rep(border_char, lb_right), "FloatBorder" },
     }
 end
 
@@ -250,16 +260,8 @@ function M.get_lines()
     return result
 end
 
----@class UiEntry
----@field regex string
----@field color string
----@field count string
----@field highlight string
----@field lightbox string
----@field hl_group string
-
 --- Render pattern entries: builds buffer lines, decorations, title from data.
----@param entries UiEntry[]
+---@param entries Candela.Ui.Entry[]
 function M.render(entries)
     ensure_init()
     local icons = require("candela.config").options.icons
@@ -277,10 +279,11 @@ function M.render(entries)
     vim.api.nvim_buf_clear_namespace(M.buf, M.ns, 0, -1)
 
     -- Dynamic count width
+    M.columns.count.width = 3
     for _, e in ipairs(entries) do
         M.columns.count.width = math.max(M.columns.count.width, #tostring(e.count) + 2)
-        M.columns.count.header = string.rep("─", M.columns.count.width)
     end
+    M.columns.count.header = string.rep("─", M.columns.count.width)
 
     -- Apply decorations per line
     M.select_extmark_ids = {}
@@ -331,8 +334,6 @@ function M.render(entries)
             invalidate = true,
         })
     end
-
-    build_title()
 
     -- Resize window
     local h = recalculate_height()
@@ -385,6 +386,97 @@ function M.clear_selection()
             invalidate = true,
         })
     end
+end
+
+local function ensure_help_buf()
+    if M.help_buf and vim.api.nvim_buf_is_valid(M.help_buf) then
+        return
+    end
+
+    local keymaps = {
+        { "<ESC>, <C-C>", "Close UI" },
+        { "<M-c>", "Change color" },
+        { "<C-H>", "Toggle highlight" },
+        { "<C-L>", "Toggle lightbox" },
+        { "<M-l>", "Open lightbox" },
+        { "<C-R>", "Refresh" },
+        { "<C-I>", "Import patterns" },
+        { "<C-E>", "Export patterns" },
+        { "<Tab>", "Select and next" },
+        { "<S-Tab>", "Select and prev" },
+        { "<C-A>", "Select all" },
+        { "<C-/>", "Vim match" },
+        { "<C-Q>", "Send to location list" },
+        { "g?", "Toggle help" },
+    }
+
+    local keymap_length = 12
+    local fmt_string = vim.fn.printf("  %%-%ds  %%s", keymap_length)
+    local lines = {}
+    for _, km in ipairs(keymaps) do
+        table.insert(lines, string.format(fmt_string, km[1], km[2]))
+    end
+
+    M.help_buf = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_lines(M.help_buf, 0, -1, false, lines)
+    vim.api.nvim_set_option_value("modifiable", false, { buf = M.help_buf })
+    vim.api.nvim_set_option_value("bufhidden", "hide", { buf = M.help_buf })
+
+    local ns = vim.api.nvim_create_namespace("candela.help")
+    for i = 0, #lines - 1 do
+        vim.api.nvim_buf_set_extmark(M.help_buf, ns, i, 2, {
+            end_col = keymap_length + 2,
+            hl_group = "CursorLineNr",
+        })
+        vim.api.nvim_buf_set_extmark(M.help_buf, ns, i, keymap_length + 2, {
+            end_col = #lines[i + 1],
+            hl_group = "Title",
+        })
+    end
+
+    local function close_help()
+        if M.help_win and vim.api.nvim_win_is_valid(M.help_win) then
+            vim.api.nvim_win_close(M.help_win, true)
+            M.help_win = nil
+        end
+    end
+    for _, key in ipairs({ "<ESC>", "<C-C>", "g?" }) do
+        vim.api.nvim_buf_set_keymap(M.help_buf, "n", key, "", {
+            noremap = true,
+            silent = true,
+            callback = close_help,
+        })
+    end
+end
+
+function M.help()
+    if M.help_win and vim.api.nvim_win_is_valid(M.help_win) then
+        vim.api.nvim_win_close(M.help_win, true)
+        M.help_win = nil
+        return
+    end
+
+    ensure_help_buf()
+
+    local lines = vim.api.nvim_buf_get_lines(M.help_buf, 0, -1, false)
+    local widest = 0
+    for _, line in ipairs(lines) do
+        widest = math.max(widest, vim.fn.strdisplaywidth(line))
+    end
+
+    local w = widest + 2
+    local h = #lines
+    M.help_win = vim.api.nvim_open_win(M.help_buf, true, {
+        relative = "editor",
+        width = w,
+        height = h,
+        col = math.floor((vim.o.columns - w) / 2),
+        row = math.floor((vim.o.lines - h) / 2),
+        style = "minimal",
+        border = "rounded",
+        title = { { " Candela Keymaps ", "Winbar" } },
+        title_pos = "center",
+    })
 end
 
 return M

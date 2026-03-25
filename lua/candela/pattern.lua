@@ -75,4 +75,33 @@ function M:toggle_lightbox()
     self.lightbox = not self.lightbox
 end
 
+--- Completion function for color input.
+--- Returns palette colors and swatch names for the current background.
+---@param arglead string
+---@return string[]
+function M.complete_colors(arglead)
+    local opts = require("candela.config").options.palette
+    local bg = vim.o.background or "dark"
+    local items = {}
+
+    -- Swatch names
+    local swatches = opts.swatches[bg] or opts.swatches.dark or {}
+    for name, _ in pairs(swatches) do
+        table.insert(items, name)
+    end
+
+    -- Palette hex colors
+    local colors = opts.colors[bg] or opts.colors.dark or {}
+    for _, hex in ipairs(colors) do
+        table.insert(items, hex)
+    end
+
+    if arglead == "" then
+        return items
+    end
+    return vim.tbl_filter(function(item)
+        return item:lower():find(arglead:lower(), 1, true) ~= nil
+    end, items)
+end
+
 return M
