@@ -10,6 +10,10 @@ describe("candela.pattern", function()
                         dark = { RED = "#FF0000", BLUE = "#0000FF" },
                         light = { RED = "#FF8888", BLUE = "#8888FF" },
                     },
+                    colors = {
+                        dark = { "#AA0000", "#00AA00" },
+                        light = { "#FF0000" },
+                    },
                 },
             },
         }
@@ -92,6 +96,32 @@ describe("candela.pattern", function()
             local p = pattern.new("ERROR", "#000000", true, true, 0)
             p:change_color("notacolor")
             assert.equals("#000000", p.color)
+        end)
+    end)
+
+    describe("complete_colors", function()
+        it("returns swatch names and palette colors", function()
+            local items = pattern.complete_colors("")
+            assert.is_true(#items > 0)
+        end)
+
+        it("filters by arglead", function()
+            local items = pattern.complete_colors("RED")
+            for _, item in ipairs(items) do
+                assert.truthy(item:lower():find("red"))
+            end
+        end)
+
+        it("returns hex colors from palette", function()
+            local items = pattern.complete_colors("#")
+            local has_hex = false
+            for _, item in ipairs(items) do
+                if item:match("^#") then
+                    has_hex = true
+                    break
+                end
+            end
+            assert.is_true(has_hex)
         end)
     end)
 end)

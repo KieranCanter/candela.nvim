@@ -1,4 +1,4 @@
----@class CandelaPattern
+---@class Candela.Pattern
 ---@field regex string
 ---@field color string
 ---@field highlight boolean
@@ -12,7 +12,7 @@ M.__index = M
 ---@param highlight boolean
 ---@param lightbox boolean
 ---@param count integer
----@return CandelaPattern
+---@return Candela.Pattern
 function M.new(regex, color, highlight, lightbox, count)
     return setmetatable({
         regex = regex,

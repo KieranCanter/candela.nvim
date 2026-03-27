@@ -115,29 +115,29 @@ local function default_icons(nerd_font)
         return {
             nerd_font = true,
             candela = "\u{f05e2}", -- 󰗢
-            color = "\u{e22b}", --
-            regex = "\u{f069}", --
+            regex = "\u{f069}", -- 
+            color = "\u{e22b}", -- 
             highlight = {
-                header = "\u{ea61}", --
+                header = "\u{ea61}", -- 
                 toggle_on = "\u{f1a25}", -- 󱨥
                 toggle_off = "\u{f1a26}", -- 󱨦
             },
             lightbox = {
-                header = "\u{e68f}", --
+                header = "\u{e68f}", -- 
                 toggle_on = "\u{f1a25}", -- 󱨥
                 toggle_off = "\u{f1a26}", -- 󱨦
             },
             selection = {
-                toggle_on = "\u{ea71}", --
-                toggle_off = "\u{eabc}", --
+                toggle_on = "\u{ea71}", -- 
+                toggle_off = "\u{eabc}", -- 
             },
         }
     end
     return {
         nerd_font = false,
         candela = "\u{1F56F}", -- 🕯
-        color = "\u{1F3A8}", -- 🎨
         regex = "\u{2728}", -- ✨
+        color = "\u{1F3A8}", -- 🎨
         highlight = {
             header = "\u{1F4A1}", -- 💡
             toggle_on = "\u{25C9}", -- ◉
@@ -361,6 +361,7 @@ function M.setup(opts)
         desc = "Refresh Candela when color scheme changes",
         callback = function()
             require("candela.patterns").regen_colors()
+            require("candela.highlighter").refresh_ui()
         end,
     })
 

@@ -51,8 +51,7 @@ function M.set_ui_keymaps(buf)
         if not regex then
             return
         end
-        require("candela.patterns").toggle_lightbox(regex)
-        require("candela.lightbox").update_folds()
+        require("candela.lightbox").toggle_pattern(regex)
         require("candela.highlighter").refresh_ui()
     end)
 
@@ -193,7 +192,7 @@ function M.set_ui_keymaps(buf)
     end)
 
     -- Vim Match
-    map("<C-/>", "[Candela] vim match", function()
+    map("<C-N>", "[Candela] vim match", function()
         local patterns = require("candela.patterns")
         local locator = require("candela.locator")
         local selected = patterns.get_selected()
@@ -295,6 +294,7 @@ function M.ensure_init()
         end
 
         hl.refresh_ui()
+        require("candela.lightbox").update_folds()
         patterns.clear_selected()
     end
 

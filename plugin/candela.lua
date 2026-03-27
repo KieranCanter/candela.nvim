@@ -16,7 +16,7 @@ end, {
 
 local plugs = {
     {
-        "<Plug>CandelaUI",
+        "<Plug>CandelaUi",
         function()
             require("candela.ui").toggle()
         end,

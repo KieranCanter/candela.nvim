@@ -5,6 +5,7 @@ M.win = nil
 M.winconfig = nil
 M.ns = vim.api.nvim_create_namespace("candela.ui")
 M.on_write = nil
+M._dirty = false -- true when user has edited buffer without :w
 
 M.help_buf = nil
 M.help_win = nil
@@ -71,6 +72,7 @@ local function ensure_init()
 
     vim.api.nvim_set_option_value("buftype", "acwrite", { buf = M.buf })
     vim.api.nvim_set_option_value("bufhidden", "hide", { buf = M.buf })
+    vim.api.nvim_set_option_value("buflisted", false, { buf = M.buf })
     -- Disable indentations options, we don't want accidental indention if the user defines a regex that happens to be
     -- an identifier like `else`
     vim.api.nvim_set_option_value("indentexpr", "", { buf = M.buf })
@@ -115,6 +117,15 @@ local function ensure_init()
         end,
     })
 
+    -- Prevent "unsaved changes" prompt on quit
+    vim.api.nvim_create_autocmd("BufLeave", {
+        group = augroup,
+        buffer = M.buf,
+        callback = function()
+            vim.api.nvim_set_option_value("modified", false, { buf = M.buf })
+        end,
+    })
+
     vim.api.nvim_create_autocmd("VimResized", {
         group = augroup,
         callback = function()
@@ -129,6 +140,7 @@ local function ensure_init()
             if not is_open() then
                 return
             end
+            M._dirty = true
             local height = recalculate_height()
             if height ~= M.winconfig.height then
                 M.resize(nil, height)
@@ -227,7 +239,10 @@ function M.open()
     -- Capture user's setting before opening (style=minimal will reset it)
     USER_RELATIVENUMBER = vim.o.relativenumber
 
-    require("candela.highlighter").refresh_ui()
+    -- Only refresh if buffer has no pending unsaved edits
+    if not M._dirty then
+        require("candela.highlighter").refresh_ui()
+    end
 
     M.win = vim.api.nvim_open_win(M.buf, true, M.winconfig)
     set_window_options()
@@ -235,6 +250,8 @@ end
 
 function M.close()
     if M.win and vim.api.nvim_win_is_valid(M.win) then
+        M.clear_selection()
+        vim.api.nvim_set_option_value("modified", false, { buf = M.buf })
         vim.api.nvim_win_close(M.win, true)
         M.win = nil
     end
@@ -338,6 +355,7 @@ function M.render(entries)
     -- Resize window
     local h = recalculate_height()
     M.resize(nil, h)
+    M._dirty = false
 end
 
 --- Render selection icons for all rows.
@@ -405,7 +423,7 @@ local function ensure_help_buf()
         { "<Tab>", "Select and next" },
         { "<S-Tab>", "Select and prev" },
         { "<C-A>", "Select all" },
-        { "<C-/>", "Vim match" },
+        { "<C-N>", "Vim match" },
         { "<C-Q>", "Send to location list" },
         { "g?", "Toggle help" },
     }

@@ -16,7 +16,13 @@ describe("candela.commands", function()
                 engine = { command = "rg", args = { "--line-number", "--color=never" } },
                 matching = { hl_eol = false },
                 icons = { highlight = {}, lightbox = {} },
-                window = { toggle_width = 4 },
+                window = { width = 0.5, min_height = 5, max_height = 30, margin = 16 },
+                lightbox = {
+                    default_view = "system-vsplit",
+                    fold_style = "nvim",
+                    fillchar = "-",
+                    custom_foldtext = nil,
+                },
                 palette = {
                     use = "replace",
                     cycle = "constant",
@@ -38,6 +44,7 @@ describe("candela.commands", function()
             end,
             render = function() end,
             help = function() end,
+            close = function() end,
         }
 
         -- Stub highlighter
@@ -165,8 +172,34 @@ describe("candela.commands", function()
 
     describe("dispatch", function()
         it("handles unknown command", function()
-            -- Should not error, just notify
             dispatch("nonexistent")
+        end)
+    end)
+
+    describe("vimmatch", function()
+        it("dispatches vimmatch command", function()
+            patterns.add("ERROR")
+            -- Should not error
+            dispatch("vimmatch ERROR")
+        end)
+    end)
+
+    describe("loclist", function()
+        it("dispatches loclist command", function()
+            patterns.add("ERROR")
+            -- Should not error
+            dispatch("loclist ERROR")
+        end)
+    end)
+
+    describe("lightbox", function()
+        it("dispatches lightbox with view", function()
+            -- Should not error
+            dispatch("lightbox system-vsplit")
+        end)
+
+        it("dispatches lightbox without view", function()
+            dispatch("lightbox")
         end)
     end)
 end)
