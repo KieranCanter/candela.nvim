@@ -175,8 +175,7 @@ M.commands = {
             if not regex then
                 return
             end
-            require("candela.patterns").toggle_lightbox(regex)
-            require("candela.lightbox").update_folds()
+            require("candela.lightbox").toggle_pattern(regex)
             require("candela.highlighter").refresh_ui()
         end,
         complete = function(lead)
@@ -212,6 +211,7 @@ M.commands = {
     lightbox = {
         impl = function(subargs)
             local view = subargs[1] or nil
+            require("candela.ui").close()
             require("candela.lightbox").toggle(view)
         end,
         complete = function()

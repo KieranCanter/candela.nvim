@@ -124,4 +124,63 @@ describe("candela.ui", function()
             assert.is_false(vim.api.nvim_get_option_value("modified", { buf = ui.buf }))
         end)
     end)
+
+    describe("help", function()
+        it("opens and closes help window", function()
+            ui.help()
+            -- Find the help window (not the main UI window)
+            local wins = vim.api.nvim_list_wins()
+            local found = false
+            for _, w in ipairs(wins) do
+                local buf = vim.api.nvim_win_get_buf(w)
+                local lines = vim.api.nvim_buf_get_lines(buf, 0, 1, false)
+                if lines[1] and lines[1]:find("ESC") then
+                    found = true
+                    break
+                end
+            end
+            assert.is_true(found)
+
+            -- Toggle closes it
+            ui.help()
+        end)
+    end)
+
+    describe("dirty flag", function()
+        it("skips refresh on open when dirty", function()
+            local refresh_called = false
+            local orig = package.loaded["candela.highlighter"].refresh_ui
+            package.loaded["candela.highlighter"].refresh_ui = function()
+                refresh_called = true
+            end
+
+            ui.render({ make_entry("ERROR") })
+            -- Simulate user edit
+            vim.api.nvim_set_option_value("modifiable", true, { buf = ui.buf })
+            vim.api.nvim_buf_set_lines(ui.buf, 1, 1, false, { "NEWLINE" })
+            ui._dirty = true
+
+            ui.close()
+            refresh_called = false
+            ui.open()
+            assert.is_false(refresh_called)
+
+            package.loaded["candela.highlighter"].refresh_ui = orig
+        end)
+
+        it("refreshes on open when not dirty", function()
+            local refresh_called = false
+            local orig = package.loaded["candela.highlighter"].refresh_ui
+            package.loaded["candela.highlighter"].refresh_ui = function()
+                refresh_called = true
+            end
+
+            ui._dirty = false
+            ui.close()
+            ui.open()
+            assert.is_true(refresh_called)
+
+            package.loaded["candela.highlighter"].refresh_ui = orig
+        end)
+    end)
 end)

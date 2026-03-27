@@ -3,7 +3,7 @@
 
 local M = {}
 
----@type table<string, CandelaPattern>
+---@type table<string, Candela.Pattern>
 M.patterns = {}
 
 ---@type table<string, boolean>
@@ -102,7 +102,7 @@ function M.hash(regex)
 end
 
 ---@param regex string
----@return CandelaPattern|nil
+---@return Candela.Pattern|nil
 function M.get(regex)
     return M.patterns[regex]
 end
@@ -217,7 +217,7 @@ end
 
 ---@param regex string
 ---@param new_color string hex color or swatch name
----@return CandelaPattern|nil pattern on success
+---@return Candela.Pattern|nil pattern on success
 function M.change_color(regex, new_color)
     local p = M.patterns[regex]
     if not p then

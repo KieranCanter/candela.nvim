@@ -1,9 +1,6 @@
 TODO
-  * refactor to replace prompt functionality with oil-like functionality, manipulating the buffer itself to add, remove,
-  * modify, etc. patterns.
-  * support other color spaces rgb, hsv, hsl, lch, oklch, etc.
-  * make color picking easier (libchroma/huey/new neovim plugin integration?)
+  * make UI keymaps user config options
   * persistent patterns toggle?
   * live-search toggle
-  * Make UI keymaps user config options?
-  * help menu resizing and polish i guess...
+  * support other color spaces rgb, hsv, hsl, lch, oklch, etc.
+  * make color picking easier (libchroma/huey/new neovim plugin integration?)

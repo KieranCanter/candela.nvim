@@ -98,6 +98,19 @@ local function compute_fold_ranges()
     M.folds_cache = ranges
 end
 
+--- Toggle a pattern's lightbox state and update cache/folds.
+---@param regex string
+function M.toggle_pattern(regex)
+    local is_on = require("candela.patterns").toggle_lightbox(regex)
+    local matches = require("candela.highlighter").match_cache[regex]
+    if is_on then
+        M.add_many_to_cache(matches, regex)
+    else
+        M.remove_from_cache(matches, regex)
+    end
+    M.update_folds()
+end
+
 --- Recompute and apply folds in the lightbox window.
 function M.update_folds()
     if not is_open() then
@@ -105,23 +118,24 @@ function M.update_folds()
     end
 
     local cursor = vim.api.nvim_win_get_cursor(M.win)
+
+    -- Delete all existing folds
     vim.api.nvim_win_call(M.win, function()
-        for _, range in ipairs(M.folds_cache) do
-            if vim.fn.foldclosed(range[1]) ~= -1 then
-                vim.api.nvim_win_set_cursor(M.win, { range[1], 0 })
-                vim.cmd("normal! zd")
-            end
-        end
+        vim.cmd("normal! zE")
     end)
 
+    -- Recompute and apply
     compute_fold_ranges()
-
     vim.api.nvim_win_call(M.win, function()
         for _, range in ipairs(M.folds_cache) do
             vim.cmd(string.format("%d,%dfold", range[1], range[2]))
         end
     end)
-    vim.api.nvim_win_set_cursor(M.win, cursor)
+
+    -- Restore cursor (clamp to valid range)
+    local line_count = vim.api.nvim_buf_line_count(M.buf)
+    local row = math.min(cursor[1], line_count)
+    vim.api.nvim_win_set_cursor(M.win, { row, cursor[2] })
 end
 
 --- Parse a view string into a win_config or vim command.
@@ -146,6 +160,7 @@ local function apply_window_options(win)
     vim.api.nvim_set_option_value("foldmethod", "manual", { win = win })
     vim.api.nvim_set_option_value("foldenable", true, { win = win })
     vim.api.nvim_set_option_value("foldlevel", 0, { win = win })
+    vim.api.nvim_set_option_value("foldminlines", 0, { win = win })
 
     local config = require("candela.config").options.lightbox
     vim.api.nvim_set_option_value("fillchars", "fold:" .. config.fillchar, { win = win })

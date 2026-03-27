@@ -1,0 +1,1000 @@
+Mar 25 00:00:52 prod-web-01 systemd-journald[56159]: Runtime journal (/run/log/journal/) is 11.1% full.
+Mar 25 00:01:10 prod-web-01 app-server[47723]: ERROR [http-thread-0] com.app.api.PaymentController - Payment processing failed for order #47723: Connection timeout to payment gateway
+Mar 25 00:01:33 prod-web-01 systemd-resolved[7181]: Server returned error NXDOMAIN, mitigating potential DNS violation DVE-2018-0001.
+Mar 25 00:01:37 prod-web-01 nginx[18380]: 185.192.150.110 - admin [25/Mar/2026:00:01:37 +0000] "GET /admin/dashboard HTTP/1.1" 200 303657 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36"
+Mar 25 00:01:42 prod-web-01 dockerd[35261]: time="2026-03-25T00:01:42.000000000Z" level=info msg="Successfully pulled image: redis:7-alpine"
+Mar 25 00:08:55 prod-web-01 systemd-resolved[44769]: Using DNS server 10.0.0.2.
+Mar 25 00:09:05 prod-web-01 CRON[5931]: (root) CMD (/usr/lib/apt/apt.systemd.daily install)
+Mar 25 00:09:18 prod-web-01 nginx[57268]: 45.175.185.30 - - [25/Mar/2026:00:09:18 +0000] "GET /images/logo.png HTTP/1.1" 200 346047 "https://example.com/dashboard" "curl/8.4.0"
+Mar 25 00:09:21 prod-web-01 sudo[17693]:     ubuntu : TTY=pts/4 ; PWD=/home/ubuntu ; USER=root ; COMMAND=/usr/bin/apt update
+Mar 25 00:09:22 prod-web-01 CRON[22118]: (root) CMD (cd /opt/monitoring && ./collect-metrics.sh)
+Mar 25 00:11:20 prod-web-01 systemd-journald[52014]: Suppressed 29233 messages from /system.slice/nginx.service
+Mar 25 00:12:32 prod-web-01 systemd[1]: Stopped Application Server.
+Mar 25 00:12:49 prod-web-01 nginx[56083]: 10.0.1.246 - - [25/Mar/2026:00:12:49 +0000] "POST /api/v1/orders HTTP/1.1" 200 336985 "-" "Googlebot/2.1 (+http://www.google.com/bot.html)"
+Mar 25 00:13:18 prod-web-01 fail2ban-server[55999]: NOTICE  [sshd] Ban 198.148.50.181
+Mar 25 00:13:21 prod-web-01 systemd-oomd[23754]: Killed /system.slice/app-server.service due to memory pressure
+Mar 25 00:13:26 prod-web-01 postgresql[12917]: LOG:  automatic vacuum of table "appdb.public.sessions": index scans: 1 pages: 0 removed, 45269 remain tuples: 45269 removed, 12917 remain
+Mar 25 00:13:29 prod-web-01 systemd-oomd[22678]: Swap used: 77%, threshold: 90%
+Mar 25 00:13:32 prod-web-01 fail2ban-server[7723]: INFO    [sshd] Ignore 198.55.168.128 by ip
+Mar 25 00:13:37 prod-web-01 postgresql[29103]: DETAIL:  Process 29103 waits for ShareLock on transaction 29103; blocked by process 21013.
+Mar 25 00:13:42 prod-web-01 sshd[60533]: Failed password for invalid user oracle from 212.138.32.250 port 33908 ssh2
+Mar 25 00:15:38 prod-web-01 CRON[51119]: (root) CMD (/usr/lib/apt/apt.systemd.daily install)
+Mar 25 00:16:08 prod-web-01 postgresql[13293]: LOG:  connection received: host=10.0.3.88 port=58969
+Mar 25 00:17:12 prod-web-01 systemd-oomd[30935]: Killed /system.slice/app-server.service due to memory pressure
+Mar 25 00:17:14 prod-web-01 systemd-journald[3860]: Runtime journal (/run/log/journal/) is 84.2% full.
+Mar 25 00:17:18 prod-web-01 dockerd[15908]: time="2026-03-25T00:17:18.000000000Z" level=warning msg="Container c8a74e44c2c4 health check failed"
+Mar 25 00:17:21 prod-web-01 app-server[45407]: INFO  [scheduler-1] com.app.jobs.CleanupJob - Cleaned up 19358 expired sessions
+Mar 25 00:17:34 prod-web-01 dockerd[9963]: time="2026-03-25T00:17:34.000000000Z" level=info msg="ignoring event" container=ede537e03cb8 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Mar 25 00:17:43 prod-web-01 app-server[64390]: INFO  [http-thread-3] com.app.api.AuthController - User monitoring logged in from 10.0.2.208
+Mar 25 00:18:25 prod-web-01 systemd[1]: Unit prometheus-node-exporter.service entered failed state.
+Mar 25 00:18:30 prod-web-01 systemd-oomd[14448]: Swap used: 76%, threshold: 90%
+Mar 25 00:18:59 prod-web-01 postgresql[62958]: LOG:  checkpoint starting: time
+Mar 25 00:20:58 prod-web-01 dockerd[37132]: time="2026-03-25T00:20:58.000000000Z" level=info msg="ignoring event" container=34e3768939c0 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Mar 25 00:21:01 prod-web-01 dockerd[28717]: time="2026-03-25T00:21:01.000000000Z" level=info msg="ignoring event" container=ede537e03cb8 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Mar 25 00:21:04 prod-web-01 systemd[1]: Created slice User Slice of admin.
+Mar 25 00:21:09 prod-web-01 app-server[32891]: WARN  [http-thread-7] com.app.api.SearchController - Slow query detected: 180ms for term "webcam"
+Mar 25 00:21:24 prod-web-01 app-server[19973]: INFO  [http-thread-1] com.app.api.AuthController - User www-data logged in from 142.172.69.180
+Mar 25 00:21:26 prod-web-01 sshd[50821]: Failed password for invalid user nagios from 91.12.170.59 port 62382 ssh2
+Mar 25 00:21:27 prod-web-01 CRON[59712]: (root) CMD (cd /opt/monitoring && ./collect-metrics.sh)
+Mar 25 00:21:32 prod-web-01 nginx[45458]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 203.153.120.136, server: _, request: "GET /api/v1/products HTTP/1.1", upstream: "http://127.0.0.1:6379/api/v1/products"
+Mar 25 00:21:36 prod-web-01 nginx[34271]: 10.0.2.40 - - [25/Mar/2026:00:21:36 +0000] "GET /api/v1/products HTTP/1.1" 403 197509 "https://example.com/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0"
+Mar 25 00:21:41 prod-web-01 nginx[28437]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 10.0.0.98, server: _, request: "GET /login HTTP/1.1", upstream: "http://127.0.0.1:5432/login"
+Mar 25 00:22:14 prod-web-01 systemd-resolved[52863]: DNSSEC validation failed for question example.com IN A: no-signature
+Mar 25 00:22:16 prod-web-01 dockerd[38399]: time="2026-03-25T00:22:16.000000000Z" level=info msg="Container 34e3768939c0 stopped"
+Mar 25 00:28:13 prod-web-01 postgresql[54182]: LOG:  disconnection: session time: 0:00:22.883 user=admin database=appdb host=10.0.1.179 port=32423
+Mar 25 00:29:49 prod-web-01 app-server[29220]: INFO  [http-thread-0] com.app.api.OrderController - Order #29220 created for user #40482 total=$1743.77
+Mar 25 00:29:53 prod-web-01 dockerd[26090]: time="2026-03-25T00:29:53.000000000Z" level=warning msg="Container ede537e03cb8 health check failed"
+Mar 25 00:30:38 prod-web-01 postgresql[30170]: FATAL:  too many connections for role "ubuntu"
+Mar 25 00:30:56 prod-web-01 systemd[1]: Reloaded Fail2Ban Service.
+Mar 25 00:31:18 prod-web-01 dockerd[11105]: time="2026-03-25T00:31:18.000000000Z" level=info msg="Successfully pulled image: grafana/grafana:10.2.3"
+Mar 25 00:31:37 prod-web-01 nginx[21926]: *21926 connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.0.152
+Mar 25 00:32:09 prod-web-01 postgresql[15099]: LOG:  checkpoint starting: time
+Mar 25 00:32:14 prod-web-01 app-server[37558]: WARN  [http-thread-2] com.app.security.RateLimiter - Rate limit exceeded for IP 10.0.0.24: 20885 requests in 60s
+Mar 25 00:32:32 prod-web-01 app-server[40119]: INFO  [http-thread-1] com.app.api.UserController - Request processed: GET /api/users/40119 in 452ms
+Mar 25 00:32:35 prod-web-01 fail2ban-server[60776]: INFO    [sshd] Ignore 142.234.242.146 by ip
+Mar 25 00:32:36 prod-web-01 postgresql[55260]: LOG:  checkpoint starting: time
+Mar 25 00:33:01 prod-web-01 dockerd[36071]: time="2026-03-25T00:33:01.000000000Z" level=info msg="Container ede537e03cb8 stopped"
+Mar 25 00:33:05 prod-web-01 app-server[38210]: INFO  [scheduler-1] com.app.jobs.CleanupJob - Cleaned up 15445 expired sessions
+Mar 25 00:33:06 prod-web-01 postgresql[51452]: FATAL:  too many connections for role "admin"
+Mar 25 00:33:08 prod-web-01 sshd[33035]: banner exchange: Connection from 142.176.84.216 port 33646: invalid format
+Mar 25 00:33:37 prod-web-01 app-server[25540]: INFO  [http-thread-2] com.app.api.AuthController - User root logged in from 10.0.2.208
+Mar 25 00:34:21 prod-web-01 nginx[16772]: 185.207.12.187 - - [25/Mar/2026:00:34:21 +0000] "GET /api/v2/metrics HTTP/1.1" 301 122861 "-" "curl/8.4.0"
+Mar 25 00:34:49 prod-web-01 CRON[64720]: (root) CMD (/usr/lib/apt/apt.systemd.daily install)
+Mar 25 00:35:05 prod-web-01 sshd[25718]: Connection closed by authenticating user admin 203.227.235.165 port 32591 [preauth]
+Mar 25 00:35:09 prod-web-01 nginx[31540]: 10.0.3.57 - ubuntu [25/Mar/2026:00:35:09 +0000] "GET /admin/dashboard HTTP/1.1" 401 453029 "-" "curl/8.4.0"
+Mar 25 00:35:19 prod-web-01 sshd[43061]: Connection reset by 198.103.69.17 port 32216 [preauth]
+Mar 25 00:37:15 prod-web-01 sudo[61165]:     www-data : TTY=pts/3 ; PWD=/home/www-data ; USER=root ; COMMAND=/bin/systemctl restart nginx
+Mar 25 00:37:19 prod-web-01 systemd-oomd[59641]: Killed /system.slice/app-server.service due to memory pressure
+Mar 25 00:37:20 prod-web-01 sshd[23321]: Disconnected from user deploy 203.227.235.165 port 55998
+Mar 25 00:37:23 prod-web-01 systemd[1]: Stopped Prometheus Node Exporter.
+Mar 25 00:37:24 prod-web-01 postgresql[24666]: LOG:  connection authorized: user=deploy database=appdb
+Mar 25 00:37:28 prod-web-01 systemd-resolved[24921]: Grace period over, resuming full feature set (1.1.1.1).
+Mar 25 00:37:55 prod-web-01 systemd[1]: Started Daily Cleanup of Temporary Directories.
+Mar 25 00:37:57 prod-web-01 sshd[23826]: Received disconnect from 142.176.84.216 port 59651:11: Bye Bye [preauth]
+Mar 25 00:38:02 prod-web-01 kernel: TCP: request_sock_TCP: Possible SYN flooding on port 6379. Sending cookies.
+Mar 25 00:38:05 prod-web-01 dockerd[26146]: time="2026-03-25T00:38:05.000000000Z" level=info msg="Successfully pulled image: grafana/grafana:10.2.3"
+Mar 25 00:38:07 prod-web-01 nginx[38070]: 10.0.0.174 - www-data [25/Mar/2026:00:38:07 +0000] "GET /admin/dashboard HTTP/1.1" 400 431285 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36"
+Mar 25 00:38:09 prod-web-01 nginx[12034]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 185.117.163.214, server: _, request: "GET /index.html HTTP/1.1", upstream: "http://127.0.0.1:80/index.html"
+Mar 25 00:39:14 prod-web-01 nginx[22449]: 10.0.1.36 - www-data [25/Mar/2026:00:39:14 +0000] "GET /admin/dashboard HTTP/1.1" 201 114205 "-" "Googlebot/2.1 (+http://www.google.com/bot.html)"
+Mar 25 00:39:18 prod-web-01 dockerd[58306]: time="2026-03-25T00:39:18.000000000Z" level=info msg="Container 931216a41557 stopped"
+Mar 25 00:39:22 prod-web-01 nginx[53819]: *53819 connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.1.184
+Mar 25 00:39:47 prod-web-01 dockerd[19672]: time="2026-03-25T00:39:47.000000000Z" level=info msg="Successfully pulled image: redis:7-alpine"
+Mar 25 00:39:48 prod-web-01 sshd[63172]: Accepted publickey for www-data from 198.103.69.17 port 48775 ssh2: RSA SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8
+Mar 25 00:39:56 prod-web-01 nginx[44126]: *44126 connect() failed (111: Connection refused) while connecting to upstream, client: 185.192.150.110
+Mar 25 00:40:01 prod-web-01 systemd[1]: Removed slice User Slice of www-data.
+Mar 25 00:40:05 prod-web-01 systemd-resolved[6661]: DNSSEC validation failed for question api.internal.local IN A: no-signature
+Mar 25 00:40:07 prod-web-01 sshd[28070]: Connection reset by 142.176.84.216 port 35564 [preauth]
+Mar 25 00:40:11 prod-web-01 nginx[30616]: 203.21.142.76 - - [25/Mar/2026:00:40:11 +0000] "POST /api/v1/payments HTTP/1.1" 200 112732 "-" "Go-http-client/2.0"
+Mar 25 00:40:12 prod-web-01 nginx[42307]: *42307 connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.0.144
+Mar 25 00:40:18 prod-web-01 dockerd[28000]: time="2026-03-25T00:40:18.000000000Z" level=info msg="Pulling image: app-server:latest"
+Mar 25 00:40:19 prod-web-01 CRON[64830]: (root) CMD (test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily ))
+Mar 25 00:40:20 prod-web-01 CRON[22740]: (root) CMD (/usr/lib/apt/apt.systemd.daily install)
+Mar 25 00:40:37 prod-web-01 systemd[1]: Started Daily apt download activities.
+Mar 25 00:40:38 prod-web-01 app-server[58969]: WARN  [http-thread-4] com.app.cache.RedisCache - Cache miss for key: user:58969:profile, fetching from DB
+Mar 25 00:40:40 prod-web-01 nginx[27822]: 10.0.1.246 - - [25/Mar/2026:00:40:40 +0000] "POST /api/v1/payments HTTP/1.1" 200 205993 "-" "Wget/1.21.3"
+Mar 25 00:40:41 prod-web-01 dockerd[43065]: time="2026-03-25T00:40:41.000000000Z" level=info msg="Container 9ac64c6f7d28 started"
+Mar 25 00:40:45 prod-web-01 nginx[3275]: *3275 connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.2.27
+Mar 25 00:40:50 prod-web-01 nginx[38132]: 10.0.0.174 - - [25/Mar/2026:00:40:50 +0000] "POST /api/v1/auth/token HTTP/1.1" 200 460269 "-" "Googlebot/2.1 (+http://www.google.com/bot.html)"
+Mar 25 00:40:51 prod-web-01 postgresql[45882]: FATAL:  too many connections for role "ubuntu"
+Mar 25 00:40:53 prod-web-01 sudo[18955]:     ubuntu : TTY=pts/1 ; PWD=/home/ubuntu ; USER=root ; COMMAND=/usr/bin/apt update
+Mar 25 00:40:54 prod-web-01 app-server[17540]: ERROR [http-thread-0] com.app.api.PaymentController - Payment processing failed for order #17540: Connection timeout to payment gateway
+Mar 25 00:48:58 prod-web-01 dockerd[10825]: time="2026-03-25T00:48:58.000000000Z" level=info msg="Container ede537e03cb8 stopped"
+Mar 25 00:50:01 prod-web-01 app-server[63057]: WARN  [http-thread-7] com.app.cache.RedisCache - Cache miss for key: user:63057:profile, fetching from DB
+Mar 25 00:50:02 prod-web-01 systemd-oomd[10386]: Memory pressure watch on /system.slice/app-server.service
+Mar 25 00:50:28 prod-web-01 sshd[21453]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=142.42.119.98  user=root
+Mar 25 00:50:29 prod-web-01 systemd-journald[51544]: Runtime journal (/run/log/journal/) is 39.6% full.
+Mar 25 00:50:30 prod-web-01 nginx[64774]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 10.0.1.184, server: _, request: "GET /static/css/style.css HTTP/1.1", upstream: "http://127.0.0.1:22/static/css/style.css"
+Mar 25 00:50:34 prod-web-01 kernel: [drm] GPU freq: 1398 MHz
+Mar 25 00:50:42 prod-web-01 app-server[12879]: ERROR [http-thread-0] com.app.db.ConnectionPool - Failed to acquire connection from pool: timeout after 30000ms
+Mar 25 01:00:18 prod-web-01 kernel: NMI watchdog: Watchdog detected hard LOCKUP on cpu 6
+Mar 25 01:00:35 prod-web-01 kernel: EXT4-fs (sda1): re-mounted. Opts: errors=continue
+Mar 25 01:00:39 prod-web-01 systemd[1]: Reached target Multi-User System.
+Mar 25 01:01:50 prod-web-01 nginx[61025]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 142.172.69.180, server: _, request: "GET /api/v1/products HTTP/1.1", upstream: "http://127.0.0.1:8443/api/v1/products"
+Mar 25 01:03:28 prod-web-01 nginx[35257]: 10.0.2.63 - - [25/Mar/2026:01:03:28 +0000] "GET /api/v1/health HTTP/1.1" 404 131366 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0"
+Mar 25 01:03:33 prod-web-01 dockerd[57390]: time="2026-03-25T01:03:33.000000000Z" level=info msg="ignoring event" container=e9ae8e1c224b module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Mar 25 01:03:59 prod-web-01 CRON[52382]: (root) CMD (/usr/lib/apt/apt.systemd.daily install)
+Mar 25 01:04:34 prod-web-01 nginx[26288]: 10.0.0.7 - - [25/Mar/2026:01:04:34 +0000] "GET /.env HTTP/1.1" 304 22990 "https://example.com/" "python-requests/2.31.0"
+Mar 25 01:04:36 prod-web-01 systemd[1]: Started Docker Application Container Engine.
+Mar 25 01:04:53 prod-web-01 postgresql[15409]: ERROR:  deadlock detected
+Mar 25 01:05:03 prod-web-01 kernel: EXT4-fs warning (device sda1): ext4_dx_add_entry:2086: Directory (ino: 62103) index full, reach max htree level :2
+Mar 25 01:05:33 prod-web-01 postgresql[9801]: LOG:  automatic vacuum of table "appdb.public.sessions": index scans: 1 pages: 0 removed, 41076 remain tuples: 41076 removed, 9801 remain
+Mar 25 01:06:53 prod-web-01 CRON[9774]: (deploy) CMD (/opt/scripts/backup.sh >> /var/log/backup.log 2>&1)
+Mar 25 01:09:13 prod-web-01 nginx[64467]: *64467 connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.0.144
+Mar 25 01:09:15 prod-web-01 app-server[44326]: INFO  [http-thread-2] com.app.api.OrderController - Order #44326 created for user #16095 total=$1944.10
+Mar 25 01:09:19 prod-web-01 sshd[40376]: error: maximum authentication attempts exceeded for test from 203.153.17.99 port 41919 ssh2 [preauth]
+Mar 25 01:09:21 prod-web-01 fail2ban-server[35212]: INFO    [sshd] Ignore 203.153.120.136 by ip
+Mar 25 01:09:23 prod-web-01 sshd[17622]: banner exchange: Connection from 185.254.237.164 port 53962: invalid format
+Mar 25 01:09:53 prod-web-01 app-server[26500]: WARN  [http-thread-4] com.app.cache.RedisCache - Cache miss for key: user:26500:profile, fetching from DB
+Mar 25 01:09:54 prod-web-01 sshd[52096]: Connection closed by authenticating user monitoring 142.191.144.138 port 55896 [preauth]
+Mar 25 01:10:09 prod-web-01 sshd[54290]: Connection reset by 185.117.163.214 port 59017 [preauth]
+Mar 25 01:10:12 prod-web-01 nginx[59609]: 203.93.57.36 - - [25/Mar/2026:01:10:12 +0000] "POST /api/v1/inventory HTTP/1.1" 404 126907 "-" "python-requests/2.31.0"
+Mar 25 01:11:05 prod-web-01 nginx[50163]: 91.40.161.41 - - [25/Mar/2026:01:11:05 +0000] "POST /api/v1/auth/token HTTP/1.1" 200 206421 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0"
+Mar 25 01:11:10 prod-web-01 sshd[24925]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=185.117.163.214  user=test
+Mar 25 01:11:16 prod-web-01 systemd[1]: Reached target Multi-User System.
+Mar 25 01:13:07 prod-web-01 nginx[38462]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 142.172.69.180, server: _, request: "GET /api/v1/search?q=test HTTP/1.1", upstream: "http://127.0.0.1:6379/api/v1/search?q=test"
+Mar 25 01:13:12 prod-web-01 systemd[1]: Reloading PostgreSQL RDBMS...
+Mar 25 01:13:26 prod-web-01 app-server[21176]: ERROR [http-thread-6] com.app.db.ConnectionPool - Failed to acquire connection from pool: timeout after 30000ms
+Mar 25 01:13:30 prod-web-01 dockerd[51104]: time="2026-03-25T01:13:30.000000000Z" level=info msg="Successfully pulled image: nginx:1.25-alpine"
+Mar 25 01:13:34 prod-web-01 kernel: TCP: request_sock_TCP: Possible SYN flooding on port 8443. Sending cookies.
+Mar 25 01:13:35 prod-web-01 app-server[62355]: INFO  [scheduler-1] com.app.jobs.CleanupJob - Cleaned up 18104 expired sessions
+Mar 25 01:15:24 prod-web-01 systemd-oomd[4935]: Swap used: 6%, threshold: 90%
+Mar 25 01:17:10 prod-web-01 sshd[11159]: Connection reset by 203.153.17.99 port 47258 [preauth]
+Mar 25 01:17:11 prod-web-01 fail2ban-server[58245]: NOTICE  [sshd] Ban 203.21.142.76
+Mar 25 01:17:16 prod-web-01 fail2ban-server[7633]: INFO    [sshd] Found 142.234.242.146 - 2026-03-25T01:17:16.000000000Z
+Mar 25 01:17:31 prod-web-01 nginx[22197]: *22197 connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.0.24
+Mar 25 01:17:44 prod-web-01 sshd[7023]: Connection closed by authenticating user root 198.55.168.128 port 44249 [preauth]
+Mar 25 01:18:07 prod-web-01 sshd[45147]: Accepted publickey for admin from 142.176.84.216 port 63077 ssh2: RSA SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8
+Mar 25 01:18:12 prod-web-01 nginx[61564]: *61564 connect() failed (111: Connection refused) while connecting to upstream, client: 185.254.237.164
+Mar 25 01:18:15 prod-web-01 kernel: TCP: request_sock_TCP: Possible SYN flooding on port 9090. Sending cookies.
+Mar 25 01:19:22 prod-web-01 nginx[34327]: 10.0.3.88 - admin [25/Mar/2026:01:19:22 +0000] "GET /admin/dashboard HTTP/1.1" 304 293961 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36"
+Mar 25 01:19:23 prod-web-01 sudo[6753]:     admin : TTY=pts/2 ; PWD=/home/admin ; USER=root ; COMMAND=/usr/bin/apt update
+Mar 25 01:19:25 prod-web-01 certbot[20880]: INFO:certbot._internal.renewal:Cert is due for renewal, auto-renewing...
+Mar 25 01:27:56 prod-web-01 sudo[15585]: pam_unix(sudo:session): session opened for user root by www-data(uid=0)
+Mar 25 01:28:01 prod-web-01 app-server[13442]: INFO  [http-thread-1] com.app.api.UserController - Request processed: GET /api/users/13442 in 116ms
+Mar 25 01:28:08 prod-web-01 sudo[48079]:     deploy : TTY=pts/5 ; PWD=/home/deploy ; USER=root ; COMMAND=/usr/bin/apt update
+Mar 25 01:28:09 prod-web-01 systemd-journald[53917]: Vacuuming done, freed 0B of archived journals from /var/log/journal/.
+Mar 25 01:28:35 prod-web-01 app-server[52596]: WARN  [http-thread-4] com.app.api.SearchController - Slow query detected: 125ms for term "laptop"
+Mar 25 01:28:40 prod-web-01 systemd-resolved[35432]: DNSSEC validation failed for question api.internal.local IN A: no-signature
+Mar 25 01:28:43 prod-web-01 CRON[8460]: (root) CMD (/usr/lib/apt/apt.systemd.daily install)
+Mar 25 01:33:36 prod-web-01 dockerd[11876]: time="2026-03-25T01:33:36.000000000Z" level=info msg="ignoring event" container=179284ae81e2 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Mar 25 01:33:50 prod-web-01 systemd[1]: Started Session 4696 of user deploy.
+Mar 25 01:33:58 prod-web-01 systemd[1]: Started Session 2933 of user admin.
+Mar 25 01:34:03 prod-web-01 systemd-resolved[7374]: Grace period over, resuming full feature set (8.8.8.8).
+Mar 25 01:34:08 prod-web-01 systemd-resolved[22356]: Using DNS server 1.1.1.1.
+Mar 25 01:35:49 prod-web-01 sshd[5561]: error: maximum authentication attempts exceeded for admin from 142.191.144.138 port 54832 ssh2 [preauth]
+Mar 25 01:35:54 prod-web-01 nginx[60052]: 142.234.242.146 - - [25/Mar/2026:01:35:54 +0000] "GET /health HTTP/1.1" 200 2 "-" "ELB-HealthChecker/2.0"
+Mar 25 01:35:55 prod-web-01 systemd-oomd[9992]: Killed /system.slice/app-server.service due to memory pressure
+Mar 25 01:36:00 prod-web-01 app-server[31470]: INFO  [scheduler-1] com.app.jobs.CleanupJob - Cleaned up 30761 expired sessions
+Mar 25 01:36:01 prod-web-01 kernel: [drm] GPU freq: 1352 MHz
+Mar 25 01:44:26 prod-web-01 app-server[44297]: ERROR [http-thread-3] com.app.api.PaymentController - Payment processing failed for order #44297: Connection timeout to payment gateway
+Mar 25 01:44:27 prod-web-01 systemd-resolved[22952]: DNSSEC validation failed for question example.com IN A: no-signature
+Mar 25 01:46:21 prod-web-01 fail2ban-server[47404]: INFO    [sshd] Found 212.138.32.250 - 2026-03-25T01:46:21.000000000Z
+Mar 25 01:46:24 prod-web-01 sudo[26731]: pam_unix(sudo:session): session closed for user root
+Mar 25 01:47:49 prod-web-01 app-server[36397]: INFO  [http-thread-4] com.app.api.OrderController - Order #36397 created for user #15801 total=$1817.80
+Mar 25 01:47:51 prod-web-01 systemd-oomd[33062]: Killed /system.slice/app-server.service due to memory pressure
+Mar 25 01:47:53 prod-web-01 dockerd[54787]: time="2026-03-25T01:47:53.000000000Z" level=warning msg="Container 9ac64c6f7d28 health check failed"
+Mar 25 01:48:03 prod-web-01 postgresql[3667]: DETAIL:  Process 3667 waits for ShareLock on transaction 3667; blocked by process 9740.
+Mar 25 01:48:04 prod-web-01 CRON[8700]: (root) CMD (test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily ))
+Mar 25 01:48:14 prod-web-01 systemd[1]: Starting Uncomplicated firewall...
+Mar 25 01:48:17 prod-web-01 app-server[19389]: INFO  [http-thread-7] com.app.api.UserController - Request processed: GET /api/users/19389 in 606ms
+Mar 25 01:48:22 prod-web-01 postgresql[3203]: ERROR:  deadlock detected
+Mar 25 01:48:24 prod-web-01 dockerd[42111]: time="2026-03-25T01:48:24.000000000Z" level=info msg="ignoring event" container=e2766d43cdf8 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Mar 25 01:48:32 prod-web-01 app-server[50359]: ERROR [http-thread-7] com.app.api.PaymentController - Payment processing failed for order #50359: Connection timeout to payment gateway
+Mar 25 01:48:33 prod-web-01 sshd[58343]: Failed password for invalid user pi from 212.37.68.36 port 31487 ssh2
+Mar 25 01:48:36 prod-web-01 certbot[10721]: INFO:certbot._internal.renewal:Cert not yet due for renewal
+Mar 25 01:48:41 prod-web-01 sudo[63114]:     root : TTY=pts/7 ; PWD=/home/root ; USER=root ; COMMAND=/usr/bin/apt update
+Mar 25 01:49:04 prod-web-01 app-server[2477]: ERROR [http-thread-6] com.app.api.PaymentController - Payment processing failed for order #2477: Connection timeout to payment gateway
+Mar 25 01:49:18 prod-web-01 sudo[10146]: pam_unix(sudo:session): session opened for user root by jenkins(uid=0)
+Mar 25 01:49:22 prod-web-01 kernel: [drm] GPU freq: 2319 MHz
+Mar 25 01:49:24 prod-web-01 nginx[4192]: 10.0.1.36 - - [25/Mar/2026:01:49:24 +0000] "GET /health HTTP/1.1" 200 2 "-" "ELB-HealthChecker/2.0"
+Mar 25 01:49:25 prod-web-01 sshd[41201]: Connection reset by 203.153.120.136 port 64871 [preauth]
+Mar 25 01:49:27 prod-web-01 systemd[1]: Started Daily apt download activities.
+Mar 25 01:50:42 prod-web-01 app-server[16848]: WARN  [http-thread-7] com.app.api.SearchController - Slow query detected: 604ms for term "monitor stand"
+Mar 25 01:50:46 prod-web-01 nginx[37512]: 45.59.211.9 - - [25/Mar/2026:01:50:46 +0000] "GET /health HTTP/1.1" 200 2 "-" "ELB-HealthChecker/2.0"
+Mar 25 01:51:13 prod-web-01 sudo[5240]:     admin : TTY=pts/6 ; PWD=/home/admin ; USER=root ; COMMAND=/usr/bin/apt update
+Mar 25 01:51:14 prod-web-01 sshd[45512]: banner exchange: Connection from 198.42.95.91 port 36313: invalid format
+Mar 25 01:51:36 prod-web-01 systemd-journald[33209]: Suppressed 24769 messages from /system.slice/nginx.service
+Mar 25 01:51:37 prod-web-01 nginx[27996]: 10.0.1.60 - - [25/Mar/2026:01:51:37 +0000] "GET /health HTTP/1.1" 200 2 "-" "ELB-HealthChecker/2.0"
+Mar 25 01:51:41 prod-web-01 postgresql[23252]: LOG:  temporary file: path "base/pgsql_tmp/pgsql_tmp23252.0", size 6036
+Mar 25 01:52:02 prod-web-01 nginx[27365]: 10.0.1.246 - root [25/Mar/2026:01:52:02 +0000] "GET /admin/dashboard HTTP/1.1" 401 261726 "-" "curl/8.4.0"
+Mar 25 01:53:53 prod-web-01 nginx[43339]: 10.0.1.60 - - [25/Mar/2026:01:53:53 +0000] "GET /health HTTP/1.1" 200 2 "-" "ELB-HealthChecker/2.0"
+Mar 25 01:55:40 prod-web-01 sudo[59770]: pam_unix(sudo:session): session opened for user root by monitoring(uid=0)
+Mar 25 01:55:45 prod-web-01 fail2ban-server[36765]: NOTICE  [sshd] Unban 142.191.144.138
+Mar 25 01:55:46 prod-web-01 systemd-resolved[20491]: Server returned error NXDOMAIN, mitigating potential DNS violation DVE-2018-0001.
+Mar 25 01:55:47 prod-web-01 CRON[11343]: (root) CMD (/usr/lib/apt/apt.systemd.daily install)
+Mar 25 01:55:51 prod-web-01 systemd[1]: Reloaded Uncomplicated firewall.
+Mar 25 01:56:03 prod-web-01 postgresql[31728]: LOG:  connection received: host=10.0.2.208 port=43907
+Mar 25 01:56:13 prod-web-01 sudo[9645]: pam_unix(sudo:session): session opened for user root by deploy(uid=0)
+Mar 25 01:56:17 prod-web-01 systemd[1]: Starting Cleanup of Temporary Directories...
+Mar 25 01:56:18 prod-web-01 nginx[55852]: 142.176.84.216 - - [25/Mar/2026:01:56:18 +0000] "GET /robots.txt HTTP/1.1" 404 3043 "-" "Go-http-client/2.0"
+Mar 25 01:56:22 prod-web-01 nginx[19673]: 45.59.211.9 - root [25/Mar/2026:01:56:22 +0000] "GET /admin/dashboard HTTP/1.1" 200 348924 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Safari/605.1.15"
+Mar 25 01:56:41 prod-web-01 app-server[35555]: ERROR [http-thread-0] com.app.db.ConnectionPool - Failed to acquire connection from pool: timeout after 30000ms
+Mar 25 01:56:46 prod-web-01 sshd[56240]: Failed password for invalid user nagios from 212.138.32.250 port 57279 ssh2
+Mar 25 01:56:50 prod-web-01 dockerd[24640]: time="2026-03-25T01:56:50.000000000Z" level=info msg="Successfully pulled image: app-server:latest"
+Mar 25 01:58:20 prod-web-01 CRON[20322]: (root) CMD (test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily ))
+Mar 25 01:58:23 prod-web-01 nginx[31752]: 142.222.26.98 - - [25/Mar/2026:01:58:23 +0000] "POST /api/v1/inventory HTTP/1.1" 201 436774 "-" "Go-http-client/2.0"
+Mar 25 01:58:55 prod-web-01 nginx[12450]: 212.138.32.250 - - [25/Mar/2026:01:58:55 +0000] "POST /api/v1/inventory HTTP/1.1" 200 294640 "-" "curl/8.4.0"
+Mar 25 01:58:56 prod-web-01 dockerd[14460]: time="2026-03-25T01:58:56.000000000Z" level=info msg="ignoring event" container=e9ae8e1c224b module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Mar 25 01:59:05 prod-web-01 systemd[1]: Failed to start OpenBSD Secure Shell server.
+Mar 25 01:59:10 prod-web-01 sudo[30241]: pam_unix(sudo:session): session opened for user root by www-data(uid=0)
+Mar 25 01:59:14 prod-web-01 nginx[34259]: *34259 connect() failed (111: Connection refused) while connecting to upstream, client: 212.37.68.36
+Mar 25 01:59:18 prod-web-01 systemd[1]: Starting Regular background program processing daemon...
+Mar 25 01:59:21 prod-web-01 systemd[1]: Removed slice User Slice of ubuntu.
+Mar 25 01:59:41 prod-web-01 postgresql[50917]: WARNING:  could not open statistics file "pg_stat_tmp/global.stat": Operation not permitted
+Mar 25 02:01:11 prod-web-01 systemd[1]: Starting Cleanup of Temporary Directories...
+Mar 25 02:01:13 prod-web-01 dockerd[12892]: time="2026-03-25T02:01:13.000000000Z" level=warning msg="Container e9ae8e1c224b health check failed"
+Mar 25 02:01:26 prod-web-01 sshd[43700]: Connection reset by 198.42.95.91 port 56656 [preauth]
+Mar 25 02:01:31 prod-web-01 CRON[20702]: (root) CMD (/usr/lib/apt/apt.systemd.daily install)
+Mar 25 02:01:35 prod-web-01 systemd-journald[6080]: Vacuuming done, freed 0B of archived journals from /var/log/journal/.
+Mar 25 02:05:15 prod-web-01 dockerd[58010]: time="2026-03-25T02:05:15.000000000Z" level=info msg="Container e2766d43cdf8 started"
+Mar 25 02:05:28 prod-web-01 postgresql[50743]: ERROR:  deadlock detected
+Mar 25 02:05:31 prod-web-01 nginx[54846]: 10.0.1.36 - - [25/Mar/2026:02:05:31 +0000] "GET /docs/api HTTP/1.1" 200 44844 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36"
+Mar 25 02:05:43 prod-web-01 kernel: ACPI: EC: interrupt blocked
+Mar 25 02:05:57 prod-web-01 dockerd[21394]: time="2026-03-25T02:05:57.000000000Z" level=warning msg="Container 34e3768939c0 health check failed"
+Mar 25 02:06:40 prod-web-01 sudo[15378]: pam_unix(sudo:session): session opened for user root by admin(uid=0)
+Mar 25 02:07:32 prod-web-01 sshd[2408]: Invalid user test from 45.175.185.30 port 36631
+Mar 25 02:13:11 prod-web-01 sshd[51009]: Accepted publickey for www-data from 185.253.21.219 port 65092 ssh2: RSA SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8
+Mar 25 02:13:32 prod-web-01 postgresql[39088]: LOG:  checkpoint complete: wrote 19346 buffers (0.57%); 0 WAL file(s) added, 0 removed, 1 recycled; write=48.87 s, sync=0.001 s, total=48.87 s; sync files=42, longest=0.001 s, average=0.001 s; distance=19346 kB, estimate=19346 kB
+Mar 25 02:13:35 prod-web-01 kernel: device eth0 entered promiscuous mode
+Mar 25 02:14:56 prod-web-01 app-server[31933]: INFO  [http-thread-3] com.app.api.UserController - Request processed: GET /api/users/31933 in 965ms
+Mar 25 02:15:00 prod-web-01 sshd[45942]: error: maximum authentication attempts exceeded for nagios from 212.24.194.13 port 65232 ssh2 [preauth]
+Mar 25 02:15:10 prod-web-01 postgresql[14041]: LOG:  disconnection: session time: 0:00:7.133 user=deploy database=appdb host=142.222.26.98 port=49077
+Mar 25 02:15:33 prod-web-01 postgresql[1487]: LOG:  checkpoint starting: time
+Mar 25 02:16:08 prod-web-01 sshd[20129]: Connection reset by 185.192.150.110 port 44238 [preauth]
+Mar 25 02:16:10 prod-web-01 postgresql[36941]: LOG:  connection authorized: user=www-data database=appdb
+Mar 25 02:16:35 prod-web-01 systemd[1]: Started Daily apt download activities.
+Mar 25 02:16:39 prod-web-01 nginx[1982]: 185.253.21.219 - - [25/Mar/2026:02:16:39 +0000] "POST /api/v1/notifications HTTP/1.1" 403 193451 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36"
+Mar 25 02:16:42 prod-web-01 dockerd[30419]: time="2026-03-25T02:16:42.000000000Z" level=info msg="Successfully pulled image: postgres:16"
+Mar 25 02:16:57 prod-web-01 postgresql[43470]: LOG:  duration: 7.7 ms  statement: SELECT * FROM users WHERE id = 43470
+Mar 25 02:16:59 prod-web-01 postgresql[48295]: LOG:  disconnection: session time: 0:00:30.452 user=ubuntu database=appdb host=10.0.0.98 port=46316
+Mar 25 02:17:04 prod-web-01 nginx[25585]: 10.0.3.57 - - [25/Mar/2026:02:17:04 +0000] "GET /health HTTP/1.1" 200 2 "-" "ELB-HealthChecker/2.0"
+Mar 25 02:17:25 prod-web-01 nginx[43657]: 10.0.1.60 - - [25/Mar/2026:02:17:25 +0000] "GET /sitemap.xml HTTP/1.1" 404 354641 "https://example.com/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36"
+Mar 25 02:17:38 prod-web-01 CRON[39409]: (www-data) CMD (/opt/scripts/cleanup-tmp.sh)
+Mar 25 02:17:42 prod-web-01 systemd-resolved[14168]: Server returned error NXDOMAIN, mitigating potential DNS violation DVE-2018-0001.
+Mar 25 02:24:08 prod-web-01 app-server[32013]: ERROR [http-thread-0] com.app.db.ConnectionPool - Failed to acquire connection from pool: timeout after 30000ms
+Mar 25 02:24:12 prod-web-01 systemd-oomd[2089]: Memory pressure watch on /system.slice/app-server.service
+Mar 25 02:24:16 prod-web-01 CRON[14870]: (root) CMD (test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily ))
+Mar 25 02:24:19 prod-web-01 nginx[62421]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 10.0.0.152, server: _, request: "GET /api/v1/health HTTP/1.1", upstream: "http://127.0.0.1:8080/api/v1/health"
+Mar 25 02:24:43 prod-web-01 systemd-resolved[40248]: Using DNS server 10.0.0.2.
+Mar 25 02:24:47 prod-web-01 app-server[46637]: INFO  [scheduler-1] com.app.jobs.CleanupJob - Cleaned up 9501 expired sessions
+Mar 25 02:26:17 prod-web-01 systemd[1]: Started Session 1967 of user deploy.
+Mar 25 02:33:10 prod-web-01 postgresql[49847]: FATAL:  too many connections for role "monitoring"
+Mar 25 02:33:19 prod-web-01 systemd[1]: Reloading A high performance web server...
+Mar 25 02:33:33 prod-web-01 sshd[19179]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=185.254.237.164  user=oracle
+Mar 25 02:33:34 prod-web-01 CRON[36937]: (root) CMD (cd /opt/monitoring && ./collect-metrics.sh)
+Mar 25 02:33:36 prod-web-01 app-server[37154]: INFO  [metrics-reporter] com.app.metrics.Reporter - Metrics flush: requests=44457, errors=5, p99_latency=256ms
+Mar 25 02:33:38 prod-web-01 nginx[56394]: 142.222.26.98 - - [25/Mar/2026:02:33:38 +0000] "GET /health HTTP/1.1" 200 2 "-" "ELB-HealthChecker/2.0"
+Mar 25 02:34:04 prod-web-01 fail2ban-server[12456]: NOTICE  [sshd] Ban 203.153.17.99
+Mar 25 02:34:05 prod-web-01 nginx[31169]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 10.0.0.7, server: _, request: "GET / HTTP/1.1", upstream: "http://127.0.0.1:443/"
+Mar 25 02:35:31 prod-web-01 sshd[49961]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=91.156.163.44  user=oracle
+Mar 25 02:35:40 prod-web-01 app-server[4410]: ERROR [http-thread-2] com.app.api.PaymentController - Payment processing failed for order #4410: Connection timeout to payment gateway
+Mar 25 02:36:45 prod-web-01 nginx[14083]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 10.0.2.40, server: _, request: "GET /favicon.ico HTTP/1.1", upstream: "http://127.0.0.1:3000/favicon.ico"
+Mar 25 02:37:38 prod-web-01 nginx[8309]: 10.0.0.152 - - [25/Mar/2026:02:37:38 +0000] "GET /health HTTP/1.1" 200 2 "-" "ELB-HealthChecker/2.0"
+Mar 25 02:37:41 prod-web-01 app-server[9377]: INFO  [http-thread-2] com.app.api.UserController - Request processed: GET /api/users/9377 in 979ms
+Mar 25 02:37:45 prod-web-01 sshd[39804]: Invalid user pi from 185.249.142.221 port 63606
+Mar 25 02:38:56 prod-web-01 systemd-journald[48322]: Runtime journal (/run/log/journal/) is 84.4% full.
+Mar 25 02:39:05 prod-web-01 postgresql[60124]: LOG:  disconnection: session time: 0:00:38.193 user=admin database=appdb host=10.0.1.179 port=42125
+Mar 25 02:39:09 prod-web-01 systemd-resolved[9662]: Using DNS server 10.0.0.2.
+Mar 25 02:39:57 prod-web-01 kernel: ACPI: EC: interrupt blocked
+Mar 25 02:41:03 prod-web-01 nginx[44367]: 10.0.1.36 - www-data [25/Mar/2026:02:41:03 +0000] "GET /admin/dashboard HTTP/1.1" 200 204786 "-" "Wget/1.21.3"
+Mar 25 02:41:06 prod-web-01 nginx[36307]: 10.0.1.60 - monitoring [25/Mar/2026:02:41:06 +0000] "GET /admin/dashboard HTTP/1.1" 401 407158 "-" "curl/8.4.0"
+Mar 25 02:41:17 prod-web-01 systemd[1]: Started Daily apt download activities.
+Mar 25 02:41:18 prod-web-01 dockerd[50226]: time="2026-03-25T02:41:18.000000000Z" level=info msg="Successfully pulled image: app-server:latest"
+Mar 25 02:41:22 prod-web-01 nginx[8104]: 10.0.3.57 - - [25/Mar/2026:02:41:22 +0000] "GET /health HTTP/1.1" 200 2 "-" "ELB-HealthChecker/2.0"
+Mar 25 02:41:51 prod-web-01 nginx[48558]: 10.0.0.174 - root [25/Mar/2026:02:41:51 +0000] "GET /admin/dashboard HTTP/1.1" 304 423359 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0"
+Mar 25 02:42:09 prod-web-01 app-server[14685]: ERROR [http-thread-5] com.app.api.PaymentController - Payment processing failed for order #14685: Connection timeout to payment gateway
+Mar 25 02:45:12 prod-web-01 postgresql[57295]: LOG:  automatic vacuum of table "appdb.public.sessions": index scans: 1 pages: 0 removed, 48574 remain tuples: 48574 removed, 57295 remain
+Mar 25 02:45:16 prod-web-01 postgresql[59990]: ERROR:  deadlock detected
+Mar 25 02:45:17 prod-web-01 postgresql[14860]: LOG:  connection received: host=10.0.0.195 port=47684
+Mar 25 02:45:21 prod-web-01 app-server[60808]: WARN  [http-thread-7] com.app.security.RateLimiter - Rate limit exceeded for IP 10.0.0.7: 44177 requests in 60s
+Mar 25 02:45:26 prod-web-01 nginx[64684]: 10.0.3.151 - - [25/Mar/2026:02:45:26 +0000] "POST /api/v1/auth/token HTTP/1.1" 200 366643 "-" "Wget/1.21.3"
+Mar 25 02:45:29 prod-web-01 nginx[62466]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 10.0.0.174, server: _, request: "GET /api/v1/orders HTTP/1.1", upstream: "http://127.0.0.1:22/api/v1/orders"
+Mar 25 02:45:33 prod-web-01 nginx[18334]: *18334 connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.0.7
+Mar 25 02:45:35 prod-web-01 systemd[1]: Removed slice User Slice of deploy.
+Mar 25 02:45:39 prod-web-01 systemd[1]: Stopped Uncomplicated firewall.
+Mar 25 02:45:44 prod-web-01 dockerd[8681]: time="2026-03-25T02:45:44.000000000Z" level=info msg="Container c8a74e44c2c4 started"
+Mar 25 02:46:09 prod-web-01 postgresql[63019]: ERROR:  deadlock detected
+Mar 25 02:46:32 prod-web-01 systemd-journald[24085]: Vacuuming done, freed 0B of archived journals from /var/log/journal/.
+Mar 25 02:46:40 prod-web-01 fail2ban-server[38614]: INFO    [sshd] Found 142.191.144.138 - 2026-03-25T02:46:40.000000000Z
+Mar 25 02:46:57 prod-web-01 CRON[43256]: (ubuntu) CMD (/opt/scripts/backup.sh >> /var/log/backup.log 2>&1)
+Mar 25 02:47:01 prod-web-01 sudo[54487]:     deploy : TTY=pts/2 ; PWD=/opt/app ; USER=root ; COMMAND=/bin/journalctl -u app-server --since '1 hour ago'
+Mar 25 02:47:04 prod-web-01 app-server[24134]: INFO  [http-thread-1] com.app.api.OrderController - Order #24134 created for user #37602 total=$1882.46
+Mar 25 02:47:28 prod-web-01 sshd[28727]: Connection closed by authenticating user jenkins 203.153.120.136 port 36688 [preauth]
+Mar 25 02:48:46 prod-web-01 sshd[27390]: Invalid user user from 185.117.163.214 port 64705
+Mar 25 02:48:50 prod-web-01 dockerd[40079]: time="2026-03-25T02:48:50.000000000Z" level=error msg="Error response from daemon: conflict: unable to remove 179284ae81e2 (cannot be forced) - image is being used by running container c8a74e44c2c4"
+Mar 25 02:48:51 prod-web-01 systemd-resolved[55746]: DNSSEC validation failed for question mail.example.com IN A: no-signature
+Mar 25 02:48:53 prod-web-01 app-server[24554]: INFO  [http-thread-6] com.app.api.AuthController - User root logged in from 142.42.119.98
+Mar 25 02:49:19 prod-web-01 CRON[41881]: (deploy) CMD (/opt/scripts/backup.sh >> /var/log/backup.log 2>&1)
+Mar 25 02:49:23 prod-web-01 postgresql[17300]: LOG:  automatic vacuum of table "appdb.public.sessions": index scans: 1 pages: 0 removed, 19998 remain tuples: 19998 removed, 17300 remain
+Mar 25 02:49:26 prod-web-01 nginx[28558]: 10.0.1.246 - deploy [25/Mar/2026:02:49:26 +0000] "GET /admin/dashboard HTTP/1.1" 200 412421 "-" "curl/8.4.0"
+Mar 25 02:49:29 prod-web-01 postgresql[57643]: LOG:  automatic vacuum of table "appdb.public.sessions": index scans: 1 pages: 0 removed, 31792 remain tuples: 31792 removed, 57643 remain
+Mar 25 02:50:49 prod-web-01 nginx[13061]: 10.0.1.246 - www-data [25/Mar/2026:02:50:49 +0000] "GET /admin/dashboard HTTP/1.1" 301 76675 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36"
+Mar 25 02:50:50 prod-web-01 kernel: device eth0 entered promiscuous mode
+Mar 25 02:51:28 prod-web-01 postgresql[40704]: WARNING:  could not open statistics file "pg_stat_tmp/global.stat": Operation not permitted
+Mar 25 02:51:29 prod-web-01 app-server[51027]: ERROR [http-thread-4] com.app.db.ConnectionPool - Failed to acquire connection from pool: timeout after 30000ms
+Mar 25 02:51:33 prod-web-01 sshd[33517]: Connection reset by 198.55.168.128 port 61046 [preauth]
+Mar 25 02:51:36 prod-web-01 systemd-journald[64446]: Suppressed 13150 messages from /system.slice/nginx.service
+Mar 25 02:51:52 prod-web-01 dockerd[59164]: time="2026-03-25T02:51:52.000000000Z" level=info msg="Container a33c2774d400 started"
+Mar 25 02:51:57 prod-web-01 dockerd[24054]: time="2026-03-25T02:51:57.000000000Z" level=warning msg="Container 9ac64c6f7d28 health check failed"
+Mar 25 02:52:04 prod-web-01 postgresql[54308]: FATAL:  too many connections for role "ubuntu"
+Mar 25 02:52:36 prod-web-01 nginx[26177]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 203.153.120.136, server: _, request: "GET /api/v2/metrics HTTP/1.1", upstream: "http://127.0.0.1:8443/api/v2/metrics"
+Mar 25 02:52:40 prod-web-01 nginx[62110]: *62110 connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.1.246
+Mar 25 02:53:10 prod-web-01 kernel: [drm] GPU freq: 1192 MHz
+Mar 25 02:53:15 prod-web-01 kernel: NMI watchdog: Watchdog detected hard LOCKUP on cpu 1
+Mar 25 02:53:16 prod-web-01 certbot[25557]: INFO:certbot._internal.plugins.selection:Authenticator selected: nginx
+Mar 25 02:53:21 prod-web-01 systemd-resolved[60707]: DNSSEC validation failed for question api.internal.local IN A: no-signature
+Mar 25 02:53:24 prod-web-01 nginx[38749]: 10.0.1.179 - - [25/Mar/2026:02:53:24 +0000] "POST /api/v1/notifications HTTP/1.1" 500 290758 "-" "Wget/1.21.3"
+Mar 25 02:53:27 prod-web-01 app-server[49414]: INFO  [http-thread-5] com.app.api.OrderController - Order #49414 created for user #61340 total=$1015.43
+Mar 25 02:53:48 prod-web-01 sudo[22155]:     jenkins : TTY=pts/1 ; PWD=/opt/app ; USER=root ; COMMAND=/bin/journalctl -u app-server --since '1 hour ago'
+Mar 25 02:54:17 prod-web-01 kernel: device eth0 left promiscuous mode
+Mar 25 02:54:19 prod-web-01 app-server[47321]: INFO  [http-thread-6] com.app.api.OrderController - Order #47321 created for user #46084 total=$1952.66
+Mar 25 02:54:21 prod-web-01 dockerd[12672]: time="2026-03-25T02:54:21.000000000Z" level=error msg="Error response from daemon: conflict: unable to remove ede537e03cb8 (cannot be forced) - image is being used by running container cc472df4dbb8"
+Mar 25 02:54:23 prod-web-01 fail2ban-server[23778]: INFO    [sshd] Found 185.192.150.110 - 2026-03-25T02:54:23.000000000Z
+Mar 25 02:54:43 prod-web-01 kernel: device eth0 entered promiscuous mode
+Mar 25 02:54:46 prod-web-01 nginx[49059]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 91.92.217.89, server: _, request: "GET /wp-admin HTTP/1.1", upstream: "http://127.0.0.1:80/wp-admin"
+Mar 25 02:54:48 prod-web-01 systemd-resolved[52430]: DNSSEC validation failed for question mail.example.com IN A: no-signature
+Mar 25 02:54:53 prod-web-01 certbot[51541]: INFO:certbot._internal.renewal:Cert is due for renewal, auto-renewing...
+Mar 25 02:54:56 prod-web-01 kernel: INFO: task kworker/1:0 blocked for more than 120 seconds.
+Mar 25 02:55:43 prod-web-01 nginx[20447]: 10.0.0.144 - - [25/Mar/2026:02:55:43 +0000] "GET /docs/api HTTP/1.1" 404 87003 "https://www.google.com/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0"
+Mar 25 02:55:44 prod-web-01 app-server[31054]: INFO  [metrics-reporter] com.app.metrics.Reporter - Metrics flush: requests=26438, errors=4, p99_latency=786ms
+Mar 25 02:55:52 prod-web-01 dockerd[22637]: time="2026-03-25T02:55:52.000000000Z" level=info msg="Pulling image: grafana/grafana:10.2.3"
+Mar 25 02:55:56 prod-web-01 nginx[21773]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 10.0.0.24, server: _, request: "GET /favicon.ico HTTP/1.1", upstream: "http://127.0.0.1:5432/favicon.ico"
+Mar 25 02:55:58 prod-web-01 CRON[7167]: (deploy) CMD (/opt/scripts/backup.sh >> /var/log/backup.log 2>&1)
+Mar 25 02:56:38 prod-web-01 systemd[1]: Unit nginx.service entered failed state.
+Mar 25 02:56:56 prod-web-01 systemd-resolved[21392]: Using DNS server 1.1.1.1.
+Mar 25 02:57:06 prod-web-01 nginx[18878]: 198.42.95.91 - - [25/Mar/2026:02:57:06 +0000] "POST /api/v1/auth/token HTTP/1.1" 200 303403 "-" "Go-http-client/2.0"
+Mar 25 02:57:09 prod-web-01 sshd[3060]: Connection closed by authenticating user admin 198.103.69.17 port 42217 [preauth]
+Mar 25 02:57:28 prod-web-01 app-server[32036]: INFO  [http-thread-6] com.app.api.AuthController - User root logged in from 91.156.163.44
+Mar 25 02:57:31 prod-web-01 nginx[1055]: 91.12.170.59 - deploy [25/Mar/2026:02:57:31 +0000] "GET /admin/dashboard HTTP/1.1" 200 228877 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Safari/605.1.15"
+Mar 25 02:57:46 prod-web-01 sudo[40120]: pam_unix(sudo:session): session opened for user root by monitoring(uid=0)
+Mar 25 02:57:50 prod-web-01 nginx[55672]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 10.0.3.151, server: _, request: "GET /static/js/app.js HTTP/1.1", upstream: "http://127.0.0.1:8080/static/js/app.js"
+Mar 25 02:58:20 prod-web-01 nginx[6243]: *6243 connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.2.27
+Mar 25 02:58:24 prod-web-01 systemd[1]: Started Daily apt download activities.
+Mar 25 02:58:25 prod-web-01 nginx[63282]: 10.0.1.36 - - [25/Mar/2026:02:58:25 +0000] "POST /api/v1/notifications HTTP/1.1" 200 158964 "-" "curl/8.4.0"
+Mar 25 02:58:27 prod-web-01 nginx[52790]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 142.222.26.98, server: _, request: "GET /robots.txt HTTP/1.1", upstream: "http://127.0.0.1:6379/robots.txt"
+Mar 25 02:58:33 prod-web-01 systemd[1]: Unit postgresql@14-main.service entered failed state.
+Mar 25 02:58:35 prod-web-01 sshd[37049]: error: maximum authentication attempts exceeded for oracle from 212.24.194.13 port 44270 ssh2 [preauth]
+Mar 25 02:59:01 prod-web-01 nginx[27889]: 10.0.0.152 - monitoring [25/Mar/2026:02:59:01 +0000] "GET /admin/dashboard HTTP/1.1" 200 170404 "-" "curl/8.4.0"
+Mar 25 03:00:08 prod-web-01 sshd[31093]: Received disconnect from 142.176.84.216 port 45852:11: Bye Bye [preauth]
+Mar 25 03:00:13 prod-web-01 app-server[54193]: INFO  [scheduler-1] com.app.jobs.CleanupJob - Cleaned up 31637 expired sessions
+Mar 25 03:00:17 prod-web-01 nginx[50894]: 10.0.0.7 - - [25/Mar/2026:03:00:17 +0000] "GET /api/v1/health HTTP/1.1" 200 495343 "https://www.google.com/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0"
+Mar 25 03:01:52 prod-web-01 postgresql[41531]: WARNING:  could not open statistics file "pg_stat_tmp/global.stat": Operation not permitted
+Mar 25 03:01:53 prod-web-01 sshd[27115]: Accepted publickey for ubuntu from 142.172.69.180 port 63254 ssh2: RSA SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8
+Mar 25 03:01:58 prod-web-01 CRON[32279]: (root) CMD (/usr/sbin/logrotate /etc/logrotate.conf)
+Mar 25 03:02:01 prod-web-01 postgresql[63353]: LOG:  checkpoint complete: wrote 32501 buffers (0.21%); 0 WAL file(s) added, 0 removed, 1 recycled; write=32.482 s, sync=0.001 s, total=32.482 s; sync files=42, longest=0.001 s, average=0.001 s; distance=32501 kB, estimate=32501 kB
+Mar 25 03:02:03 prod-web-01 app-server[7744]: ERROR [http-thread-6] com.app.db.ConnectionPool - Failed to acquire connection from pool: timeout after 30000ms
+Mar 25 03:02:20 prod-web-01 nginx[24174]: 10.0.0.144 - admin [25/Mar/2026:03:02:20 +0000] "GET /admin/dashboard HTTP/1.1" 200 12414 "-" "Go-http-client/2.0"
+Mar 25 03:02:24 prod-web-01 systemd-oomd[25577]: Swap used: 76%, threshold: 90%
+Mar 25 03:02:51 prod-web-01 systemd[1]: Started Daily Cleanup of Temporary Directories.
+Mar 25 03:03:12 prod-web-01 nginx[42574]: 10.0.1.246 - - [25/Mar/2026:03:03:12 +0000] "GET /health HTTP/1.1" 200 2 "-" "ELB-HealthChecker/2.0"
+Mar 25 03:03:42 prod-web-01 kernel: TCP: request_sock_TCP: Possible SYN flooding on port 9090. Sending cookies.
+Mar 25 03:04:41 prod-web-01 app-server[9998]: INFO  [http-thread-1] com.app.api.UserController - Request processed: GET /api/users/9998 in 519ms
+Mar 25 03:04:42 prod-web-01 postgresql[2058]: WARNING:  could not open statistics file "pg_stat_tmp/global.stat": Operation not permitted
+Mar 25 03:04:43 prod-web-01 app-server[25359]: INFO  [scheduler-1] com.app.jobs.CleanupJob - Cleaned up 17388 expired sessions
+Mar 25 03:05:00 prod-web-01 sshd[23850]: Accepted publickey for deploy from 212.138.32.250 port 57517 ssh2: RSA SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8
+Mar 25 03:05:30 prod-web-01 app-server[19500]: INFO  [http-thread-2] com.app.api.AuthController - User root logged in from 142.222.26.98
+Mar 25 03:05:35 prod-web-01 dockerd[64621]: time="2026-03-25T03:05:35.000000000Z" level=info msg="ignoring event" container=ede537e03cb8 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Mar 25 03:05:36 prod-web-01 systemd-journald[30659]: Runtime journal (/run/log/journal/) is 73.8% full.
+Mar 25 03:06:25 prod-web-01 dockerd[14251]: time="2026-03-25T03:06:25.000000000Z" level=info msg="ignoring event" container=179284ae81e2 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Mar 25 03:06:29 prod-web-01 nginx[64134]: 142.42.119.98 - - [25/Mar/2026:03:06:29 +0000] "POST /api/v1/inventory HTTP/1.1" 404 144425 "-" "Go-http-client/2.0"
+Mar 25 03:06:33 prod-web-01 CRON[46314]: (root) CMD (cd /opt/monitoring && ./collect-metrics.sh)
+Mar 25 03:06:37 prod-web-01 postgresql[7813]: LOG:  checkpoint complete: wrote 39581 buffers (0.54%); 0 WAL file(s) added, 0 removed, 1 recycled; write=43.727 s, sync=0.001 s, total=43.727 s; sync files=42, longest=0.001 s, average=0.001 s; distance=39581 kB, estimate=39581 kB
+Mar 25 03:07:10 prod-web-01 systemd[1]: Starting Cleanup of Temporary Directories...
+Mar 25 03:08:19 prod-web-01 systemd[1]: Failed to start Fail2Ban Service.
+Mar 25 03:08:23 prod-web-01 nginx[61375]: 10.0.1.184 - - [25/Mar/2026:03:08:23 +0000] "POST /api/v1/users HTTP/1.1" 200 287303 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0"
+Mar 25 03:08:41 prod-web-01 nginx[59235]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 10.0.3.151, server: _, request: "GET /images/logo.png HTTP/1.1", upstream: "http://127.0.0.1:8080/images/logo.png"
+Mar 25 03:08:42 prod-web-01 postgresql[2449]: LOG:  disconnection: session time: 0:00:45.783 user=www-data database=appdb host=10.0.2.63 port=52780
+Mar 25 03:08:47 prod-web-01 app-server[8843]: WARN  [http-thread-1] com.app.api.SearchController - Slow query detected: 97ms for term "keyboard"
+Mar 25 03:08:51 prod-web-01 nginx[24016]: 10.0.0.174 - - [25/Mar/2026:03:08:51 +0000] "POST /api/v1/payments HTTP/1.1" 400 31009 "-" "Go-http-client/2.0"
+Mar 25 03:08:53 prod-web-01 postgresql[34248]: LOG:  disconnection: session time: 0:00:58.346 user=www-data database=appdb host=185.207.12.187 port=65231
+Mar 25 03:08:57 prod-web-01 sudo[54143]: pam_unix(sudo:session): session opened for user root by monitoring(uid=0)
+Mar 25 03:09:11 prod-web-01 app-server[35573]: INFO  [http-thread-0] com.app.api.UserController - Request processed: GET /api/users/35573 in 701ms
+Mar 25 03:09:14 prod-web-01 dockerd[3964]: time="2026-03-25T03:09:14.000000000Z" level=info msg="Container e2766d43cdf8 started"
+Mar 25 03:09:43 prod-web-01 dockerd[3739]: time="2026-03-25T03:09:43.000000000Z" level=info msg="Pulling image: redis:7-alpine"
+Mar 25 03:10:03 prod-web-01 kernel: device eth0 entered promiscuous mode
+Mar 25 03:11:21 prod-web-01 postgresql[13056]: LOG:  checkpoint starting: time
+Mar 25 03:13:03 prod-web-01 app-server[37938]: INFO  [http-thread-7] com.app.api.UserController - Request processed: GET /api/users/37938 in 921ms
+Mar 25 03:13:07 prod-web-01 nginx[56815]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 212.37.68.36, server: _, request: "GET /favicon.ico HTTP/1.1", upstream: "http://127.0.0.1:3000/favicon.ico"
+Mar 25 03:13:09 prod-web-01 dockerd[60288]: time="2026-03-25T03:13:09.000000000Z" level=warning msg="Container c8a74e44c2c4 health check failed"
+Mar 25 03:13:24 prod-web-01 CRON[58404]: (root) CMD (cd /opt/monitoring && ./collect-metrics.sh)
+Mar 25 03:13:32 prod-web-01 sshd[42201]: Connection reset by 185.192.150.110 port 46344 [preauth]
+Mar 25 03:13:39 prod-web-01 app-server[8272]: WARN  [http-thread-4] com.app.cache.RedisCache - Cache miss for key: user:8272:profile, fetching from DB
+Mar 25 03:14:05 prod-web-01 systemd[1]: Starting Cleanup of Temporary Directories...
+Mar 25 03:14:10 prod-web-01 app-server[5876]: ERROR [http-thread-7] com.app.api.PaymentController - Payment processing failed for order #5876: Connection timeout to payment gateway
+Mar 25 03:14:14 prod-web-01 app-server[21998]: INFO  [http-thread-1] com.app.api.AuthController - User monitoring logged in from 203.153.17.99
+Mar 25 03:14:28 prod-web-01 nginx[17446]: 10.0.2.40 - ubuntu [25/Mar/2026:03:14:28 +0000] "GET /admin/dashboard HTTP/1.1" 200 32916 "-" "Wget/1.21.3"
+Mar 25 03:14:44 prod-web-01 nginx[13470]: *13470 connect() failed (111: Connection refused) while connecting to upstream, client: 185.192.150.110
+Mar 25 03:14:46 prod-web-01 nginx[18753]: 142.42.119.98 - - [25/Mar/2026:03:14:46 +0000] "POST /api/v1/products HTTP/1.1" 200 99586 "-" "Wget/1.21.3"
+Mar 25 03:14:50 prod-web-01 dockerd[41532]: time="2026-03-25T03:14:50.000000000Z" level=error msg="Error response from daemon: conflict: unable to remove 9ac64c6f7d28 (cannot be forced) - image is being used by running container cc472df4dbb8"
+Mar 25 03:15:02 prod-web-01 systemd-resolved[33020]: Server returned error NXDOMAIN, mitigating potential DNS violation DVE-2018-0001.
+Mar 25 03:15:07 prod-web-01 nginx[14111]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 10.0.0.98, server: _, request: "GET /static/css/style.css HTTP/1.1", upstream: "http://127.0.0.1:5432/static/css/style.css"
+Mar 25 03:16:17 prod-web-01 postgresql[47287]: LOG:  checkpoint starting: time
+Mar 25 03:16:19 prod-web-01 sshd[11707]: Connection reset by 212.138.32.250 port 53613 [preauth]
+Mar 25 03:16:55 prod-web-01 sshd[3764]: Accepted publickey for ubuntu from 198.148.50.181 port 39022 ssh2: RSA SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8
+Mar 25 03:18:12 prod-web-01 sshd[10978]: Invalid user postgres from 45.175.185.30 port 48442
+Mar 25 03:18:40 prod-web-01 app-server[55586]: INFO  [scheduler-1] com.app.jobs.CleanupJob - Cleaned up 47192 expired sessions
+Mar 25 03:20:28 prod-web-01 systemd-journald[4278]: Vacuuming done, freed 0B of archived journals from /var/log/journal/.
+Mar 25 03:20:29 prod-web-01 app-server[58002]: ERROR [http-thread-6] com.app.db.ConnectionPool - Failed to acquire connection from pool: timeout after 30000ms
+Mar 25 03:24:48 prod-web-01 sshd[54107]: Received disconnect from 203.153.120.136 port 58530:11: Bye Bye [preauth]
+Mar 25 03:25:55 prod-web-01 app-server[45283]: ERROR [http-thread-2] com.app.db.ConnectionPool - Failed to acquire connection from pool: timeout after 30000ms
+Mar 25 03:27:35 prod-web-01 app-server[33058]: WARN  [http-thread-7] com.app.security.RateLimiter - Rate limit exceeded for IP 10.0.3.151: 49379 requests in 60s
+Mar 25 03:27:36 prod-web-01 systemd[1]: Stopped PostgreSQL RDBMS.
+Mar 25 03:28:06 prod-web-01 systemd[1]: Started Daily apt download activities.
+Mar 25 03:28:08 prod-web-01 postgresql[33903]: LOG:  connection authorized: user=root database=appdb
+Mar 25 03:29:06 prod-web-01 CRON[15990]: (admin) CMD (/opt/scripts/cleanup-tmp.sh)
+Mar 25 03:29:09 prod-web-01 sudo[8930]:     root : TTY=pts/1 ; PWD=/home/root ; USER=root ; COMMAND=/usr/bin/apt update
+Mar 25 03:29:56 prod-web-01 systemd-journald[13364]: Suppressed 37113 messages from /system.slice/nginx.service
+Mar 25 03:30:01 prod-web-01 nginx[40743]: 10.0.0.152 - jenkins [25/Mar/2026:03:30:01 +0000] "GET /admin/dashboard HTTP/1.1" 403 273289 "-" "python-requests/2.31.0"
+Mar 25 03:30:04 prod-web-01 app-server[46563]: WARN  [http-thread-3] com.app.api.SearchController - Slow query detected: 928ms for term "webcam"
+Mar 25 03:30:33 prod-web-01 app-server[13449]: INFO  [scheduler-1] com.app.jobs.CleanupJob - Cleaned up 32578 expired sessions
+Mar 25 03:30:34 prod-web-01 sshd[61804]: Connection closed by authenticating user monitoring 45.175.185.30 port 48159 [preauth]
+Mar 25 03:30:45 prod-web-01 systemd[1]: Stopping Docker Application Container Engine...
+Mar 25 03:32:33 prod-web-01 sudo[8037]:     admin : TTY=pts/6 ; PWD=/opt/app ; USER=root ; COMMAND=/bin/journalctl -u app-server --since '1 hour ago'
+Mar 25 03:32:35 prod-web-01 systemd-resolved[12035]: Grace period over, resuming full feature set (1.1.1.1).
+Mar 25 03:32:39 prod-web-01 sudo[32360]:     www-data : TTY=pts/1 ; PWD=/opt/app ; USER=root ; COMMAND=/bin/journalctl -u app-server --since '1 hour ago'
+Mar 25 03:32:43 prod-web-01 systemd-journald[4417]: Vacuuming done, freed 0B of archived journals from /var/log/journal/.
+Mar 25 03:32:48 prod-web-01 postgresql[16854]: LOG:  disconnection: session time: 0:00:18.472 user=admin database=appdb host=10.0.2.27 port=48302
+Mar 25 03:32:52 prod-web-01 app-server[5811]: ERROR [http-thread-2] com.app.api.PaymentController - Payment processing failed for order #5811: Connection timeout to payment gateway
+Mar 25 03:32:56 prod-web-01 fail2ban-server[63110]: NOTICE  [sshd] Ban 198.42.95.91
+Mar 25 03:32:59 prod-web-01 postgresql[30383]: LOG:  connection received: host=10.0.1.179 port=52736
+Mar 25 03:33:01 prod-web-01 sshd[20851]: Accepted publickey for jenkins from 185.253.21.219 port 57418 ssh2: RSA SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8
+Mar 25 03:34:41 prod-web-01 app-server[35518]: WARN  [http-thread-0] com.app.security.RateLimiter - Rate limit exceeded for IP 10.0.0.144: 16894 requests in 60s
+Mar 25 03:34:45 prod-web-01 sshd[63160]: Received disconnect from 212.24.194.13 port 50575:11: Bye Bye [preauth]
+Mar 25 03:34:48 prod-web-01 systemd[1]: Started Daily Cleanup of Temporary Directories.
+Mar 25 03:34:50 prod-web-01 nginx[5697]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 212.138.32.250, server: _, request: "GET /api/v1/orders HTTP/1.1", upstream: "http://127.0.0.1:5432/api/v1/orders"
+Mar 25 03:34:52 prod-web-01 CRON[10678]: (root) CMD (/usr/lib/apt/apt.systemd.daily install)
+Mar 25 03:42:29 prod-web-01 app-server[30465]: WARN  [http-thread-3] com.app.security.RateLimiter - Rate limit exceeded for IP 10.0.0.195: 18219 requests in 60s
+Mar 25 03:42:34 prod-web-01 dockerd[49762]: time="2026-03-25T03:42:34.000000000Z" level=error msg="Error response from daemon: conflict: unable to remove cc472df4dbb8 (cannot be forced) - image is being used by running container e2766d43cdf8"
+Mar 25 03:42:46 prod-web-01 nginx[35782]: 203.153.17.99 - - [25/Mar/2026:03:42:46 +0000] "GET /favicon.ico HTTP/1.1" 200 39901 "https://example.com/dashboard" "python-requests/2.31.0"
+Mar 25 03:42:48 prod-web-01 nginx[43391]: 198.148.50.181 - - [25/Mar/2026:03:42:48 +0000] "GET /health HTTP/1.1" 200 2 "-" "ELB-HealthChecker/2.0"
+Mar 25 03:44:22 prod-web-01 CRON[9001]: (root) CMD (/usr/sbin/logrotate /etc/logrotate.conf)
+Mar 25 03:44:47 prod-web-01 app-server[55690]: ERROR [http-thread-0] com.app.api.PaymentController - Payment processing failed for order #55690: Connection timeout to payment gateway
+Mar 25 03:45:09 prod-web-01 systemd[1]: Started Daily Cleanup of Temporary Directories.
+Mar 25 03:45:18 prod-web-01 systemd[1]: Stopping Docker Application Container Engine...
+Mar 25 03:45:21 prod-web-01 fail2ban-server[8001]: INFO    [sshd] Found 185.207.12.187 - 2026-03-25T03:45:21.000000000Z
+Mar 25 03:45:39 prod-web-01 sshd[20182]: Connection reset by 142.42.119.98 port 56970 [preauth]
+Mar 25 03:45:40 prod-web-01 fail2ban-server[63875]: NOTICE  [sshd] Unban 91.92.217.89
+Mar 25 03:45:42 prod-web-01 sshd[31381]: error: maximum authentication attempts exceeded for oracle from 91.40.161.41 port 33905 ssh2 [preauth]
+Mar 25 03:45:45 prod-web-01 systemd[1]: Started Daily Cleanup of Temporary Directories.
+Mar 25 03:45:50 prod-web-01 sshd[49012]: Disconnected from user root 185.117.163.214 port 47821
+Mar 25 03:46:49 prod-web-01 sshd[36060]: error: maximum authentication attempts exceeded for guest from 203.21.142.76 port 58919 ssh2 [preauth]
+Mar 25 03:47:11 prod-web-01 app-server[54547]: ERROR [http-thread-2] com.app.db.ConnectionPool - Failed to acquire connection from pool: timeout after 30000ms
+Mar 25 03:47:25 prod-web-01 sshd[3063]: Failed password for invalid user root from 91.156.163.44 port 49634 ssh2
+Mar 25 03:47:52 prod-web-01 fail2ban-server[59090]: NOTICE  [sshd] Unban 203.153.17.99
+Mar 25 03:47:57 prod-web-01 dockerd[49340]: time="2026-03-25T03:47:57.000000000Z" level=error msg="Error response from daemon: conflict: unable to remove 179284ae81e2 (cannot be forced) - image is being used by running container a33c2774d400"
+Mar 25 03:48:04 prod-web-01 systemd[1]: Started Daily Cleanup of Temporary Directories.
+Mar 25 03:48:09 prod-web-01 sshd[54265]: Connection reset by 142.191.144.138 port 65390 [preauth]
+Mar 25 03:48:12 prod-web-01 postgresql[10827]: ERROR:  deadlock detected
+Mar 25 03:50:03 prod-web-01 CRON[5228]: (root) CMD (test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily ))
+Mar 25 03:50:27 prod-web-01 postgresql[44876]: LOG:  temporary file: path "base/pgsql_tmp/pgsql_tmp44876.0", size 25581
+Mar 25 03:50:30 prod-web-01 fail2ban-server[44821]: INFO    [sshd] Found 142.42.119.98 - 2026-03-25T03:50:30.000000000Z
+Mar 25 03:51:26 prod-web-01 sshd[17889]: Connection reset by 185.249.142.221 port 38007 [preauth]
+Mar 25 03:51:33 prod-web-01 app-server[26515]: WARN  [http-thread-1] com.app.security.RateLimiter - Rate limit exceeded for IP 10.0.0.195: 39147 requests in 60s
+Mar 25 03:51:37 prod-web-01 nginx[9776]: 203.227.235.165 - - [25/Mar/2026:03:51:37 +0000] "GET /health HTTP/1.1" 200 2 "-" "ELB-HealthChecker/2.0"
+Mar 25 03:51:40 prod-web-01 kernel: INFO: task kworker/6:0 blocked for more than 120 seconds.
+Mar 25 03:51:45 prod-web-01 postgresql[62624]: LOG:  automatic vacuum of table "appdb.public.sessions": index scans: 1 pages: 0 removed, 42225 remain tuples: 42225 removed, 62624 remain
+Mar 25 03:51:50 prod-web-01 postgresql[60816]: LOG:  temporary file: path "base/pgsql_tmp/pgsql_tmp60816.0", size 33262
+Mar 25 03:52:07 prod-web-01 fail2ban-server[51241]: INFO    [sshd] Ignore 91.40.161.41 by ip
+Mar 25 03:52:17 prod-web-01 app-server[27490]: INFO  [http-thread-7] com.app.api.AuthController - User monitoring logged in from 10.0.2.63
+Mar 25 03:52:18 prod-web-01 nginx[8720]: *8720 connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.3.57
+Mar 25 03:57:10 prod-web-01 app-server[56267]: INFO  [scheduler-1] com.app.jobs.CleanupJob - Cleaned up 33688 expired sessions
+Mar 25 04:06:11 prod-web-01 systemd-journald[62954]: Suppressed 29063 messages from /system.slice/nginx.service
+Mar 25 04:06:15 prod-web-01 app-server[59027]: ERROR [http-thread-1] com.app.db.ConnectionPool - Failed to acquire connection from pool: timeout after 30000ms
+Mar 25 04:06:18 prod-web-01 fail2ban-server[31617]: INFO    [sshd] Found 142.176.84.216 - 2026-03-25T04:06:18.000000000Z
+Mar 25 04:06:32 prod-web-01 app-server[57659]: WARN  [http-thread-4] com.app.cache.RedisCache - Cache miss for key: user:57659:profile, fetching from DB
+Mar 25 04:08:17 prod-web-01 systemd[1]: Starting OpenBSD Secure Shell server...
+Mar 25 04:09:50 prod-web-01 postgresql[57367]: LOG:  disconnection: session time: 0:00:49.344 user=admin database=appdb host=10.0.0.7 port=54649
+Mar 25 04:10:19 prod-web-01 CRON[18597]: (root) CMD (cd /opt/monitoring && ./collect-metrics.sh)
+Mar 25 04:10:38 prod-web-01 fail2ban-server[46565]: INFO    [sshd] Found 212.138.32.250 - 2026-03-25T04:10:38.000000000Z
+Mar 25 04:12:11 prod-web-01 systemd-resolved[21979]: Server returned error NXDOMAIN, mitigating potential DNS violation DVE-2018-0001.
+Mar 25 04:12:13 prod-web-01 sshd[26767]: Connection reset by 142.42.119.98 port 42852 [preauth]
+Mar 25 04:12:16 prod-web-01 fail2ban-server[57907]: NOTICE  [sshd] Ban 142.172.69.180
+Mar 25 04:12:24 prod-web-01 CRON[60892]: (root) CMD (/usr/lib/apt/apt.systemd.daily install)
+Mar 25 04:12:29 prod-web-01 systemd-resolved[2052]: Using DNS server 10.0.0.2.
+Mar 25 04:12:34 prod-web-01 systemd[1]: Reloaded OpenBSD Secure Shell server.
+Mar 25 04:18:13 prod-web-01 kernel: hrtimer: interrupt took 1268 ns
+Mar 25 04:19:21 prod-web-01 CRON[26285]: (www-data) CMD (/opt/scripts/cleanup-tmp.sh)
+Mar 25 04:19:22 prod-web-01 systemd-resolved[42085]: Using DNS server 8.8.8.8.
+Mar 25 04:19:25 prod-web-01 CRON[22327]: (root) CMD (/usr/lib/apt/apt.systemd.daily install)
+Mar 25 04:19:30 prod-web-01 sshd[49025]: Disconnected from user admin 142.191.144.138 port 34938
+Mar 25 04:19:35 prod-web-01 systemd-resolved[41056]: Grace period over, resuming full feature set (10.0.0.2).
+Mar 25 04:19:44 prod-web-01 app-server[36912]: INFO  [http-thread-5] com.app.api.UserController - Request processed: GET /api/users/36912 in 366ms
+Mar 25 04:19:45 prod-web-01 systemd[1]: Reached target Multi-User System.
+Mar 25 04:19:46 prod-web-01 dockerd[10947]: time="2026-03-25T04:19:46.000000000Z" level=error msg="Error response from daemon: conflict: unable to remove 179284ae81e2 (cannot be forced) - image is being used by running container cc472df4dbb8"
+Mar 25 04:19:48 prod-web-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=02:42:ac:11:00:02 SRC=192.168.1.252 DST=10.0.0.5 LEN=40 TOS=0x00 PREC=0x00 TTL=64 ID=30841 PROTO=TCP SPT=39806 DPT=5432 WINDOW=0 RES=0x00 SYN URGP=0
+Mar 25 04:20:18 prod-web-01 dockerd[52066]: time="2026-03-25T04:20:18.000000000Z" level=info msg="Container e9ae8e1c224b stopped"
+Mar 25 04:20:28 prod-web-01 nginx[40260]: 10.0.1.36 - - [25/Mar/2026:04:20:28 +0000] "POST /api/v1/users HTTP/1.1" 201 119643 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0"
+Mar 25 04:20:33 prod-web-01 sudo[41822]:     jenkins : TTY=pts/0 ; PWD=/opt/app ; USER=root ; COMMAND=/bin/journalctl -u app-server --since '1 hour ago'
+Mar 25 04:20:36 prod-web-01 postgresql[1860]: ERROR:  deadlock detected
+Mar 25 04:20:40 prod-web-01 kernel: ACPI: EC: interrupt blocked
+Mar 25 04:21:27 prod-web-01 kernel: audit: type=1400 audit({}): apparmor="ALLOWED" operation="open" profile="/usr/sbin/nginx" name="/var/log/nginx/access.log" pid={pid} comm="nginx"
+Mar 25 04:21:30 prod-web-01 dockerd[53942]: time="2026-03-25T04:21:30.000000000Z" level=info msg="Container ede537e03cb8 started"
+Mar 25 04:21:34 prod-web-01 systemd-resolved[29632]: DNSSEC validation failed for question example.com IN A: no-signature
+Mar 25 04:21:37 prod-web-01 nginx[50212]: *50212 connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.2.40
+Mar 25 04:21:43 prod-web-01 nginx[32016]: 10.0.3.9 - - [25/Mar/2026:04:21:43 +0000] "GET /health HTTP/1.1" 200 2 "-" "ELB-HealthChecker/2.0"
+Mar 25 04:21:56 prod-web-01 systemd[1]: Failed to start Prometheus Node Exporter.
+Mar 25 04:22:01 prod-web-01 sshd[7698]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=91.12.170.59  user=user
+Mar 25 04:22:06 prod-web-01 systemd-resolved[20654]: Using DNS server 8.8.8.8.
+Mar 25 04:22:09 prod-web-01 systemd[1]: Stopping A high performance web server...
+Mar 25 04:23:31 prod-web-01 systemd[1]: Starting Uncomplicated firewall...
+Mar 25 04:23:33 prod-web-01 nginx[61866]: *61866 connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.1.36
+Mar 25 04:23:47 prod-web-01 CRON[4077]: (root) CMD (test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily ))
+Mar 25 04:23:52 prod-web-01 app-server[53358]: INFO  [scheduler-1] com.app.jobs.CleanupJob - Cleaned up 7770 expired sessions
+Mar 25 04:23:57 prod-web-01 sshd[7048]: Disconnected from user www-data 203.153.17.99 port 46462
+Mar 25 04:24:01 prod-web-01 systemd-resolved[10651]: Using DNS server 1.1.1.1.
+Mar 25 04:24:04 prod-web-01 fail2ban-server[21021]: NOTICE  [sshd] Unban 198.42.95.91
+Mar 25 04:24:06 prod-web-01 systemd-resolved[45897]: Grace period over, resuming full feature set (8.8.8.8).
+Mar 25 04:24:44 prod-web-01 postgresql[19782]: ERROR:  deadlock detected
+Mar 25 04:25:06 prod-web-01 CRON[35582]: (root) CMD (/usr/sbin/logrotate /etc/logrotate.conf)
+Mar 25 04:25:29 prod-web-01 sshd[10892]: Disconnected from user jenkins 212.37.68.36 port 62765
+Mar 25 04:27:15 prod-web-01 sudo[47849]: pam_unix(sudo:session): session opened for user root by ubuntu(uid=0)
+Mar 25 04:27:21 prod-web-01 systemd-oomd[55742]: Memory pressure watch on /system.slice/app-server.service
+Mar 25 04:27:22 prod-web-01 nginx[18620]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 10.0.2.40, server: _, request: "GET /static/css/style.css HTTP/1.1", upstream: "http://127.0.0.1:6379/static/css/style.css"
+Mar 25 04:27:27 prod-web-01 sshd[56305]: Received disconnect from 142.176.84.216 port 54710:11: Bye Bye [preauth]
+Mar 25 04:27:30 prod-web-01 postgresql[6912]: FATAL:  too many connections for role "deploy"
+Mar 25 04:27:35 prod-web-01 systemd-resolved[21903]: Using DNS server 8.8.8.8.
+Mar 25 04:27:40 prod-web-01 postgresql[62952]: LOG:  temporary file: path "base/pgsql_tmp/pgsql_tmp62952.0", size 36871
+Mar 25 04:27:50 prod-web-01 kernel: Out of memory: Killed process 15903 (java) total-vm:4096000kB, anon-rss:3200000kB
+Mar 25 04:28:08 prod-web-01 systemd-journald[23584]: Runtime journal (/run/log/journal/) is 10.0% full.
+Mar 25 04:28:10 prod-web-01 app-server[23111]: ERROR [http-thread-4] com.app.api.PaymentController - Payment processing failed for order #23111: Connection timeout to payment gateway
+Mar 25 04:28:14 prod-web-01 nginx[22991]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 10.0.2.208, server: _, request: "GET / HTTP/1.1", upstream: "http://127.0.0.1:3000/"
+Mar 25 04:28:17 prod-web-01 app-server[12022]: WARN  [http-thread-5] com.app.cache.RedisCache - Cache miss for key: user:12022:profile, fetching from DB
+Mar 25 04:28:47 prod-web-01 sshd[23268]: banner exchange: Connection from 198.42.95.91 port 32872: invalid format
+Mar 25 04:28:49 prod-web-01 dockerd[19626]: time="2026-03-25T04:28:49.000000000Z" level=info msg="ignoring event" container=a33c2774d400 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Mar 25 04:28:54 prod-web-01 nginx[32293]: 10.0.1.60 - ubuntu [25/Mar/2026:04:28:54 +0000] "GET /admin/dashboard HTTP/1.1" 404 101630 "-" "python-requests/2.31.0"
+Mar 25 04:28:57 prod-web-01 nginx[36208]: 10.0.3.9 - www-data [25/Mar/2026:04:28:57 +0000] "GET /admin/dashboard HTTP/1.1" 200 448796 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Safari/605.1.15"
+Mar 25 04:29:14 prod-web-01 dockerd[19454]: time="2026-03-25T04:29:14.000000000Z" level=info msg="Container a33c2774d400 started"
+Mar 25 04:29:18 prod-web-01 sudo[6952]:     admin : TTY=pts/7 ; PWD=/home/admin ; USER=root ; COMMAND=/bin/systemctl restart nginx
+Mar 25 04:29:19 prod-web-01 app-server[11975]: ERROR [http-thread-7] com.app.db.ConnectionPool - Failed to acquire connection from pool: timeout after 30000ms
+Mar 25 04:29:21 prod-web-01 systemd[1]: Starting Cleanup of Temporary Directories...
+Mar 25 04:30:36 prod-web-01 app-server[16971]: INFO  [http-thread-0] com.app.api.OrderController - Order #16971 created for user #25440 total=$1405.02
+Mar 25 04:31:00 prod-web-01 systemd-resolved[31780]: Using DNS server 1.1.1.1.
+Mar 25 04:31:04 prod-web-01 nginx[6512]: 10.0.3.151 - - [25/Mar/2026:04:31:04 +0000] "POST /api/v1/users HTTP/1.1" 502 400066 "-" "python-requests/2.31.0"
+Mar 25 04:31:06 prod-web-01 systemd-resolved[20367]: Using DNS server 1.1.1.1.
+Mar 25 04:31:19 prod-web-01 app-server[48196]: WARN  [http-thread-1] com.app.cache.RedisCache - Cache miss for key: user:48196:profile, fetching from DB
+Mar 25 04:31:22 prod-web-01 CRON[53264]: (root) CMD (cd /opt/monitoring && ./collect-metrics.sh)
+Mar 25 04:31:46 prod-web-01 nginx[27022]: 203.153.120.136 - jenkins [25/Mar/2026:04:31:46 +0000] "GET /admin/dashboard HTTP/1.1" 200 192907 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Safari/605.1.15"
+Mar 25 04:31:47 prod-web-01 app-server[7832]: ERROR [http-thread-7] com.app.api.PaymentController - Payment processing failed for order #7832: Connection timeout to payment gateway
+Mar 25 04:31:51 prod-web-01 fail2ban-server[46318]: INFO    [sshd] Found 91.40.161.41 - 2026-03-25T04:31:51.000000000Z
+Mar 25 04:31:52 prod-web-01 systemd-journald[48807]: Suppressed 2309 messages from /system.slice/nginx.service
+Mar 25 04:32:17 prod-web-01 systemd-journald[23542]: Suppressed 31053 messages from /system.slice/nginx.service
+Mar 25 04:38:59 prod-web-01 kernel: [UFW BLOCK] IN=eth0 OUT= MAC=02:42:ac:11:00:02 SRC=192.168.1.91 DST=10.0.0.5 LEN=40 TOS=0x00 PREC=0x00 TTL=64 ID=26499 PROTO=TCP SPT=63139 DPT=443 WINDOW=0 RES=0x00 SYN URGP=0
+Mar 25 04:39:03 prod-web-01 nginx[14750]: 10.0.0.152 - - [25/Mar/2026:04:39:03 +0000] "POST /api/v1/notifications HTTP/1.1" 404 55642 "-" "python-requests/2.31.0"
+Mar 25 04:40:04 prod-web-01 app-server[57655]: ERROR [http-thread-7] com.app.db.ConnectionPool - Failed to acquire connection from pool: timeout after 30000ms
+Mar 25 04:40:09 prod-web-01 CRON[32033]: (root) CMD (cd /opt/monitoring && ./collect-metrics.sh)
+Mar 25 04:40:12 prod-web-01 sshd[53653]: Received disconnect from 91.92.217.89 port 46621:11: Bye Bye [preauth]
+Mar 25 04:40:16 prod-web-01 dockerd[13148]: time="2026-03-25T04:40:16.000000000Z" level=info msg="ignoring event" container=931216a41557 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Mar 25 04:40:21 prod-web-01 systemd[1]: Stopped PostgreSQL RDBMS.
+Mar 25 04:41:16 prod-web-01 nginx[17838]: 185.254.237.164 - - [25/Mar/2026:04:41:16 +0000] "GET /wp-admin HTTP/1.1" 200 19731 "https://www.google.com/" "Googlebot/2.1 (+http://www.google.com/bot.html)"
+Mar 25 04:41:20 prod-web-01 systemd[1]: Started Session 4218 of user deploy.
+Mar 25 04:43:07 prod-web-01 fail2ban-server[19074]: NOTICE  [sshd] Unban 198.42.95.91
+Mar 25 04:43:26 prod-web-01 systemd[1]: Unit fail2ban.service entered failed state.
+Mar 25 04:44:55 prod-web-01 systemd-journald[47332]: Vacuuming done, freed 0B of archived journals from /var/log/journal/.
+Mar 25 04:44:59 prod-web-01 systemd-journald[21317]: Suppressed 9241 messages from /system.slice/nginx.service
+Mar 25 04:46:07 prod-web-01 systemd[1]: Starting Regular background program processing daemon...
+Mar 25 04:46:09 prod-web-01 postgresql[49107]: LOG:  connection authorized: user=www-data database=appdb
+Mar 25 04:46:11 prod-web-01 systemd[1]: Started Daily Cleanup of Temporary Directories.
+Mar 25 04:46:15 prod-web-01 systemd-journald[11098]: Runtime journal (/run/log/journal/) is 93.2% full.
+Mar 25 04:52:09 prod-web-01 kernel: INFO: task kworker/4:0 blocked for more than 120 seconds.
+Mar 25 04:52:13 prod-web-01 nginx[8404]: 10.0.3.57 - - [25/Mar/2026:04:52:13 +0000] "POST /api/v1/auth/token HTTP/1.1" 404 385844 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36"
+Mar 25 04:52:37 prod-web-01 app-server[41113]: INFO  [http-thread-4] com.app.api.OrderController - Order #41113 created for user #51206 total=$1819.51
+Mar 25 04:52:44 prod-web-01 kernel: Out of memory: Killed process 38532 (java) total-vm:4096000kB, anon-rss:3200000kB
+Mar 25 04:53:08 prod-web-01 CRON[13748]: (root) CMD (/usr/lib/apt/apt.systemd.daily install)
+Mar 25 04:53:13 prod-web-01 CRON[37455]: (deploy) CMD (/opt/scripts/backup.sh >> /var/log/backup.log 2>&1)
+Mar 25 04:53:21 prod-web-01 postgresql[12733]: LOG:  disconnection: session time: 0:00:30.884 user=ubuntu database=appdb host=198.42.95.91 port=34191
+Mar 25 04:53:22 prod-web-01 systemd-journald[27858]: Runtime journal (/run/log/journal/) is 32.8% full.
+Mar 25 04:53:27 prod-web-01 app-server[54912]: WARN  [http-thread-1] com.app.cache.RedisCache - Cache miss for key: user:54912:profile, fetching from DB
+Mar 25 04:53:34 prod-web-01 app-server[59986]: ERROR [http-thread-0] com.app.api.PaymentController - Payment processing failed for order #59986: Connection timeout to payment gateway
+Mar 25 04:53:37 prod-web-01 dockerd[8653]: time="2026-03-25T04:53:37.000000000Z" level=info msg="Pulling image: grafana/grafana:10.2.3"
+Mar 25 04:53:56 prod-web-01 dockerd[23506]: time="2026-03-25T04:53:56.000000000Z" level=info msg="Container 34e3768939c0 stopped"
+Mar 25 04:53:59 prod-web-01 nginx[56745]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 10.0.1.36, server: _, request: "GET /phpmyadmin HTTP/1.1", upstream: "http://127.0.0.1:3000/phpmyadmin"
+Mar 25 04:54:04 prod-web-01 fail2ban-server[55768]: INFO    [sshd] Found 91.12.170.59 - 2026-03-25T04:54:04.000000000Z
+Mar 25 04:54:06 prod-web-01 systemd-resolved[37263]: Using DNS server 1.1.1.1.
+Mar 25 04:54:09 prod-web-01 app-server[43836]: INFO  [http-thread-4] com.app.api.UserController - Request processed: GET /api/users/43836 in 135ms
+Mar 25 04:54:11 prod-web-01 nginx[29586]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 45.175.185.30, server: _, request: "GET /api/v1/orders HTTP/1.1", upstream: "http://127.0.0.1:443/api/v1/orders"
+Mar 25 04:54:13 prod-web-01 kernel: hrtimer: interrupt took 823 ns
+Mar 25 04:54:40 prod-web-01 sshd[44816]: banner exchange: Connection from 142.191.144.138 port 52693: invalid format
+Mar 25 04:55:05 prod-web-01 nginx[48959]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 91.40.161.41, server: _, request: "GET /api/v1/health HTTP/1.1", upstream: "http://127.0.0.1:80/api/v1/health"
+Mar 25 04:55:58 prod-web-01 postgresql[36058]: ERROR:  deadlock detected
+Mar 25 04:55:59 prod-web-01 nginx[13320]: 10.0.3.88 - jenkins [25/Mar/2026:04:55:59 +0000] "GET /admin/dashboard HTTP/1.1" 403 424186 "-" "Googlebot/2.1 (+http://www.google.com/bot.html)"
+Mar 25 04:56:02 prod-web-01 sudo[11729]:     ubuntu : TTY=pts/7 ; PWD=/opt/app ; USER=root ; COMMAND=/bin/journalctl -u app-server --since '1 hour ago'
+Mar 25 04:56:21 prod-web-01 dockerd[55957]: time="2026-03-25T04:56:21.000000000Z" level=error msg="Error response from daemon: conflict: unable to remove ede537e03cb8 (cannot be forced) - image is being used by running container 34e3768939c0"
+Mar 25 04:56:26 prod-web-01 systemd-oomd[55676]: Memory pressure watch on /system.slice/app-server.service
+Mar 25 04:56:27 prod-web-01 app-server[49898]: INFO  [http-thread-3] com.app.api.UserController - Request processed: GET /api/users/49898 in 44ms
+Mar 25 04:56:29 prod-web-01 sudo[33518]: pam_unix(sudo:session): session closed for user root
+Mar 25 04:56:41 prod-web-01 nginx[7636]: 142.191.144.138 - - [25/Mar/2026:04:56:41 +0000] "GET /images/logo.png HTTP/1.1" 304 254887 "https://example.com/dashboard" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0"
+Mar 25 04:56:45 prod-web-01 systemd-oomd[63842]: Memory pressure watch on /system.slice/app-server.service
+Mar 25 04:57:06 prod-web-01 app-server[38705]: INFO  [http-thread-4] com.app.api.UserController - Request processed: GET /api/users/38705 in 522ms
+Mar 25 04:58:58 prod-web-01 fail2ban-server[52697]: INFO    [sshd] Found 203.153.17.99 - 2026-03-25T04:58:58.000000000Z
+Mar 25 04:59:03 prod-web-01 fail2ban-server[34597]: NOTICE  [sshd] Ban 91.92.217.89
+Mar 25 04:59:30 prod-web-01 systemd[1]: Starting Regular background program processing daemon...
+Mar 25 04:59:33 prod-web-01 nginx[43315]: *43315 connect() failed (111: Connection refused) while connecting to upstream, client: 203.21.142.76
+Mar 25 04:59:35 prod-web-01 CRON[27821]: (root) CMD (test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily ))
+Mar 25 04:59:58 prod-web-01 systemd-journald[26549]: Vacuuming done, freed 0B of archived journals from /var/log/journal/.
+Mar 25 05:00:02 prod-web-01 sudo[50501]:     root : TTY=pts/5 ; PWD=/opt/app ; USER=root ; COMMAND=/bin/journalctl -u app-server --since '1 hour ago'
+Mar 25 05:00:07 prod-web-01 systemd[1]: Stopping PostgreSQL RDBMS...
+Mar 25 05:01:06 prod-web-01 CRON[37998]: (root) CMD (/usr/lib/apt/apt.systemd.daily install)
+Mar 25 05:01:08 prod-web-01 sshd[45978]: Received disconnect from 203.153.120.136 port 30953:11: Bye Bye [preauth]
+Mar 25 05:01:38 prod-web-01 systemd-journald[26197]: Suppressed 5397 messages from /system.slice/nginx.service
+Mar 25 05:02:20 prod-web-01 fail2ban-server[61920]: INFO    [sshd] Found 185.249.142.221 - 2026-03-25T05:02:20.000000000Z
+Mar 25 05:02:24 prod-web-01 CRON[18913]: (root) CMD (cd /opt/monitoring && ./collect-metrics.sh)
+Mar 25 05:02:27 prod-web-01 sshd[42757]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=185.254.237.164  user=postgres
+Mar 25 05:02:31 prod-web-01 sshd[18334]: Accepted publickey for admin from 91.92.217.89 port 33524 ssh2: RSA SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8
+Mar 25 05:06:25 prod-web-01 app-server[21450]: INFO  [scheduler-1] com.app.jobs.CleanupJob - Cleaned up 32726 expired sessions
+Mar 25 05:06:35 prod-web-01 app-server[55136]: WARN  [http-thread-7] com.app.cache.RedisCache - Cache miss for key: user:55136:profile, fetching from DB
+Mar 25 05:06:37 prod-web-01 fail2ban-server[33807]: NOTICE  [sshd] Unban 198.42.95.91
+Mar 25 05:07:43 prod-web-01 app-server[44947]: INFO  [http-thread-4] com.app.api.OrderController - Order #44947 created for user #47547 total=$536.99
+Mar 25 05:07:46 prod-web-01 sshd[21381]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=212.138.32.250  user=admin
+Mar 25 05:09:35 prod-web-01 kernel: EXT4-fs (sda1): re-mounted. Opts: errors=continue
+Mar 25 05:09:40 prod-web-01 systemd[1]: Starting Regular background program processing daemon...
+Mar 25 05:17:04 prod-web-01 sshd[51783]: Received disconnect from 185.253.21.219 port 61795:11: Bye Bye [preauth]
+Mar 25 05:20:27 prod-web-01 systemd[1]: Removed slice User Slice of ubuntu.
+Mar 25 05:20:28 prod-web-01 fail2ban-server[59509]: NOTICE  [sshd] Unban 198.42.95.91
+Mar 25 05:21:44 prod-web-01 CRON[46762]: (admin) CMD (/opt/scripts/cleanup-tmp.sh)
+Mar 25 05:21:45 prod-web-01 postgresql[22595]: WARNING:  could not open statistics file "pg_stat_tmp/global.stat": Operation not permitted
+Mar 25 05:21:46 prod-web-01 systemd[1]: Started Session 8246 of user root.
+Mar 25 05:21:56 prod-web-01 nginx[27399]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 198.103.69.17, server: _, request: "GET /favicon.ico HTTP/1.1", upstream: "http://127.0.0.1:22/favicon.ico"
+Mar 25 05:22:01 prod-web-01 app-server[53253]: INFO  [http-thread-2] com.app.api.UserController - Request processed: GET /api/users/53253 in 592ms
+Mar 25 05:22:19 prod-web-01 postgresql[33755]: WARNING:  could not open statistics file "pg_stat_tmp/global.stat": Operation not permitted
+Mar 25 05:22:23 prod-web-01 dockerd[7986]: time="2026-03-25T05:22:23.000000000Z" level=info msg="Pulling image: postgres:16"
+Mar 25 05:22:27 prod-web-01 nginx[57908]: 10.0.0.7 - - [25/Mar/2026:05:22:27 +0000] "GET /.env HTTP/1.1" 502 20624 "-" "Go-http-client/2.0"
+Mar 25 05:22:29 prod-web-01 CRON[27063]: (root) CMD (cd /opt/monitoring && ./collect-metrics.sh)
+Mar 25 05:22:33 prod-web-01 nginx[30728]: 10.0.1.184 - - [25/Mar/2026:05:22:33 +0000] "POST /api/v1/users HTTP/1.1" 403 392649 "-" "Go-http-client/2.0"
+Mar 25 05:22:34 prod-web-01 nginx[58810]: 10.0.0.144 - - [25/Mar/2026:05:22:34 +0000] "GET /health HTTP/1.1" 200 2 "-" "ELB-HealthChecker/2.0"
+Mar 25 05:22:46 prod-web-01 CRON[19667]: (root) CMD (/usr/sbin/logrotate /etc/logrotate.conf)
+Mar 25 05:23:56 prod-web-01 dockerd[63349]: time="2026-03-25T05:23:56.000000000Z" level=info msg="Container e2766d43cdf8 stopped"
+Mar 25 05:23:58 prod-web-01 nginx[57031]: 10.0.0.152 - ubuntu [25/Mar/2026:05:23:58 +0000] "GET /admin/dashboard HTTP/1.1" 200 367640 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36"
+Mar 25 05:24:00 prod-web-01 nginx[51586]: *51586 connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.0.174
+Mar 25 05:24:01 prod-web-01 nginx[26048]: *26048 connect() failed (111: Connection refused) while connecting to upstream, client: 185.253.21.219
+Mar 25 05:24:05 prod-web-01 sshd[18440]: Connection reset by 198.148.50.181 port 41028 [preauth]
+Mar 25 05:24:10 prod-web-01 kernel: hrtimer: interrupt took 1915 ns
+Mar 25 05:24:11 prod-web-01 app-server[38678]: INFO  [http-thread-0] com.app.api.OrderController - Order #38678 created for user #15392 total=$1706.07
+Mar 25 05:24:15 prod-web-01 CRON[1676]: (ubuntu) CMD (/opt/scripts/backup.sh >> /var/log/backup.log 2>&1)
+Mar 25 05:25:29 prod-web-01 nginx[13886]: *13886 connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.2.208
+Mar 25 05:25:31 prod-web-01 systemd-journald[37723]: Runtime journal (/run/log/journal/) is 22.5% full.
+Mar 25 05:25:42 prod-web-01 nginx[1792]: *1792 connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.1.60
+Mar 25 05:25:46 prod-web-01 postgresql[18165]: ERROR:  deadlock detected
+Mar 25 05:25:54 prod-web-01 nginx[30781]: *30781 connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.1.184
+Mar 25 05:27:16 prod-web-01 sudo[51862]:     root : TTY=pts/6 ; PWD=/opt/app ; USER=root ; COMMAND=/bin/journalctl -u app-server --since '1 hour ago'
+Mar 25 05:28:03 prod-web-01 app-server[18194]: INFO  [http-thread-0] com.app.api.UserController - Request processed: GET /api/users/18194 in 967ms
+Mar 25 05:28:05 prod-web-01 app-server[35989]: INFO  [http-thread-0] com.app.api.UserController - Request processed: GET /api/users/35989 in 368ms
+Mar 25 05:32:17 prod-web-01 CRON[16204]: (root) CMD (/opt/scripts/backup.sh >> /var/log/backup.log 2>&1)
+Mar 25 05:32:19 prod-web-01 sshd[51771]: Received disconnect from 45.59.211.9 port 33565:11: Bye Bye [preauth]
+Mar 25 05:32:52 prod-web-01 postgresql[34268]: ERROR:  deadlock detected
+Mar 25 05:33:46 prod-web-01 nginx[15309]: 10.0.3.9 - - [25/Mar/2026:05:33:46 +0000] "GET /health HTTP/1.1" 200 2 "-" "ELB-HealthChecker/2.0"
+Mar 25 05:33:58 prod-web-01 postgresql[61181]: LOG:  disconnection: session time: 0:00:23.798 user=deploy database=appdb host=142.172.69.180 port=38713
+Mar 25 05:34:01 prod-web-01 sshd[16127]: Failed password for invalid user nagios from 142.42.119.98 port 56426 ssh2
+Mar 25 05:34:02 prod-web-01 postgresql[39234]: DETAIL:  Process 39234 waits for ShareLock on transaction 39234; blocked by process 27750.
+Mar 25 05:34:05 prod-web-01 dockerd[13425]: time="2026-03-25T05:34:05.000000000Z" level=error msg="Error response from daemon: conflict: unable to remove 179284ae81e2 (cannot be forced) - image is being used by running container e9ae8e1c224b"
+Mar 25 05:35:16 prod-web-01 systemd-resolved[9676]: Grace period over, resuming full feature set (1.1.1.1).
+Mar 25 05:35:21 prod-web-01 CRON[6582]: (root) CMD (/usr/lib/apt/apt.systemd.daily install)
+Mar 25 05:35:24 prod-web-01 postgresql[43097]: LOG:  checkpoint starting: time
+Mar 25 05:35:29 prod-web-01 nginx[50138]: 10.0.0.152 - deploy [25/Mar/2026:05:35:29 +0000] "GET /admin/dashboard HTTP/1.1" 201 168481 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Safari/605.1.15"
+Mar 25 05:35:34 prod-web-01 kernel: Out of memory: Killed process 36691 (java) total-vm:4096000kB, anon-rss:3200000kB
+Mar 25 05:35:39 prod-web-01 app-server[45628]: INFO  [http-thread-0] com.app.api.UserController - Request processed: GET /api/users/45628 in 330ms
+Mar 25 05:35:41 prod-web-01 systemd-oomd[18278]: Memory pressure watch on /system.slice/app-server.service
+Mar 25 05:35:44 prod-web-01 sshd[16792]: error: maximum authentication attempts exceeded for ftpuser from 203.21.142.76 port 56429 ssh2 [preauth]
+Mar 25 05:36:08 prod-web-01 CRON[58435]: (admin) CMD (/opt/scripts/cleanup-tmp.sh)
+Mar 25 05:36:11 prod-web-01 nginx[55344]: 203.93.57.36 - root [25/Mar/2026:05:36:11 +0000] "GET /admin/dashboard HTTP/1.1" 200 327074 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Safari/605.1.15"
+Mar 25 05:36:34 prod-web-01 sshd[38648]: Disconnected from user monitoring 142.42.119.98 port 32730
+Mar 25 05:36:39 prod-web-01 CRON[23797]: (jenkins) CMD (/opt/scripts/cleanup-tmp.sh)
+Mar 25 05:36:58 prod-web-01 sudo[2050]: pam_unix(sudo:session): session opened for user root by ubuntu(uid=0)
+Mar 25 05:37:00 prod-web-01 CRON[47507]: (root) CMD (/usr/lib/apt/apt.systemd.daily install)
+Mar 25 05:37:11 prod-web-01 nginx[37671]: *37671 connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.0.7
+Mar 25 05:37:38 prod-web-01 sshd[14784]: Failed password for invalid user pi from 198.42.95.91 port 46978 ssh2
+Mar 25 05:38:01 prod-web-01 kernel: ACPI: EC: interrupt blocked
+Mar 25 05:38:31 prod-web-01 app-server[14988]: ERROR [http-thread-0] com.app.api.PaymentController - Payment processing failed for order #14988: Connection timeout to payment gateway
+Mar 25 05:38:46 prod-web-01 nginx[19852]: *19852 connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.1.184
+Mar 25 05:39:04 prod-web-01 nginx[32830]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 198.103.69.17, server: _, request: "GET /api/v1/payments HTTP/1.1", upstream: "http://127.0.0.1:8443/api/v1/payments"
+Mar 25 05:39:13 prod-web-01 CRON[53794]: (root) CMD (/usr/sbin/logrotate /etc/logrotate.conf)
+Mar 25 05:39:17 prod-web-01 systemd-resolved[60571]: Server returned error NXDOMAIN, mitigating potential DNS violation DVE-2018-0001.
+Mar 25 05:39:41 prod-web-01 nginx[36492]: *36492 connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.1.179
+Mar 25 05:42:32 prod-web-01 sshd[29242]: Received disconnect from 91.92.217.89 port 33427:11: Bye Bye [preauth]
+Mar 25 05:43:02 prod-web-01 sudo[2113]: pam_unix(sudo:session): session opened for user root by jenkins(uid=0)
+Mar 25 05:43:28 prod-web-01 postgresql[54980]: LOG:  connection authorized: user=www-data database=appdb
+Mar 25 05:43:30 prod-web-01 nginx[50890]: *50890 connect() failed (111: Connection refused) while connecting to upstream, client: 185.254.237.164
+Mar 25 05:43:33 prod-web-01 nginx[44011]: 10.0.0.195 - - [25/Mar/2026:05:43:33 +0000] "GET /static/css/style.css HTTP/1.1" 200 262595 "https://www.google.com/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0"
+Mar 25 05:52:47 prod-web-01 sshd[26162]: Accepted publickey for ubuntu from 203.153.17.99 port 44000 ssh2: RSA SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8
+Mar 25 05:52:49 prod-web-01 dockerd[2767]: time="2026-03-25T05:52:49.000000000Z" level=info msg="Successfully pulled image: redis:7-alpine"
+Mar 25 05:52:52 prod-web-01 systemd[1]: Removed slice User Slice of www-data.
+Mar 25 05:52:53 prod-web-01 CRON[35274]: (root) CMD (/usr/sbin/logrotate /etc/logrotate.conf)
+Mar 25 05:52:57 prod-web-01 nginx[31162]: 10.0.2.40 - - [25/Mar/2026:05:52:57 +0000] "GET /health HTTP/1.1" 200 2 "-" "ELB-HealthChecker/2.0"
+Mar 25 05:53:18 prod-web-01 systemd-journald[34854]: Suppressed 14874 messages from /system.slice/nginx.service
+Mar 25 05:53:25 prod-web-01 systemd-journald[41495]: Runtime journal (/run/log/journal/) is 99.6% full.
+Mar 25 05:55:19 prod-web-01 nginx[24989]: 10.0.0.152 - deploy [25/Mar/2026:05:55:19 +0000] "GET /admin/dashboard HTTP/1.1" 400 405811 "-" "curl/8.4.0"
+Mar 25 05:55:22 prod-web-01 nginx[60662]: 142.42.119.98 - jenkins [25/Mar/2026:05:55:22 +0000] "GET /admin/dashboard HTTP/1.1" 200 389551 "-" "Go-http-client/2.0"
+Mar 25 05:55:45 prod-web-01 fail2ban-server[15937]: INFO    [sshd] Found 203.153.17.99 - 2026-03-25T05:55:45.000000000Z
+Mar 25 05:55:50 prod-web-01 systemd-resolved[37557]: Using DNS server 10.0.0.2.
+Mar 25 05:55:55 prod-web-01 app-server[32087]: INFO  [http-thread-1] com.app.api.OrderController - Order #32087 created for user #57639 total=$1544.16
+Mar 25 05:56:02 prod-web-01 nginx[25994]: *25994 connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.3.151
+Mar 25 05:56:07 prod-web-01 fail2ban-server[17560]: INFO    [sshd] Found 185.117.163.214 - 2026-03-25T05:56:07.000000000Z
+Mar 25 05:56:10 prod-web-01 postgresql[34674]: LOG:  connection authorized: user=deploy database=appdb
+Mar 25 05:56:34 prod-web-01 nginx[9445]: 10.0.0.195 - - [25/Mar/2026:05:56:34 +0000] "GET /health HTTP/1.1" 200 2 "-" "ELB-HealthChecker/2.0"
+Mar 25 05:56:36 prod-web-01 nginx[2789]: 10.0.0.174 - - [25/Mar/2026:05:56:36 +0000] "POST /api/v1/auth/token HTTP/1.1" 401 74274 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36"
+Mar 25 05:56:52 prod-web-01 systemd[1]: Created slice User Slice of monitoring.
+Mar 25 05:58:00 prod-web-01 dockerd[52973]: time="2026-03-25T05:58:00.000000000Z" level=info msg="Pulling image: postgres:16"
+Mar 25 05:58:04 prod-web-01 systemd-resolved[32976]: DNSSEC validation failed for question cdn.example.com IN A: no-signature
+Mar 25 05:58:26 prod-web-01 sudo[50931]:     ubuntu : TTY=pts/1 ; PWD=/home/ubuntu ; USER=root ; COMMAND=/usr/bin/apt update
+Mar 25 05:58:54 prod-web-01 kernel: EXT4-fs warning (device sda1): ext4_dx_add_entry:2086: Directory (ino: 7636) index full, reach max htree level :2
+Mar 25 05:59:45 prod-web-01 kernel: EXT4-fs (sda1): re-mounted. Opts: errors=continue
+Mar 25 05:59:47 prod-web-01 app-server[57398]: WARN  [http-thread-6] com.app.api.SearchController - Slow query detected: 581ms for term "monitor stand"
+Mar 25 05:59:48 prod-web-01 app-server[2804]: WARN  [http-thread-6] com.app.api.SearchController - Slow query detected: 673ms for term "wireless mouse"
+Mar 25 05:59:52 prod-web-01 systemd-oomd[6973]: Swap used: 10%, threshold: 90%
+Mar 25 05:59:55 prod-web-01 systemd[1]: Reloaded OpenBSD Secure Shell server.
+Mar 25 06:01:31 prod-web-01 systemd[1]: Stopping Prometheus Node Exporter...
+Mar 25 06:02:45 prod-web-01 systemd[1]: Starting Regular background program processing daemon...
+Mar 25 06:03:07 prod-web-01 postgresql[28913]: LOG:  automatic vacuum of table "appdb.public.sessions": index scans: 1 pages: 0 removed, 33096 remain tuples: 33096 removed, 28913 remain
+Mar 25 06:03:10 prod-web-01 systemd-journald[2478]: Runtime journal (/run/log/journal/) is 1.6% full.
+Mar 25 06:03:28 prod-web-01 systemd[1]: Reloaded Application Server.
+Mar 25 06:03:29 prod-web-01 dockerd[56901]: time="2026-03-25T06:03:29.000000000Z" level=info msg="ignoring event" container=ede537e03cb8 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Mar 25 06:03:41 prod-web-01 systemd-journald[52553]: Suppressed 49555 messages from /system.slice/nginx.service
+Mar 25 06:05:07 prod-web-01 sudo[40076]: pam_unix(sudo:session): session opened for user root by jenkins(uid=0)
+Mar 25 06:05:10 prod-web-01 app-server[30101]: WARN  [http-thread-3] com.app.security.RateLimiter - Rate limit exceeded for IP 142.172.69.180: 18383 requests in 60s
+Mar 25 06:06:21 prod-web-01 kernel: [drm] GPU freq: 2161 MHz
+Mar 25 06:07:54 prod-web-01 kernel: [drm] GPU freq: 1042 MHz
+Mar 25 06:07:59 prod-web-01 nginx[40337]: 212.138.32.250 - - [25/Mar/2026:06:07:59 +0000] "POST /api/v1/orders HTTP/1.1" 200 358873 "-" "curl/8.4.0"
+Mar 25 06:08:04 prod-web-01 kernel: EXT4-fs (sda1): re-mounted. Opts: errors=continue
+Mar 25 06:13:05 prod-web-01 nginx[30458]: *30458 connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.0.152
+Mar 25 06:13:19 prod-web-01 app-server[61292]: INFO  [http-thread-2] com.app.api.OrderController - Order #61292 created for user #6261 total=$508.08
+Mar 25 06:13:36 prod-web-01 sudo[26321]:     admin : TTY=pts/6 ; PWD=/home/admin ; USER=root ; COMMAND=/bin/systemctl restart nginx
+Mar 25 06:13:42 prod-web-01 postgresql[51653]: LOG:  automatic vacuum of table "appdb.public.sessions": index scans: 1 pages: 0 removed, 35096 remain tuples: 35096 removed, 51653 remain
+Mar 25 06:13:44 prod-web-01 app-server[54380]: INFO  [http-thread-2] com.app.api.UserController - Request processed: GET /api/users/54380 in 966ms
+Mar 25 06:13:48 prod-web-01 sshd[19872]: banner exchange: Connection from 203.153.17.99 port 37884: invalid format
+Mar 25 06:14:12 prod-web-01 sshd[57785]: Connection closed by authenticating user jenkins 198.148.50.181 port 37225 [preauth]
+Mar 25 06:14:17 prod-web-01 CRON[51736]: (root) CMD (test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily ))
+Mar 25 06:14:21 prod-web-01 app-server[56647]: INFO  [http-thread-4] com.app.api.AuthController - User monitoring logged in from 10.0.2.40
+Mar 25 06:14:50 prod-web-01 sshd[55058]: Accepted publickey for ubuntu from 212.138.32.250 port 37096 ssh2: RSA SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8
+Mar 25 06:15:01 prod-web-01 nginx[15237]: *15237 connect() failed (111: Connection refused) while connecting to upstream, client: 10.0.3.151
+Mar 25 06:15:06 prod-web-01 systemd[1]: Stopping Prometheus Node Exporter...
+Mar 25 06:15:07 prod-web-01 app-server[25223]: INFO  [metrics-reporter] com.app.metrics.Reporter - Metrics flush: requests=4370, errors=7, p99_latency=45ms
+Mar 25 06:16:03 prod-web-01 postgresql[50410]: WARNING:  could not open statistics file "pg_stat_tmp/global.stat": Operation not permitted
+Mar 25 06:16:23 prod-web-01 app-server[58594]: INFO  [http-thread-1] com.app.api.OrderController - Order #58594 created for user #50804 total=$719.94
+Mar 25 06:22:11 prod-web-01 systemd[1]: Removed slice User Slice of jenkins.
+Mar 25 06:22:20 prod-web-01 nginx[41903]: 212.138.32.250 - admin [25/Mar/2026:06:22:20 +0000] "GET /admin/dashboard HTTP/1.1" 304 11141 "-" "Go-http-client/2.0"
+Mar 25 06:22:21 prod-web-01 nginx[48039]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 10.0.3.57, server: _, request: "GET /images/logo.png HTTP/1.1", upstream: "http://127.0.0.1:9090/images/logo.png"
+Mar 25 06:22:23 prod-web-01 dockerd[24911]: time="2026-03-25T06:22:23.000000000Z" level=info msg="Pulling image: nginx:1.25-alpine"
+Mar 25 06:27:48 prod-web-01 sshd[58613]: Accepted publickey for www-data from 142.222.26.98 port 50989 ssh2: RSA SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8
+Mar 25 06:27:50 prod-web-01 CRON[50545]: (root) CMD (/usr/sbin/logrotate /etc/logrotate.conf)
+Mar 25 06:27:53 prod-web-01 nginx[15436]: *15436 connect() failed (111: Connection refused) while connecting to upstream, client: 91.156.163.44
+Mar 25 06:27:57 prod-web-01 systemd-journald[33456]: Vacuuming done, freed 0B of archived journals from /var/log/journal/.
+Mar 25 06:28:02 prod-web-01 postgresql[6611]: LOG:  duration: 350.350 ms  statement: SELECT * FROM users WHERE id = 6611
+Mar 25 06:28:05 prod-web-01 sudo[9178]:     jenkins : TTY=pts/1 ; PWD=/opt/app ; USER=root ; COMMAND=/bin/journalctl -u app-server --since '1 hour ago'
+Mar 25 06:28:18 prod-web-01 CRON[37777]: (root) CMD (/opt/scripts/cleanup-tmp.sh)
+Mar 25 06:28:20 prod-web-01 systemd[1]: Started Session 1508 of user deploy.
+Mar 25 06:28:24 prod-web-01 sudo[24716]:     ubuntu : TTY=pts/4 ; PWD=/home/ubuntu ; USER=root ; COMMAND=/usr/bin/apt update
+Mar 25 06:29:13 prod-web-01 systemd-resolved[24915]: Grace period over, resuming full feature set (8.8.8.8).
+Mar 25 06:29:14 prod-web-01 sudo[50708]: pam_unix(sudo:session): session closed for user root
+Mar 25 06:29:15 prod-web-01 systemd[1]: Starting Cleanup of Temporary Directories...
+Mar 25 06:29:31 prod-web-01 CRON[23943]: (root) CMD (cd /opt/monitoring && ./collect-metrics.sh)
+Mar 25 06:29:33 prod-web-01 systemd-resolved[44764]: Using DNS server 10.0.0.2.
+Mar 25 06:29:36 prod-web-01 systemd[1]: Reloaded Regular background program processing daemon.
+Mar 25 06:29:41 prod-web-01 systemd[1]: Reloaded Fail2Ban Service.
+Mar 25 06:31:25 prod-web-01 fail2ban-server[26547]: NOTICE  [sshd] Ban 91.40.161.41
+Mar 25 06:31:29 prod-web-01 postgresql[32937]: WARNING:  could not open statistics file "pg_stat_tmp/global.stat": Operation not permitted
+Mar 25 06:31:34 prod-web-01 nginx[43504]: 203.227.235.165 - - [25/Mar/2026:06:31:34 +0000] "POST /api/v1/auth/token HTTP/1.1" 200 327907 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Safari/605.1.15"
+Mar 25 06:31:35 prod-web-01 systemd[1]: Started Session 7847 of user www-data.
+Mar 25 06:31:40 prod-web-01 postgresql[3801]: LOG:  connection received: host=185.117.163.214 port=36535
+Mar 25 06:32:04 prod-web-01 nginx[54916]: 185.254.237.164 - admin [25/Mar/2026:06:32:04 +0000] "GET /admin/dashboard HTTP/1.1" 404 358799 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Safari/605.1.15"
+Mar 25 06:32:09 prod-web-01 systemd-oomd[48804]: Killed /system.slice/app-server.service due to memory pressure
+Mar 25 06:33:32 prod-web-01 nginx[2783]: 10.0.2.208 - monitoring [25/Mar/2026:06:33:32 +0000] "GET /admin/dashboard HTTP/1.1" 200 113482 "-" "Googlebot/2.1 (+http://www.google.com/bot.html)"
+Mar 25 06:33:38 prod-web-01 nginx[60496]: 10.0.0.152 - - [25/Mar/2026:06:33:38 +0000] "GET /static/js/app.js HTTP/1.1" 200 269254 "https://www.google.com/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0"
+Mar 25 06:33:43 prod-web-01 sshd[7976]: Failed password for invalid user user from 203.21.142.76 port 48294 ssh2
+Mar 25 06:34:35 prod-web-01 nginx[40104]: 10.0.3.88 - deploy [25/Mar/2026:06:34:35 +0000] "GET /admin/dashboard HTTP/1.1" 304 447189 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36"
+Mar 25 06:34:39 prod-web-01 systemd-journald[18547]: Runtime journal (/run/log/journal/) is 88.9% full.
+Mar 25 06:34:41 prod-web-01 nginx[46912]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 10.0.1.36, server: _, request: "GET /static/js/app.js HTTP/1.1", upstream: "http://127.0.0.1:8443/static/js/app.js"
+Mar 25 06:35:42 prod-web-01 app-server[27210]: WARN  [http-thread-2] com.app.api.SearchController - Slow query detected: 472ms for term "wireless mouse"
+Mar 25 06:35:44 prod-web-01 systemd[1]: Unit docker.service entered failed state.
+Mar 25 06:35:47 prod-web-01 app-server[53986]: ERROR [http-thread-0] com.app.api.PaymentController - Payment processing failed for order #53986: Connection timeout to payment gateway
+Mar 25 06:36:01 prod-web-01 dockerd[60591]: time="2026-03-25T06:36:01.000000000Z" level=info msg="Successfully pulled image: node:20-slim"
+Mar 25 06:36:06 prod-web-01 systemd-resolved[40900]: Server returned error NXDOMAIN, mitigating potential DNS violation DVE-2018-0001.
+Mar 25 06:36:24 prod-web-01 postgresql[54210]: LOG:  automatic vacuum of table "appdb.public.sessions": index scans: 1 pages: 0 removed, 10698 remain tuples: 10698 removed, 54210 remain
+Mar 25 06:36:29 prod-web-01 dockerd[57484]: time="2026-03-25T06:36:29.000000000Z" level=info msg="ignoring event" container=a33c2774d400 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Mar 25 06:38:28 prod-web-01 kernel: hrtimer: interrupt took 720 ns
+Mar 25 06:38:41 prod-web-01 sshd[46501]: Connection closed by authenticating user ubuntu 203.227.235.165 port 58504 [preauth]
+Mar 25 06:38:56 prod-web-01 sshd[58101]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=185.254.237.164  user=oracle
+Mar 25 06:38:58 prod-web-01 nginx[43501]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 10.0.2.40, server: _, request: "GET /.env HTTP/1.1", upstream: "http://127.0.0.1:443/.env"
+Mar 25 06:39:00 prod-web-01 fail2ban-server[15571]: NOTICE  [sshd] Ban 142.191.144.138
+Mar 25 06:39:20 prod-web-01 certbot[41191]: INFO:certbot._internal.renewal:Cert is due for renewal, auto-renewing...
+Mar 25 06:39:24 prod-web-01 nginx[51235]: 198.55.168.128 - root [25/Mar/2026:06:39:24 +0000] "GET /admin/dashboard HTTP/1.1" 200 387173 "-" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36"
+Mar 25 06:39:42 prod-web-01 sudo[57472]:     deploy : TTY=pts/6 ; PWD=/home/deploy ; USER=root ; COMMAND=/bin/systemctl restart nginx
+Mar 25 06:39:46 prod-web-01 dockerd[27762]: time="2026-03-25T06:39:46.000000000Z" level=error msg="Error response from daemon: conflict: unable to remove e2766d43cdf8 (cannot be forced) - image is being used by running container 34e3768939c0"
+Mar 25 06:39:50 prod-web-01 nginx[45591]: 10.0.3.9 - ubuntu [25/Mar/2026:06:39:50 +0000] "GET /admin/dashboard HTTP/1.1" 200 113393 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Safari/605.1.15"
+Mar 25 06:39:55 prod-web-01 nginx[61949]: 10.0.1.60 - - [25/Mar/2026:06:39:55 +0000] "GET /login HTTP/1.1" 200 281684 "https://example.com/dashboard" "Googlebot/2.1 (+http://www.google.com/bot.html)"
+Mar 25 06:39:58 prod-web-01 dockerd[51844]: time="2026-03-25T06:39:58.000000000Z" level=info msg="Successfully pulled image: node:20-slim"
+Mar 25 06:40:05 prod-web-01 kernel: audit: type=1400 audit({}): apparmor="ALLOWED" operation="open" profile="/usr/sbin/nginx" name="/var/log/nginx/access.log" pid={pid} comm="nginx"
+Mar 25 06:40:09 prod-web-01 systemd-journald[24753]: Runtime journal (/run/log/journal/) is 53.5% full.
+Mar 25 06:40:24 prod-web-01 app-server[40166]: WARN  [http-thread-6] com.app.cache.RedisCache - Cache miss for key: user:40166:profile, fetching from DB
+Mar 25 06:41:12 prod-web-01 sudo[46024]:     www-data : TTY=pts/7 ; PWD=/home/www-data ; USER=root ; COMMAND=/usr/bin/apt update
+Mar 25 06:41:16 prod-web-01 kernel: NMI watchdog: Watchdog detected hard LOCKUP on cpu 5
+Mar 25 06:41:18 prod-web-01 app-server[59091]: INFO  [scheduler-1] com.app.jobs.CleanupJob - Cleaned up 25498 expired sessions
+Mar 25 06:41:23 prod-web-01 dockerd[28308]: time="2026-03-25T06:41:23.000000000Z" level=info msg="Container 179284ae81e2 started"
+Mar 25 06:41:37 prod-web-01 app-server[31120]: INFO  [scheduler-1] com.app.jobs.CleanupJob - Cleaned up 47766 expired sessions
+Mar 25 06:42:00 prod-web-01 fail2ban-server[58189]: NOTICE  [sshd] Ban 198.103.69.17
+Mar 25 06:42:04 prod-web-01 CRON[10604]: (ubuntu) CMD (/opt/scripts/backup.sh >> /var/log/backup.log 2>&1)
+Mar 25 06:42:05 prod-web-01 sshd[18578]: Invalid user postgres from 91.156.163.44 port 50859
+Mar 25 06:42:06 prod-web-01 dockerd[61421]: time="2026-03-25T06:42:06.000000000Z" level=info msg="Container e9ae8e1c224b stopped"
+Mar 25 06:42:08 prod-web-01 app-server[61853]: INFO  [http-thread-2] com.app.api.OrderController - Order #61853 created for user #23670 total=$1460.67
+Mar 25 06:42:26 prod-web-01 app-server[24883]: INFO  [metrics-reporter] com.app.metrics.Reporter - Metrics flush: requests=25325, errors=2, p99_latency=163ms
+Mar 25 06:42:45 prod-web-01 kernel: device eth0 entered promiscuous mode
+Mar 25 06:42:48 prod-web-01 app-server[59844]: WARN  [http-thread-6] com.app.api.SearchController - Slow query detected: 179ms for term "webcam"
+Mar 25 06:42:50 prod-web-01 systemd-oomd[4128]: Swap used: 60%, threshold: 90%
+Mar 25 06:42:55 prod-web-01 dockerd[10938]: time="2026-03-25T06:42:55.000000000Z" level=warning msg="Container 34e3768939c0 health check failed"
+Mar 25 06:42:56 prod-web-01 dockerd[42523]: time="2026-03-25T06:42:56.000000000Z" level=info msg="Pulling image: app-server:latest"
+Mar 25 06:43:29 prod-web-01 app-server[50132]: ERROR [http-thread-2] com.app.db.ConnectionPool - Failed to acquire connection from pool: timeout after 30000ms
+Mar 25 06:43:31 prod-web-01 CRON[3980]: (admin) CMD (/opt/scripts/cleanup-tmp.sh)
+Mar 25 06:44:57 prod-web-01 systemd[1]: Started Daily apt download activities.
+Mar 25 06:44:58 prod-web-01 sshd[5951]: Failed password for invalid user root from 142.172.69.180 port 40424 ssh2
+Mar 25 06:45:03 prod-web-01 nginx[13293]: 10.0.0.152 - monitoring [25/Mar/2026:06:45:03 +0000] "GET /admin/dashboard HTTP/1.1" 404 310961 "-" "curl/8.4.0"
+Mar 25 06:49:19 prod-web-01 sudo[13096]:     deploy : TTY=pts/0 ; PWD=/home/deploy ; USER=root ; COMMAND=/bin/systemctl restart nginx
+Mar 25 06:49:23 prod-web-01 fail2ban-server[10652]: INFO    [sshd] Ignore 142.234.242.146 by ip
+Mar 25 06:49:25 prod-web-01 sudo[3175]: pam_unix(sudo:session): session closed for user root
+Mar 25 06:50:26 prod-web-01 app-server[63429]: WARN  [http-thread-2] com.app.security.RateLimiter - Rate limit exceeded for IP 10.0.0.152: 39559 requests in 60s
+Mar 25 06:50:30 prod-web-01 nginx[25732]: 10.0.3.151 - - [25/Mar/2026:06:50:30 +0000] "GET /health HTTP/1.1" 200 2 "-" "ELB-HealthChecker/2.0"
+Mar 25 06:50:34 prod-web-01 nginx[60477]: 10.0.0.152 - deploy [25/Mar/2026:06:50:34 +0000] "GET /admin/dashboard HTTP/1.1" 201 132838 "-" "curl/8.4.0"
+Mar 25 06:51:04 prod-web-01 systemd-resolved[42880]: Using DNS server 1.1.1.1.
+Mar 25 06:51:07 prod-web-01 dockerd[39251]: time="2026-03-25T06:51:07.000000000Z" level=info msg="ignoring event" container=cc472df4dbb8 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Mar 25 06:52:20 prod-web-01 app-server[39008]: ERROR [http-thread-2] com.app.api.PaymentController - Payment processing failed for order #39008: Connection timeout to payment gateway
+Mar 25 06:52:25 prod-web-01 postgresql[13041]: DETAIL:  Process 13041 waits for ShareLock on transaction 13041; blocked by process 58628.
+Mar 25 06:52:55 prod-web-01 kernel: hrtimer: interrupt took 2092 ns
+Mar 25 06:53:00 prod-web-01 fail2ban-server[7988]: NOTICE  [sshd] Ban 212.37.68.36
+Mar 25 06:53:05 prod-web-01 systemd[1]: Unit postgresql@14-main.service entered failed state.
+Mar 25 06:53:10 prod-web-01 CRON[1434]: (root) CMD (/usr/sbin/logrotate /etc/logrotate.conf)
+Mar 25 06:53:12 prod-web-01 sudo[28200]: pam_unix(sudo:session): session opened for user root by admin(uid=0)
+Mar 25 06:53:16 prod-web-01 kernel: EXT4-fs (sda1): re-mounted. Opts: errors=continue
+Mar 25 06:53:38 prod-web-01 nginx[15866]: 10.0.1.179 - - [25/Mar/2026:06:53:38 +0000] "POST /api/v1/orders HTTP/1.1" 401 178502 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0"
+Mar 25 06:53:53 prod-web-01 systemd[1]: Started Daily Cleanup of Temporary Directories.
+Mar 25 06:53:55 prod-web-01 sudo[33467]: pam_unix(sudo:session): session closed for user root
+Mar 25 06:53:58 prod-web-01 nginx[32318]: 91.12.170.59 - - [25/Mar/2026:06:53:58 +0000] "POST /api/v1/products HTTP/1.1" 200 137205 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0"
+Mar 25 06:54:02 prod-web-01 systemd[1]: Unit cron.service entered failed state.
+Mar 25 06:54:18 prod-web-01 app-server[29264]: WARN  [http-thread-0] com.app.cache.RedisCache - Cache miss for key: user:29264:profile, fetching from DB
+Mar 25 06:54:45 prod-web-01 systemd[1]: Removed slice User Slice of ubuntu.
+Mar 25 06:54:50 prod-web-01 postgresql[23307]: LOG:  checkpoint complete: wrote 30067 buffers (0.21%); 0 WAL file(s) added, 0 removed, 1 recycled; write=45.839 s, sync=0.001 s, total=45.839 s; sync files=42, longest=0.001 s, average=0.001 s; distance=30067 kB, estimate=30067 kB
+Mar 25 06:54:52 prod-web-01 app-server[63076]: WARN  [http-thread-1] com.app.security.RateLimiter - Rate limit exceeded for IP 10.0.3.88: 24345 requests in 60s
+Mar 25 06:54:54 prod-web-01 app-server[48790]: ERROR [http-thread-3] com.app.api.PaymentController - Payment processing failed for order #48790: Connection timeout to payment gateway
+Mar 25 06:56:10 prod-web-01 postgresql[9612]: LOG:  automatic vacuum of table "appdb.public.sessions": index scans: 1 pages: 0 removed, 12451 remain tuples: 12451 removed, 9612 remain
+Mar 25 06:56:14 prod-web-01 sshd[32823]: Failed password for invalid user pi from 198.103.69.17 port 62822 ssh2
+Mar 25 06:56:31 prod-web-01 nginx[35341]: 10.0.0.152 - - [25/Mar/2026:06:56:31 +0000] "POST /api/v1/payments HTTP/1.1" 400 58856 "-" "python-requests/2.31.0"
+Mar 25 06:56:36 prod-web-01 dockerd[19615]: time="2026-03-25T06:56:36.000000000Z" level=warning msg="Container a33c2774d400 health check failed"
+Mar 25 06:56:39 prod-web-01 dockerd[14730]: time="2026-03-25T06:56:39.000000000Z" level=info msg="Pulling image: grafana/grafana:10.2.3"
+Mar 25 06:56:53 prod-web-01 kernel: EXT4-fs (sda1): re-mounted. Opts: errors=continue
+Mar 25 06:57:14 prod-web-01 kernel: perf: interrupt took too long (1411 > 205), lowering kernel.perf_event_max_sample_rate to 50000
+Mar 25 06:57:18 prod-web-01 kernel: TCP: request_sock_TCP: Possible SYN flooding on port 8443. Sending cookies.
+Mar 25 06:57:47 prod-web-01 kernel: device eth0 left promiscuous mode
+Mar 25 06:58:22 prod-web-01 systemd-resolved[60860]: Using DNS server 1.1.1.1.
+Mar 25 06:58:40 prod-web-01 sshd[64492]: Disconnected from user deploy 185.117.163.214 port 35144
+Mar 25 06:58:41 prod-web-01 systemd-oomd[30703]: Memory pressure watch on /system.slice/app-server.service
+Mar 25 06:59:05 prod-web-01 certbot[1243]: INFO:certbot._internal.renewal:Cert is due for renewal, auto-renewing...
+Mar 25 06:59:12 prod-web-01 dockerd[27673]: time="2026-03-25T06:59:12.000000000Z" level=warning msg="Container ede537e03cb8 health check failed"
+Mar 25 07:01:24 prod-web-01 sudo[53293]: pam_unix(sudo:session): session opened for user root by root(uid=0)
+Mar 25 07:02:39 prod-web-01 nginx[15906]: 10.0.2.40 - - [25/Mar/2026:07:02:39 +0000] "GET /health HTTP/1.1" 200 2 "-" "ELB-HealthChecker/2.0"
+Mar 25 07:03:06 prod-web-01 dockerd[16424]: time="2026-03-25T07:03:06.000000000Z" level=info msg="Pulling image: app-server:latest"
+Mar 25 07:03:35 prod-web-01 postgresql[29208]: LOG:  connection received: host=10.0.0.174 port=61305
+Mar 25 07:05:07 prod-web-01 sshd[17419]: Invalid user user from 45.59.211.9 port 36491
+Mar 25 07:05:09 prod-web-01 app-server[42077]: WARN  [http-thread-0] com.app.api.SearchController - Slow query detected: 704ms for term "laptop"
+Mar 25 07:12:30 prod-web-01 systemd-journald[64532]: Runtime journal (/run/log/journal/) is 50.1% full.
+Mar 25 07:12:41 prod-web-01 dockerd[56549]: time="2026-03-25T07:12:41.000000000Z" level=info msg="Pulling image: node:20-slim"
+Mar 25 07:12:51 prod-web-01 sshd[19246]: Connection reset by 91.40.161.41 port 58128 [preauth]
+Mar 25 07:12:52 prod-web-01 sudo[35776]: pam_unix(sudo:session): session opened for user root by root(uid=0)
+Mar 25 07:13:18 prod-web-01 postgresql[48283]: LOG:  checkpoint starting: time
+Mar 25 07:13:22 prod-web-01 CRON[56716]: (root) CMD (cd /opt/monitoring && ./collect-metrics.sh)
+Mar 25 07:13:25 prod-web-01 sshd[9764]: Received disconnect from 203.227.235.165 port 59438:11: Bye Bye [preauth]
+Mar 25 07:13:41 prod-web-01 dockerd[36243]: time="2026-03-25T07:13:41.000000000Z" level=error msg="Error response from daemon: conflict: unable to remove 179284ae81e2 (cannot be forced) - image is being used by running container 931216a41557"
+Mar 25 07:15:24 prod-web-01 CRON[8330]: (root) CMD (/usr/sbin/logrotate /etc/logrotate.conf)
+Mar 25 07:15:27 prod-web-01 nginx[7224]: *7224 connect() failed (111: Connection refused) while connecting to upstream, client: 198.55.168.128
+Mar 25 07:15:54 prod-web-01 systemd-oomd[22258]: Killed /system.slice/app-server.service due to memory pressure
+Mar 25 07:15:59 prod-web-01 systemd-oomd[35833]: Memory pressure watch on /system.slice/app-server.service
+Mar 25 07:16:18 prod-web-01 systemd-journald[45605]: Suppressed 36021 messages from /system.slice/nginx.service
+Mar 25 07:16:29 prod-web-01 app-server[1508]: INFO  [http-thread-1] com.app.api.UserController - Request processed: GET /api/users/1508 in 766ms
+Mar 25 07:16:31 prod-web-01 CRON[45343]: (root) CMD (/usr/sbin/logrotate /etc/logrotate.conf)
+Mar 25 07:16:34 prod-web-01 fail2ban-server[27410]: INFO    [sshd] Ignore 203.93.57.36 by ip
+Mar 25 07:17:50 prod-web-01 postgresql[61419]: LOG:  checkpoint starting: time
+Mar 25 07:18:01 prod-web-01 nginx[16485]: 10.0.2.27 - - [25/Mar/2026:07:18:01 +0000] "GET /index.html HTTP/1.1" 404 98192 "-" "curl/8.4.0"
+Mar 25 07:18:03 prod-web-01 nginx[22609]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 10.0.3.151, server: _, request: "GET /index.html HTTP/1.1", upstream: "http://127.0.0.1:6379/index.html"
+Mar 25 07:18:28 prod-web-01 app-server[56229]: INFO  [http-thread-4] com.app.api.UserController - Request processed: GET /api/users/56229 in 712ms
+Mar 25 07:18:31 prod-web-01 app-server[53560]: WARN  [http-thread-2] com.app.api.SearchController - Slow query detected: 845ms for term "hdmi cable"
+Mar 25 07:18:35 prod-web-01 systemd[1]: Started Daily Cleanup of Temporary Directories.
+Mar 25 07:19:03 prod-web-01 nginx[40937]: *40937 connect() failed (111: Connection refused) while connecting to upstream, client: 142.172.69.180
+Mar 25 07:19:05 prod-web-01 app-server[55433]: INFO  [metrics-reporter] com.app.metrics.Reporter - Metrics flush: requests=32192, errors=2, p99_latency=278ms
+Mar 25 07:19:08 prod-web-01 CRON[17423]: (root) CMD (cd /opt/monitoring && ./collect-metrics.sh)
+Mar 25 07:19:13 prod-web-01 app-server[17853]: INFO  [http-thread-6] com.app.api.AuthController - User deploy logged in from 142.172.69.180
+Mar 25 07:19:25 prod-web-01 systemd[1]: Failed to start PostgreSQL RDBMS.
+Mar 25 07:19:47 prod-web-01 dockerd[46835]: time="2026-03-25T07:19:47.000000000Z" level=info msg="Pulling image: grafana/grafana:10.2.3"
+Mar 25 07:21:53 prod-web-01 sshd[24886]: Received disconnect from 91.40.161.41 port 61022:11: Bye Bye [preauth]
+Mar 25 07:21:56 prod-web-01 fail2ban-server[7089]: NOTICE  [sshd] Unban 142.222.26.98
+Mar 25 07:22:01 prod-web-01 dockerd[4821]: time="2026-03-25T07:22:01.000000000Z" level=info msg="Successfully pulled image: nginx:1.25-alpine"
+Mar 25 07:22:23 prod-web-01 sudo[37300]: pam_unix(sudo:session): session closed for user root
+Mar 25 07:23:30 prod-web-01 systemd-resolved[61384]: Grace period over, resuming full feature set (8.8.8.8).
+Mar 25 07:25:08 prod-web-01 nginx[41730]: 10.0.0.195 - - [25/Mar/2026:07:25:08 +0000] "POST /api/v1/orders HTTP/1.1" 403 284037 "-" "Wget/1.21.3"
+Mar 25 07:25:32 prod-web-01 nginx[46763]: 185.249.142.221 - - [25/Mar/2026:07:25:32 +0000] "GET /api/v1/orders HTTP/1.1" 200 440557 "https://www.google.com/" "python-requests/2.31.0"
+Mar 25 07:26:02 prod-web-01 nginx[34977]: 10.0.0.174 - - [25/Mar/2026:07:26:02 +0000] "GET /health HTTP/1.1" 200 2 "-" "ELB-HealthChecker/2.0"
+Mar 25 07:26:32 prod-web-01 sshd[33213]: Accepted publickey for www-data from 142.234.242.146 port 61999 ssh2: RSA SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8
+Mar 25 07:26:58 prod-web-01 postgresql[60725]: LOG:  connection received: host=10.0.0.98 port=47859
+Mar 25 07:27:09 prod-web-01 systemd-oomd[52619]: Killed /system.slice/app-server.service due to memory pressure
+Mar 25 07:27:12 prod-web-01 sshd[12369]: error: maximum authentication attempts exceeded for admin from 203.153.120.136 port 59682 ssh2 [preauth]
+Mar 25 07:27:14 prod-web-01 nginx[48608]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 10.0.1.179, server: _, request: "GET /api/v1/orders HTTP/1.1", upstream: "http://127.0.0.1:22/api/v1/orders"
+Mar 25 07:27:18 prod-web-01 sshd[64231]: Disconnected from user monitoring 198.42.95.91 port 51646
+Mar 25 07:27:54 prod-web-01 sshd[2896]: Connection reset by 142.222.26.98 port 63066 [preauth]
+Mar 25 07:28:13 prod-web-01 postgresql[34521]: LOG:  disconnection: session time: 0:00:36.380 user=monitoring database=appdb host=142.172.69.180 port=54967
+Mar 25 07:28:20 prod-web-01 fail2ban-server[9584]: NOTICE  [sshd] Unban 198.148.50.181
+Mar 25 07:28:25 prod-web-01 app-server[10273]: INFO  [metrics-reporter] com.app.metrics.Reporter - Metrics flush: requests=1455, errors=6, p99_latency=660ms
+Mar 25 07:28:48 prod-web-01 nginx[40831]: 91.40.161.41 - ubuntu [25/Mar/2026:07:28:48 +0000] "GET /admin/dashboard HTTP/1.1" 200 45269 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 Safari/605.1.15"
+Mar 25 07:29:48 prod-web-01 systemd[1]: Stopping Application Server...
+Mar 25 07:29:53 prod-web-01 app-server[22032]: ERROR [http-thread-1] com.app.api.PaymentController - Payment processing failed for order #22032: Connection timeout to payment gateway
+Mar 25 07:29:55 prod-web-01 app-server[18854]: ERROR [http-thread-7] com.app.api.PaymentController - Payment processing failed for order #18854: Connection timeout to payment gateway
+Mar 25 07:29:59 prod-web-01 dockerd[45029]: time="2026-03-25T07:29:59.000000000Z" level=info msg="ignoring event" container=e2766d43cdf8 module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Mar 25 07:30:19 prod-web-01 CRON[52206]: (root) CMD (/usr/lib/apt/apt.systemd.daily install)
+Mar 25 07:30:39 prod-web-01 sudo[55949]: pam_unix(sudo:session): session closed for user root
+Mar 25 07:30:40 prod-web-01 sshd[35005]: pam_unix(sshd:auth): authentication failure; logname= uid=0 euid=0 tty=ssh ruser= rhost=185.254.237.164  user=ftpuser
+Mar 25 07:30:48 prod-web-01 sshd[25239]: Disconnected from user root 142.234.242.146 port 37388
+Mar 25 07:30:51 prod-web-01 app-server[64555]: INFO  [metrics-reporter] com.app.metrics.Reporter - Metrics flush: requests=27796, errors=5, p99_latency=807ms
+Mar 25 07:32:36 prod-web-01 app-server[43705]: INFO  [http-thread-3] com.app.api.OrderController - Order #43705 created for user #57180 total=$848.88
+Mar 25 07:32:39 prod-web-01 CRON[37829]: (deploy) CMD (/opt/scripts/backup.sh >> /var/log/backup.log 2>&1)
+Mar 25 07:32:43 prod-web-01 kernel: ACPI: EC: interrupt blocked
+Mar 25 07:32:44 prod-web-01 app-server[42697]: INFO  [scheduler-1] com.app.jobs.CleanupJob - Cleaned up 9824 expired sessions
+Mar 25 07:33:31 prod-web-01 nginx[30907]: *30907 connect() failed (111: Connection refused) while connecting to upstream, client: 212.138.32.250
+Mar 25 07:33:43 prod-web-01 nginx[12302]: 10.0.3.88 - - [25/Mar/2026:07:33:43 +0000] "GET /health HTTP/1.1" 200 2 "-" "ELB-HealthChecker/2.0"
+Mar 25 07:40:35 prod-web-01 systemd[1]: Failed to start OpenBSD Secure Shell server.
+Mar 25 07:41:04 prod-web-01 app-server[61230]: INFO  [http-thread-2] com.app.api.AuthController - User deploy logged in from 10.0.2.27
+Mar 25 07:41:07 prod-web-01 systemd[1]: Unit docker.service entered failed state.
+Mar 25 07:41:10 prod-web-01 postgresql[1662]: LOG:  checkpoint starting: time
+Mar 25 07:42:31 prod-web-01 nginx[13722]: 10.0.0.24 - - [25/Mar/2026:07:42:31 +0000] "POST /api/v1/payments HTTP/1.1" 404 209844 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0"
+Mar 25 07:42:36 prod-web-01 fail2ban-server[14396]: INFO    [sshd] Found 91.92.217.89 - 2026-03-25T07:42:36.000000000Z
+Mar 25 07:52:13 prod-web-01 dockerd[25217]: time="2026-03-25T07:52:13.000000000Z" level=warning msg="Container a33c2774d400 health check failed"
+Mar 25 07:52:18 prod-web-01 sudo[60880]: pam_unix(sudo:session): session opened for user root by deploy(uid=0)
+Mar 25 07:52:32 prod-web-01 nginx[37668]: 10.0.1.36 - - [25/Mar/2026:07:52:32 +0000] "POST /api/v1/payments HTTP/1.1" 200 76879 "-" "Wget/1.21.3"
+Mar 25 07:52:33 prod-web-01 app-server[28181]: INFO  [scheduler-1] com.app.jobs.CleanupJob - Cleaned up 30663 expired sessions
+Mar 25 07:53:29 prod-web-01 postgresql[15013]: DETAIL:  Process 15013 waits for ShareLock on transaction 15013; blocked by process 40216.
+Mar 25 07:53:36 prod-web-01 app-server[44967]: WARN  [http-thread-3] com.app.api.SearchController - Slow query detected: 429ms for term "laptop"
+Mar 25 07:53:37 prod-web-01 sudo[37249]:     deploy : TTY=pts/5 ; PWD=/home/deploy ; USER=root ; COMMAND=/bin/systemctl restart nginx
+Mar 25 07:53:58 prod-web-01 app-server[26774]: INFO  [scheduler-1] com.app.jobs.CleanupJob - Cleaned up 2119 expired sessions
+Mar 25 07:54:02 prod-web-01 app-server[32256]: ERROR [http-thread-6] com.app.api.PaymentController - Payment processing failed for order #32256: Connection timeout to payment gateway
+Mar 25 07:55:19 prod-web-01 nginx[44352]: *44352 connect() failed (111: Connection refused) while connecting to upstream, client: 142.222.26.98
+Mar 25 07:55:43 prod-web-01 CRON[60857]: (root) CMD (test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.daily ))
+Mar 25 07:59:01 prod-web-01 sshd[5864]: Failed password for invalid user admin from 185.117.163.214 port 53135 ssh2
+Mar 25 07:59:02 prod-web-01 certbot[48239]: INFO:certbot._internal.renewal:Cert not yet due for renewal
+Mar 25 07:59:31 prod-web-01 systemd[1]: Failed to start Advanced key-value store.
+Mar 25 07:59:32 prod-web-01 sshd[56039]: error: maximum authentication attempts exceeded for oracle from 185.192.150.110 port 34939 ssh2 [preauth]
+Mar 25 07:59:56 prod-web-01 dockerd[23831]: time="2026-03-25T07:59:56.000000000Z" level=info msg="ignoring event" container=e9ae8e1c224b module=libcontainerd namespace=moby topic=/tasks/delete type="*events.TaskDelete"
+Mar 25 08:06:24 prod-web-01 nginx[20234]: 10.0.3.57 - www-data [25/Mar/2026:08:06:24 +0000] "GET /admin/dashboard HTTP/1.1" 403 422910 "-" "Wget/1.21.3"
+Mar 25 08:06:25 prod-web-01 postgresql[54839]: WARNING:  could not open statistics file "pg_stat_tmp/global.stat": Operation not permitted
+Mar 25 08:06:40 prod-web-01 sudo[22656]:     ubuntu : TTY=pts/2 ; PWD=/home/ubuntu ; USER=root ; COMMAND=/usr/bin/apt update
+Mar 25 08:07:13 prod-web-01 sudo[34554]: pam_unix(sudo:session): session opened for user root by monitoring(uid=0)
+Mar 25 08:07:18 prod-web-01 certbot[31353]: INFO:certbot._internal.renewal:Cert is due for renewal, auto-renewing...
+Mar 25 08:07:37 prod-web-01 sshd[22700]: Accepted publickey for admin from 185.117.163.214 port 52046 ssh2: RSA SHA256:nThbg6kXUpJWGl7E1IGOCspRomTxdCARLviKw6E5SY8
+Mar 25 08:07:39 prod-web-01 systemd[1]: Reached target Multi-User System.
+Mar 25 08:07:43 prod-web-01 systemd[1]: Started Daily Cleanup of Temporary Directories.
+Mar 25 08:08:08 prod-web-01 postgresql[34537]: WARNING:  could not open statistics file "pg_stat_tmp/global.stat": Operation not permitted
+Mar 25 08:08:12 prod-web-01 systemd[1]: Reloading Prometheus Node Exporter...
+Mar 25 08:08:57 prod-web-01 sshd[28219]: Connection reset by 91.12.170.59 port 61507 [preauth]
+Mar 25 08:09:00 prod-web-01 dockerd[14473]: time="2026-03-25T08:09:00.000000000Z" level=warning msg="Container cc472df4dbb8 health check failed"
+Mar 25 08:09:03 prod-web-01 systemd-oomd[53854]: Swap used: 74%, threshold: 90%
+Mar 25 08:09:06 prod-web-01 systemd-resolved[6852]: DNSSEC validation failed for question example.com IN A: no-signature
+Mar 25 08:09:09 prod-web-01 sshd[28046]: Invalid user nagios from 45.59.211.9 port 40242
+Mar 25 08:09:13 prod-web-01 systemd-oomd[45275]: Swap used: 47%, threshold: 90%
+Mar 25 08:09:18 prod-web-01 nginx[7283]: upstream timed out (110: Connection timed out) while reading response header from upstream, client: 10.0.0.24, server: _, request: "GET /favicon.ico HTTP/1.1", upstream: "http://127.0.0.1:8080/favicon.ico"
+Mar 25 08:09:20 prod-web-01 systemd-resolved[59000]: Grace period over, resuming full feature set (8.8.8.8).
+Mar 25 08:10:24 prod-web-01 CRON[21632]: (admin) CMD (/opt/scripts/cleanup-tmp.sh)
+Mar 25 08:10:51 prod-web-01 postgresql[14699]: WARNING:  could not open statistics file "pg_stat_tmp/global.stat": Operation not permitted
+Mar 25 08:10:55 prod-web-01 systemd-journald[60207]: Suppressed 28597 messages from /system.slice/nginx.service
+Mar 25 08:10:59 prod-web-01 postgresql[57560]: LOG:  checkpoint starting: time
+Mar 25 08:11:25 prod-web-01 sshd[61453]: error: maximum authentication attempts exceeded for ftpuser from 198.55.168.128 port 37195 ssh2 [preauth]
+Mar 25 08:11:29 prod-web-01 postgresql[50895]: LOG:  checkpoint starting: time
+Mar 25 08:11:34 prod-web-01 systemd-oomd[49454]: Killed /system.slice/app-server.service due to memory pressure
+Mar 25 08:13:27 prod-web-01 dockerd[44148]: time="2026-03-25T08:13:27.000000000Z" level=info msg="Successfully pulled image: nginx:1.25-alpine"
+Mar 25 08:13:28 prod-web-01 fail2ban-server[46860]: NOTICE  [sshd] Ban 45.175.185.30
+Mar 25 08:13:31 prod-web-01 systemd-journald[11276]: Vacuuming done, freed 0B of archived journals from /var/log/journal/.
+Mar 25 08:13:46 prod-web-01 postgresql[45250]: LOG:  connection authorized: user=monitoring database=appdb
+Mar 25 08:13:53 prod-web-01 systemd[1]: Stopped Regular background program processing daemon.
+Mar 25 08:13:58 prod-web-01 app-server[31267]: INFO  [http-thread-5] com.app.api.AuthController - User admin logged in from 10.0.0.174
+Mar 25 08:14:02 prod-web-01 sshd[62729]: Disconnected from user deploy 203.21.142.76 port 43235
+Mar 25 08:14:20 prod-web-01 app-server[50717]: WARN  [http-thread-7] com.app.security.RateLimiter - Rate limit exceeded for IP 10.0.2.27: 10408 requests in 60s
+Mar 25 08:21:14 prod-web-01 systemd-journald[36803]: Vacuuming done, freed 0B of archived journals from /var/log/journal/.
+Mar 25 08:21:16 prod-web-01 sshd[37673]: Disconnected from user ubuntu 185.253.21.219 port 64616
+Mar 25 08:21:20 prod-web-01 systemd-resolved[19010]: DNSSEC validation failed for question cdn.example.com IN A: no-signature
+Mar 25 08:21:25 prod-web-01 systemd-resolved[53958]: DNSSEC validation failed for question api.internal.local IN A: no-signature
+Mar 25 08:21:29 prod-web-01 postgresql[32848]: LOG:  checkpoint starting: time
+Mar 25 08:22:42 prod-web-01 systemd[1]: Failed to start Fail2Ban Service.
+Mar 25 08:22:45 prod-web-01 dockerd[38463]: time="2026-03-25T08:22:45.000000000Z" level=info msg="Container ede537e03cb8 started"
+Mar 25 08:22:47 prod-web-01 kernel: INFO: task kworker/6:0 blocked for more than 120 seconds.
+Mar 25 08:22:50 prod-web-01 systemd-journald[32718]: Vacuuming done, freed 0B of archived journals from /var/log/journal/.
+Mar 25 08:22:54 prod-web-01 kernel: TCP: request_sock_TCP: Possible SYN flooding on port 9090. Sending cookies.
