@@ -57,8 +57,8 @@ Or with config changes:
 
 All options are optional. Candela works out of the box with sensible defaults. For lua_ls
 autocomplete in your config, add `---@type Candela.Config` above your `opts` table. See
-["candela-config-options" in
-`doc/candela.txt`](https://github.com/KieranCanter/candela.nvim/blob/main/doc/candela.txt#L187) for
+["candela-configuration" in
+`doc/candela.txt`](https://github.com/KieranCanter/candela.nvim/blob/main/doc/candela.txt#L57) for
 more info on these options.
 
 ```lua
@@ -276,7 +276,7 @@ vim.keymap.set("n", "<leader>cdh", "<Plug>CandelaHelp")
 
 ## commands
 See ["candela-commands" in
-`doc/candela.txt`](https://github.com/KieranCanter/candela.nvim/blob/main/doc/candela.txt#L349) for
+`doc/candela.txt`](https://github.com/KieranCanter/candela.nvim/blob/main/doc/candela.txt#L281) for
 more details on each command.
 
 <details>
@@ -305,7 +305,7 @@ more details on each command.
 ## api
 
 See ["candela-api" in
-`doc/candela.txt`](https://github.com/KieranCanter/candela.nvim/blob/main/doc/candela.txt#L438) for
+`doc/candela.txt`](https://github.com/KieranCanter/candela.nvim/blob/main/doc/candela.txt#L342) for
 more details on each API function.
 
 <details>
