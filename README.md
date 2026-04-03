@@ -57,8 +57,8 @@ Or with config changes:
 
 All options are optional. Candela works out of the box with sensible defaults. For lua_ls
 autocomplete in your config, add `---@type Candela.Config` above your `opts` table. See
-["candela-config-options" in
-`doc/candela.txt`](https://github.com/KieranCanter/candela.nvim/blob/main/doc/candela.txt#L187) for
+"candela-configuration" in
+[`doc/candela.txt`](https://github.com/KieranCanter/candela.nvim/blob/main/doc/candela.txt) for
 more info on these options.
 
 ```lua
@@ -66,13 +66,13 @@ more info on these options.
 opts = {
     window = {
         width = 0.5,          -- fraction of screen width
-        min_height = 5,
-        max_height = 30,
-        margin = 16,
+        min_height = 5,       -- starting/minimum height in buffer lines
+        max_height = 30,      -- max height in buffer lines
+        margin = 16,          -- margin between Candela UI and Neovim UI
     },
     engine = {
         command = nil,         -- auto-detected: rg > ag > ugrep > ack > grep
-        args = {},
+        args = {},             -- args passed to regex command
     },
     matching = {
         auto_refresh = false,  -- refresh highlights on buffer switch
@@ -82,23 +82,22 @@ opts = {
     lightbox = {
         default_view = "system-vsplit",  -- default split for UI keymap
         fold_style = "nvim",             -- "nvim" | "fillchar" | "count" | "preview" | "detailed"
-        fillchar = "-",
-        custom_foldtext = nil,
+        fillchar = "-",                  -- foldtext fillchar (see "fold" in `:h fillchars`)
+        custom_foldtext = nil,           -- function used to define foldtext (`:h 'foldtext'`)
     },
     icons = {
         nerd_font = false,     -- set true for default nerd font icons
-        -- if nerd_font == true:
-        -- if nerd_font == false:
+        ...,
     },
     palette = {
         use = "replace",       -- "replace" | "prepend" | "append"
         cycle = "constant",    -- "constant" | "random"
-        colors = { dark = { ... }, light = { ... } },
-        swatches = { dark = { ... }, light = { ... } },
+        colors = { dark = { ... }, light = { ... } }, -- available colors (hex codes)
+        swatches = { dark = { ... }, light = { ... } }, -- named color shortcuts
     },
     syntax_highlighting = {
-        enabled = true,
-        file_types = { ".log", "text" },
+        enabled = true,                  -- enable built-in log syntax highlighting
+        file_types = { ".log", "text" }, -- file types to enabled syntax highlighting for
     },
 }
 ```
@@ -235,7 +234,7 @@ with the user command `:Candela help` or by pressing `g?` with the UI open.
 
 | Key | Action |
 |-----|--------|
-| `<ESC>` | Close UI |
+| `<ESC>`, `<C-C>` | Close UI |
 | `g?` | Toggle help menu |
 | `<C-H>` | Toggle highlight on pattern |
 | `<C-L>` | Toggle lightbox on pattern |
@@ -275,8 +274,8 @@ vim.keymap.set("n", "<leader>cdh", "<Plug>CandelaHelp")
 ```
 
 ## commands
-See ["candela-commands" in
-`doc/candela.txt`](https://github.com/KieranCanter/candela.nvim/blob/main/doc/candela.txt#L349) for
+See "candela-commands" in
+[`doc/candela.txt`](https://github.com/KieranCanter/candela.nvim/blob/main/doc/candela.txt) for
 more details on each command.
 
 <details>
@@ -304,8 +303,8 @@ more details on each command.
 
 ## api
 
-See ["candela-api" in
-`doc/candela.txt`](https://github.com/KieranCanter/candela.nvim/blob/main/doc/candela.txt#L438) for
+See "candela-api" in
+[`doc/candela.txt`](https://github.com/KieranCanter/candela.nvim/blob/main/doc/candela.txt) for
 more details on each API function.
 
 <details>
@@ -374,6 +373,7 @@ local lightbox = require("candela.lightbox")
 lightbox.open({view})
 lightbox.close()
 lightbox.toggle({view?})
+lightbox.toggle_pattern({regex})
 lightbox.refresh()
 lightbox.update_folds()
 ```
@@ -413,7 +413,7 @@ cdio.clear()
 * **lightbox**: fold-based view showing only matched lines
 * **import/export**: save and load pattern lists
 * **syntax highlighting**: built-in highlighting for common log formats
-* **nerd font support**: auto-detected or configurable
+* **nerd font defaults**: configurable icons with nerd font and non-nerd font default options
 
 ### lightbox
 

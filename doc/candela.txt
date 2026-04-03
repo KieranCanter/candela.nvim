@@ -267,7 +267,7 @@ UI buffer keymaps ~
 You are not left helpless though, as there are pre-set `<Plug>` keymaps
 provided that you may hook into your own key combination (see |<Plug>|).
 
-`<Plug>CandelaUI`:       Toggle UI window.
+`<Plug>CandelaUi`:       Toggle UI window.
 `<Plug>CandelaRefresh`:  Refresh patterns in current buffer.
 `<Plug>CandelaClear`:    Clear all patterns.
 `<Plug>CandelaLightbox`: Toggle lightbox window.
@@ -508,6 +508,12 @@ toggle({view?})                                   *candela.lightbox.toggle()*
 
     Parameters: ~
       • {view?}  (`string?`) Defaults to "system-vsplit".
+
+toggle_pattern({regex})                *candela.lightbox.toggle_pattern()*
+    Toggle a pattern's lightbox state and update the lightbox cache/folds.
+
+    Parameters: ~
+      • {regex}  (`string`) Regex of the pattern to toggle.
 
 refresh()                                        *candela.lightbox.refresh()*
     Refresh the lightbox buffer to match the current base buffer.
