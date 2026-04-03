@@ -105,7 +105,7 @@
 
 local M = {}
 
-M.version = { major = 2, minor = 0, patch = 0, pre = "" }
+M.version = { major = 2, minor = 0, patch = 1, pre = "" }
 M.options = nil
 
 ---@param nerd_font boolean
