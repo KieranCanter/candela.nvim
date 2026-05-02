@@ -42,14 +42,14 @@ That's it. No `setup()` call required — just add the plugin and go.
 INSTALLATION                                            *candela-installation*
 
 You probably know how to use your preferred package manager. The GitHub repo
-is `KieranCanter/candela.nvim`. The `lazy.nvim` snippet is: >lua
+is `kicanter/candela.nvim`. The `lazy.nvim` snippet is: >lua
 
-    { "KieranCanter/candela.nvim" }
+    { "kicanter/candela.nvim" }
 <
 Or with config changes: >lua
 
     {
-        "KieranCanter/candela.nvim",
+        "kicanter/candela.nvim",
         opts = {...},
     }
 <
