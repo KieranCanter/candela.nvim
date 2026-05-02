@@ -38,17 +38,17 @@ that's it.
 ## installation
 
 You probably know how to use your preferred package manager. The GitHub repo
-is `KieranCanter/candela.nvim`.  No `setup()` required e.g. with `lazy.nvim`:
+is `kicanter/candela.nvim`.  No `setup()` required e.g. with `lazy.nvim`:
 
 ```lua
-{ "KieranCanter/candela.nvim" }
+{ "kicanter/candela.nvim" }
 ```
 
 Or with config changes:
 
 ```lua
 {
-    "KieranCanter/candela.nvim",
+    "kicanter/candela.nvim",
     opts = {...},
 }
 ```
@@ -58,7 +58,7 @@ Or with config changes:
 All options are optional. Candela works out of the box with sensible defaults. For lua_ls
 autocomplete in your config, add `---@type Candela.Config` above your `opts` table. See
 "candela-configuration" in
-[`doc/candela.txt`](https://github.com/KieranCanter/candela.nvim/blob/main/doc/candela.txt) for
+[`doc/candela.txt`](https://github.com/kicanter/candela.nvim/blob/main/doc/candela.txt) for
 more info on these options.
 
 ```lua
@@ -275,7 +275,7 @@ vim.keymap.set("n", "<leader>cdh", "<Plug>CandelaHelp")
 
 ## commands
 See "candela-commands" in
-[`doc/candela.txt`](https://github.com/KieranCanter/candela.nvim/blob/main/doc/candela.txt) for
+[`doc/candela.txt`](https://github.com/kicanter/candela.nvim/blob/main/doc/candela.txt) for
 more details on each command.
 
 <details>
@@ -304,7 +304,7 @@ more details on each command.
 ## api
 
 See "candela-api" in
-[`doc/candela.txt`](https://github.com/KieranCanter/candela.nvim/blob/main/doc/candela.txt) for
+[`doc/candela.txt`](https://github.com/kicanter/candela.nvim/blob/main/doc/candela.txt) for
 more details on each API function.
 
 <details>
@@ -447,7 +447,7 @@ lightbox as well.
 Candela provides a convenient way to import and export patterns should you want to reuse a list of
 commonly used patterns or don't want to have to re-enter a long list when exiting and opening
 Neovim. These patterns exist in the form of a `.lua` file that returns a list of
-[`Candela.Pattern`](https://github.com/KieranCanter/candela.nvim/blob/main/lua/candela/pattern.lua#L1-L6)
+[`Candela.Pattern`](https://github.com/kicanter/candela.nvim/blob/main/lua/candela/pattern.lua#L1-L6)
 data structures.
 
 ```lua
