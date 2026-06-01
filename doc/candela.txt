@@ -228,7 +228,7 @@ for various other color spaces like RGB, HSL, LCH, OKLCH, etc.
                 Table of swatches to their corresponding hex code.
 
                                   *candela-config-syntax-highlighting*
-{syntax_highlight}
+{syntax_highlighting}
 
 • {enabled} `true` | `false`:
         Enable or disable syntax highlighting.
